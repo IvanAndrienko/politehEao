@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model News {
+  id                Int      @id @default(autoincrement())
+  title             String
+  slug              String   @unique
+  shortDescription  String?  @db.Text
+  fullText          String   @db.Text
+  previewImage      String?
+  attachments       String[] // Массив URL файлов/документов
+  images            String[] // Массив URL изображений для новости
+  publishedAt       DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id        Int      @id @default(autoincrement())
+  phone     String?
+  email     String?
+  address   String?
+  vkLink    String?
+  telegram  String?
+  updatedAt DateTime @updatedAt
+}
+
+model Specialty {
+  id            String   @id @default(uuid())
+  code          String   @unique
+  name          String
+  duration      String?
+  form          String?
+  qualification String?
+  budgetPlaces  Int?
+  paidPlaces    Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model RequiredDocument {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ImportantDate {
+  id        String   @id @default(uuid())
+  date      String
+  event     String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdmissionContact {
+  id        String   @id @default(uuid())
+  type      String   // 'phone', 'email', 'address', 'schedule'
+  title     String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Dormitory {
+  id          Int      @id @default(autoincrement())
+  description String?
+  address     String?
+  images      String[] // Массив URL изображений
+  updatedAt   DateTime @updatedAt
+}
+
