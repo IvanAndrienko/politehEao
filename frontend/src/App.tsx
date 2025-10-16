@@ -8,9 +8,13 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminFiles from "./pages/admin/AdminFiles";
 import AdminAdmission from "./pages/admin/AdminAdmission";
+import AdminRaspisanie from "./pages/admin/AdminRaspisanie";
 import NewsList from "./pages/NewsList";
 import NewsDetail from "./pages/NewsDetail";
 import Admission from "./pages/Admission";
+import Students from "./pages/Students";
+import Raspisanie from "./pages/Raspisanie";
+import GroupRaspisanie from "./pages/GroupRaspisanie";
 
 function App() {
   return (
@@ -58,6 +62,11 @@ function App() {
               <AdminAdmission />
             </ProtectedRoute>
           } />
+          <Route path="/admin/raspisanie" element={
+            <ProtectedRoute>
+              <AdminRaspisanie />
+            </ProtectedRoute>
+          } />
           <Route path="/news" element={
             <>
               <Header />
@@ -84,9 +93,34 @@ function App() {
             <>
               <Header />
               <main className="flex-1">
-                <div className="max-w-screen-2xl mx-auto py-6 sm:px-3 lg:px-4">
                   <Admission />
-                </div>
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/students" element={
+            <>
+              <Header />
+              <main className="flex-1">
+                <Students />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/students/raspisanie" element={
+            <>
+              <Header />
+              <main className="flex-1">
+                <Raspisanie />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/students/raspisanie/:groupCode" element={
+            <>
+              <Header />
+              <main className="flex-1">
+                <GroupRaspisanie />
               </main>
               <Footer />
             </>

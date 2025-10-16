@@ -215,7 +215,7 @@ export default function Admission() {
     <div className="min-h-screen bg-gray-50">
       {/* Героическая секция с заголовком */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-none mx-0">
           <div className="text-center">
             <FaGraduationCap className="w-16 h-16 mx-auto mb-6 text-blue-200" />
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Абитуриенту</h1>

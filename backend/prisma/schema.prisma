@@ -92,3 +92,27 @@ model Dormitory {
   updatedAt   DateTime @updatedAt
 }
 
+model StudyGroup {
+  id            String   @id @default(uuid())
+  code          String   @unique
+  name          String
+  fullName      String
+  specialty     String?
+  lessons       Lesson[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Lesson {
+  id            String     @id @default(uuid())
+  groupId       String
+  group         StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  dayOfWeek     Int        // 1-5 (понедельник-пятница)
+  lessonNumber  Int        // 1-5 (номер пары)
+  subject       String
+  teacher       String
+  room          String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+

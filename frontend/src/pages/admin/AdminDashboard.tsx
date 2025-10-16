@@ -177,8 +177,13 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="bg-gray-50 px-5 py-3">
-                    <div className="text-sm text-gray-500">
-                      Скоро...
+                    <div className="text-sm">
+                      <a
+                        href="/admin/raspisanie"
+                        className="font-medium text-blue-600 hover:text-blue-500"
+                      >
+                        Управлять
+                      </a>
                     </div>
                   </div>
                 </div>

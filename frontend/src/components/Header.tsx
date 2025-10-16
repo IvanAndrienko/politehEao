@@ -135,7 +135,7 @@ export default function Header() {
             </div>
             <Link to="/news" className="hover:bg-gray-100 px-4 py-2 rounded-md transition-colors">Новости</Link>
             <Link to="/admission" className="hover:bg-gray-100 px-4 py-2 rounded-md transition-colors">Абитуриенту</Link>
-            <a href="#" className="hover:bg-gray-100 px-4 py-2 rounded-md transition-colors">Студенту</a>
+            <Link to="/students" className="hover:bg-gray-100 px-4 py-2 rounded-md transition-colors">Студенту</Link>
           </nav>
         </div>
       </div>
