@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import {
   FaCalendar,
   FaFileAlt,
@@ -38,26 +39,24 @@ export default function Students() {
     }
   ];
 
-  const announcements = [
-    {
-      title: "Изменения в расписании",
-      date: "15 марта 2024",
-      content: "В связи с производственной практикой занятия группы ИС-21 переносятся на 16:00",
-      urgent: true
-    },
-    {
-      title: "Студенческая конференция",
-      date: "20 марта 2024",
-      content: "Приглашаем студентов к участию в научно-практической конференции 'Молодежь и инновации'",
-      urgent: false
-    },
-    {
-      title: "Медицинский осмотр",
-      date: "25 марта 2024",
-      content: "Студентам 1-2 курсов необходимо пройти плановый медицинский осмотр",
-      urgent: false
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [loadingAnnouncements, setLoadingAnnouncements] = useState(true);
+
+  useEffect(() => {
+    loadAnnouncements();
+  }, []);
+
+  const loadAnnouncements = async () => {
+    try {
+      const response = await fetch('/api/schedule/announcements');
+      const data = await response.json();
+      setAnnouncements(data);
+    } catch (error) {
+      console.error('Error loading announcements:', error);
+    } finally {
+      setLoadingAnnouncements(false);
     }
-  ];
+  };
 
   const upcomingEvents = [
     {
@@ -167,9 +166,9 @@ export default function Students() {
               <h2 className="text-xl font-bold text-gray-900">Объявления</h2>
             </div>
             <div className="space-y-4">
-              {announcements.map((announcement, index) => (
+              {announcements.slice(0, 3).map((announcement: any, index: number) => (
                 <div
-                  key={index}
+                  key={announcement.id || index}
                   className={`p-4 rounded-lg border-l-4 ${
                     announcement.urgent
                       ? 'border-red-500 bg-red-50'
@@ -189,70 +188,36 @@ export default function Students() {
                 </div>
               ))}
             </div>
-            <button className="mt-4 text-blue-600 hover:text-blue-700 font-medium text-sm">
+            <button
+              onClick={() => navigate('/students/anons')}
+              className="mt-4 text-blue-600 hover:text-blue-700 font-medium text-sm"
+            >
               Все объявления →
             </button>
           </div>
 
-          {/* Ближайшие события в Политехническом техникуме */}
+          {/* Студенческие сервисы */}
           <div className="bg-white border rounded-lg p-6">
             <div className="flex items-center mb-4">
-              <FaCalendar className="w-6 h-6 text-green-600 mr-2" />
-              <h2 className="text-xl font-bold text-gray-900">Ближайшие события</h2>
+              <FaGraduationCap className="w-6 h-6 text-green-600 mr-2" />
+              <h2 className="text-xl font-bold text-gray-900">Студенческие сервисы</h2>
             </div>
             <div className="space-y-4">
-              {upcomingEvents.map((event, index) => (
+              {services.map((service, index) => (
                 <div key={index} className="flex items-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-center mr-4">
-                    <div className="text-2xl font-bold text-green-600">{event.date}</div>
-                    <div className="text-xs text-gray-500">{event.month}</div>
+                  <div className="mr-4">
+                    {service.icon}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                    <div className="flex items-center text-sm text-gray-600 mt-1">
-                      <FaClock className="w-4 h-4 mr-1" />
-                      <span className="mr-3">{event.time}</span>
-                      <span>{event.location}</span>
-                    </div>
+                    <h3 className="font-semibold text-gray-900">{service.title}</h3>
+                    <p className="text-sm text-gray-600 mt-1">{service.description}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <button className="mt-4 text-green-600 hover:text-green-700 font-medium text-sm">
-              Календарь событий →
-            </button>
           </div>
         </div>
 
-        {/* Студенческие сервисы */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Студенческие сервисы</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {services.map((service, index) => (
-              <div key={index} className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start mb-4">
-                  <div className="mr-4">{service.icon}</div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{service.title}</h3>
-                    <p className="text-gray-600 mb-4">{service.description}</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {service.links.map((link, linkIndex) => (
-                    <a
-                      key={linkIndex}
-                      href="#"
-                      className="block text-blue-600 hover:text-blue-700 text-sm flex items-center"
-                    >
-                      <FaExternalLinkAlt className="w-4 h-4 mr-2" />
-                      {link}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
 
         {/* Документы и справки */}
         <section className="mb-12 bg-gray-50 py-12 -mx-4 px-4">

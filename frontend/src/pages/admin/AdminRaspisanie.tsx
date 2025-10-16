@@ -45,12 +45,27 @@ export default function AdminRaspisanie() {
     room: ''
   });
 
+  const [lessonErrors, setLessonErrors] = useState({
+    subject: '',
+    teacher: '',
+    room: '',
+    timeConflict: ''
+  });
+
   const timeSlots = {
     1: '9:00–10:30',
     2: '10:40–12:10',
     3: '12:20–13:50',
     4: '14:30–16:00',
     5: '16:10–17:40'
+  };
+
+  const lessonLabels = {
+    1: '1-я пара',
+    2: '2-я пара',
+    3: '3-я пара',
+    4: '4-я пара',
+    5: '5-я пара'
   };
 
   const dayNames = {
@@ -161,6 +176,8 @@ export default function AdminRaspisanie() {
   const handleCreateLesson = async () => {
     if (!selectedGroup) return;
 
+    if (!validateLessonForm()) return;
+
     try {
       const response = await fetch('/api/schedule/lessons', {
         method: 'POST',
@@ -174,6 +191,7 @@ export default function AdminRaspisanie() {
       if (response.ok) {
         setShowLessonModal(false);
         setLessonForm({ dayOfWeek: 1, lessonNumber: 1, subject: '', teacher: '', room: '' });
+        setLessonErrors({ subject: '', teacher: '', room: '', timeConflict: '' });
         loadLessons(selectedGroup.id);
       } else {
         console.error('Failed to create lesson:', response.statusText);
@@ -186,6 +204,8 @@ export default function AdminRaspisanie() {
   const handleUpdateLesson = async () => {
     if (!editingLesson) return;
 
+    if (!validateLessonForm()) return;
+
     try {
       const response = await fetch(`/api/schedule/lessons/${editingLesson.id}`, {
         method: 'PUT',
@@ -197,6 +217,7 @@ export default function AdminRaspisanie() {
         setShowLessonModal(false);
         setEditingLesson(null);
         setLessonForm({ dayOfWeek: 1, lessonNumber: 1, subject: '', teacher: '', room: '' });
+        setLessonErrors({ subject: '', teacher: '', room: '', timeConflict: '' });
         if (selectedGroup) {
           loadLessons(selectedGroup.id);
         }
@@ -242,6 +263,43 @@ export default function AdminRaspisanie() {
     setShowGroupModal(true);
   };
 
+  const validateLessonForm = () => {
+    const errors = {
+      subject: '',
+      teacher: '',
+      room: '',
+      timeConflict: ''
+    };
+
+    if (!lessonForm.subject.trim()) {
+      errors.subject = 'Предмет обязателен для заполнения';
+    }
+
+    if (!lessonForm.teacher.trim()) {
+      errors.teacher = 'Преподаватель обязателен для заполнения';
+    }
+
+    if (!lessonForm.room.trim()) {
+      errors.room = 'Кабинет обязателен для заполнения';
+    }
+
+    // Проверка на конфликт времени
+    if (selectedGroup && lessons.length > 0) {
+      const existingLesson = lessons.find(lesson =>
+        lesson.dayOfWeek === lessonForm.dayOfWeek &&
+        lesson.lessonNumber === lessonForm.lessonNumber &&
+        lesson.id !== editingLesson?.id
+      );
+
+      if (existingLesson) {
+        errors.timeConflict = `В этот день уже есть ${lessonLabels[lessonForm.lessonNumber as keyof typeof lessonLabels]} (${timeSlots[lessonForm.lessonNumber as keyof typeof timeSlots]})`;
+      }
+    }
+
+    setLessonErrors(errors);
+    return !Object.values(errors).some(error => error !== '');
+  };
+
   const openLessonModal = (lesson?: Lesson) => {
     if (lesson) {
       setEditingLesson(lesson);
@@ -256,6 +314,7 @@ export default function AdminRaspisanie() {
       setEditingLesson(null);
       setLessonForm({ dayOfWeek: 1, lessonNumber: 1, subject: '', teacher: '', room: '' });
     }
+    setLessonErrors({ subject: '', teacher: '', room: '', timeConflict: '' });
     setShowLessonModal(true);
   };
 
@@ -390,10 +449,10 @@ export default function AdminRaspisanie() {
                                       <div className="flex items-center space-x-4 mb-2">
                                         <div className="flex items-center text-blue-600 text-sm">
                                           <FaClock className="w-3 h-3 mr-1" />
-                                          <span>{timeSlots[lesson.lessonNumber as keyof typeof timeSlots]}</span>
+                                          <span>{lessonLabels[lesson.lessonNumber as keyof typeof lessonLabels]} ({timeSlots[lesson.lessonNumber as keyof typeof timeSlots]})</span>
                                         </div>
                                         <div className="flex items-center text-gray-500 text-sm">
-                                          <FaMapMarkerAlt className="w-3 h-3 mr-1" />
+                                          <FaMapMarkerAlt className="w-4 h-4 mr-1" />
                                           <span>{lesson.room}</span>
                                         </div>
                                       </div>
@@ -441,8 +500,8 @@ export default function AdminRaspisanie() {
 
           {/* Модальное окно для группы */}
           {showGroupModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-white border border-gray-300 rounded-lg p-6 w-full max-w-md shadow-xl">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   {editingGroup ? 'Редактировать группу' : 'Добавить группу'}
                 </h3>
@@ -512,8 +571,8 @@ export default function AdminRaspisanie() {
 
           {/* Модальное окно для урока */}
           {showLessonModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-white border border-gray-300 rounded-lg p-6 w-full max-w-md shadow-xl">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   {editingLesson ? 'Редактировать урок' : 'Добавить урок'}
                 </h3>
@@ -539,12 +598,13 @@ export default function AdminRaspisanie() {
                       onChange={(e) => setLessonForm({...lessonForm, lessonNumber: parseInt(e.target.value)})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value={1}>1 пара (9:00–10:30)</option>
-                      <option value={2}>2 пара (10:40–12:10)</option>
-                      <option value={3}>3 пара (12:20–13:50)</option>
-                      <option value={4}>4 пара (14:30–16:00)</option>
-                      <option value={5}>5 пара (16:10–17:40)</option>
+                      <option value={1}>1-я пара (9:00–10:30)</option>
+                      <option value={2}>2-я пара (10:40–12:10)</option>
+                      <option value={3}>3-я пара (12:20–13:50)</option>
+                      <option value={4}>4-я пара (14:30–16:00)</option>
+                      <option value={5}>5-я пара (16:10–17:40)</option>
                     </select>
+                    {lessonErrors.timeConflict && <p className="text-red-500 text-xs mt-1">{lessonErrors.timeConflict}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Предмет</label>
@@ -552,9 +612,10 @@ export default function AdminRaspisanie() {
                       type="text"
                       value={lessonForm.subject}
                       onChange={(e) => setLessonForm({...lessonForm, subject: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${lessonErrors.subject ? 'border-red-500' : 'border-gray-300'}`}
                       placeholder="Математика"
                     />
+                    {lessonErrors.subject && <p className="text-red-500 text-xs mt-1">{lessonErrors.subject}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Преподаватель</label>
@@ -562,9 +623,10 @@ export default function AdminRaspisanie() {
                       type="text"
                       value={lessonForm.teacher}
                       onChange={(e) => setLessonForm({...lessonForm, teacher: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${lessonErrors.teacher ? 'border-red-500' : 'border-gray-300'}`}
                       placeholder="Иванов И.И."
                     />
+                    {lessonErrors.teacher && <p className="text-red-500 text-xs mt-1">{lessonErrors.teacher}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Кабинет</label>
@@ -572,9 +634,10 @@ export default function AdminRaspisanie() {
                       type="text"
                       value={lessonForm.room}
                       onChange={(e) => setLessonForm({...lessonForm, room: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${lessonErrors.room ? 'border-red-500' : 'border-gray-300'}`}
                       placeholder="Каб. 101"
                     />
+                    {lessonErrors.room && <p className="text-red-500 text-xs mt-1">{lessonErrors.room}</p>}
                   </div>
                 </div>
                 <div className="flex justify-end space-x-3 mt-6">

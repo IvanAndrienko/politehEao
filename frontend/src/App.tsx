@@ -9,6 +9,7 @@ import AdminNews from "./pages/admin/AdminNews";
 import AdminFiles from "./pages/admin/AdminFiles";
 import AdminAdmission from "./pages/admin/AdminAdmission";
 import AdminRaspisanie from "./pages/admin/AdminRaspisanie";
+import AdminAnons from "./pages/admin/AdminAnons";
 import NewsList from "./pages/NewsList";
 import NewsDetail from "./pages/NewsDetail";
 import Admission from "./pages/Admission";
@@ -65,6 +66,11 @@ function App() {
           <Route path="/admin/raspisanie" element={
             <ProtectedRoute>
               <AdminRaspisanie />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/anons" element={
+            <ProtectedRoute>
+              <AdminAnons />
             </ProtectedRoute>
           } />
           <Route path="/news" element={

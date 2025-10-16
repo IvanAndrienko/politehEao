@@ -116,3 +116,13 @@ model Lesson {
   updatedAt     DateTime   @updatedAt
 }
 
+model Announcement {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   @db.Text
+  date        DateTime @default(now())
+  isUrgent    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

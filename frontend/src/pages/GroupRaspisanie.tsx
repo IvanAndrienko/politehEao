@@ -97,7 +97,7 @@ export default function GroupRaspisanie() {
             </button>
             <div className="text-center flex-1">
               <FaCalendarAlt className={`w-12 h-12 mx-auto mb-4 text-blue-200 transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`} />
-              <h1 className={`text-3xl md:text-4xl font-bold mb-2 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>Группа {groupCode}</h1>
+              <h1 className={`text-3xl md:text-4xl font-bold mb-2 text-white transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>Группа {groupCode}</h1>
               <p className={`text-blue-100 transition-all duration-700 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>{groupInfo.name}</p>
             </div>
             <div className="w-24"></div> {/* Для центрирования */}
@@ -106,11 +106,6 @@ export default function GroupRaspisanie() {
       </div>
 
       <div className={`max-w-screen-2xl mx-auto px-4 py-8 transition-all duration-700 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        {/* Информация о группе */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Информация о группе</h2>
-          <p className="text-gray-600">{groupInfo.specialty}</p>
-        </div>
 
         {/* Расписание по дням в виде таблицы */}
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
@@ -134,7 +129,6 @@ export default function GroupRaspisanie() {
                       <div
                         key={lessonIndex}
                         className="bg-gray-50 border border-gray-100 rounded-md p-2 hover:bg-blue-50 transition-all duration-200 hover:shadow-sm"
-                        style={{ transitionDelay: `${1000 + dayIndex * 100 + lessonIndex * 30}ms` }}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center text-blue-600 text-xs">
@@ -142,7 +136,7 @@ export default function GroupRaspisanie() {
                             <span className="font-medium">{lesson.time}</span>
                           </div>
                           <div className="flex items-center text-gray-500 text-xs">
-                            <FaMapMarkerAlt className="w-2.5 h-2.5 mr-1" />
+                            <FaMapMarkerAlt className="w-3.5 h-3.5 mr-1" />
                             <span>{lesson.room}</span>
                           </div>
                         </div>
