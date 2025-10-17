@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { FaCalendarAlt } from 'react-icons/fa';
+import { FaCalendarAlt, FaArrowLeft } from 'react-icons/fa';
 
 interface StudyGroup {
   id: string;
@@ -12,13 +12,11 @@ interface StudyGroup {
 
 export default function Raspisanie() {
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
   const [groups, setGroups] = useState<StudyGroup[]>([]);
 
   useEffect(() => {
-    // Небольшая задержка для плавного появления
-    const timer = setTimeout(() => setIsVisible(true), 50);
-    return () => clearTimeout(timer);
+    // Скролл к верху страницы при загрузке
+    window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
@@ -50,21 +48,32 @@ export default function Raspisanie() {
   };
 
   return (
-    <div className={`transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+    <div>
       {/* Героическая секция с заголовком */}
-      <div className={`bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16 transition-all duration-700 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <div className="max-w-screen-2xl mx-auto px-4">
           <div className="text-center">
-            <FaCalendarAlt className={`w-16 h-16 mx-auto mb-6 text-blue-200 transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`} />
-            <h1 className={`text-4xl md:text-5xl font-bold mb-4 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>Расписание занятий</h1>
-            <p className={`text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto transition-all duration-700 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <FaCalendarAlt className="w-16 h-16 mx-auto mb-6 text-blue-200" />
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Расписание занятий</h1>
+            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
               Расписание учебных групп Политехнического техникума
             </p>
           </div>
         </div>
       </div>
 
-      <div className={`max-w-screen-2xl mx-auto px-4 py-8 transition-all duration-700 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div className="max-w-screen-2xl mx-auto px-4 py-8">
+        {/* Кнопка назад */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('/students')}
+            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <FaArrowLeft className="w-4 h-4 mr-2" />
+            Назад к студенческому порталу
+          </button>
+        </div>
+
         {/* Описание */}
         <div className="text-center mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Расписание групп</h2>
@@ -79,8 +88,7 @@ export default function Raspisanie() {
           {groups.map((group, index) => (
             <div
               key={index}
-              className={`bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group transform hover:-translate-y-1 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-              style={{ transitionDelay: `${800 + index * 100}ms` }}
+              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group transform hover:-translate-y-1"
               onClick={() => handleGroupClick(group.code)}
             >
               <div className="flex items-center justify-between mb-3">
@@ -104,7 +112,7 @@ export default function Raspisanie() {
         </div>
 
         {/* Дополнительная информация */}
-        <div className={`mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6 transition-all duration-700 delay-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-3">Важная информация</h3>
           <ul className="text-blue-800 space-y-2">
             <li className="flex items-start">

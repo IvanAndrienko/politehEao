@@ -68,7 +68,11 @@ export default function AdminAnons() {
       const response = await fetch('/api/schedule/announcements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify({
+          title: form.title,
+          content: form.content,
+          isUrgent: form.urgent
+        })
       });
 
       if (response.ok) {
@@ -91,7 +95,11 @@ export default function AdminAnons() {
       const response = await fetch(`/api/schedule/announcements/${editingAnnouncement.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify({
+          title: form.title,
+          content: form.content,
+          isUrgent: form.urgent
+        })
       });
 
       if (response.ok) {

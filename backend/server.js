@@ -11,6 +11,7 @@ import uploadRouter from "./src/routes/file-upload-routes.js";
 import filesRouter from "./src/routes/files.js";
 import admissionRouter from "./src/routes/admission.js";
 import scheduleRouter from "./src/routes/schedule.js";
+import studentsRouter from "./src/routes/students.js";
 
 dotenv.config();
 
@@ -117,6 +118,9 @@ app.use('/api/admission', admissionRouter);
 
 // Роуты расписания
 app.use('/api/schedule', scheduleRouter);
+
+// Роуты студенческих сервисов
+app.use('/api/students', studentsRouter);
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`🚀 Сервер запущен: http://localhost:${PORT}`));

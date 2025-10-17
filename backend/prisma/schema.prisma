@@ -126,3 +126,15 @@ model Announcement {
   updatedAt   DateTime @updatedAt
 }
 
+model StudentService {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  url         String?  // URL ссылка для перенаправления
+  icon        String   // Название иконки (например, 'FaHome')
+  order       Int      @default(0) // Порядок отображения
+  isActive    Boolean  @default(true) // Активен ли сервис
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

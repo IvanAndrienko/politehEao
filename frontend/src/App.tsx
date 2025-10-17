@@ -10,10 +10,12 @@ import AdminFiles from "./pages/admin/AdminFiles";
 import AdminAdmission from "./pages/admin/AdminAdmission";
 import AdminRaspisanie from "./pages/admin/AdminRaspisanie";
 import AdminAnons from "./pages/admin/AdminAnons";
+import AdminStudents from "./pages/admin/AdminStudents";
 import NewsList from "./pages/NewsList";
 import NewsDetail from "./pages/NewsDetail";
 import Admission from "./pages/Admission";
 import Students from "./pages/Students";
+import Anons from "./pages/Anons";
 import Raspisanie from "./pages/Raspisanie";
 import GroupRaspisanie from "./pages/GroupRaspisanie";
 
@@ -73,6 +75,11 @@ function App() {
               <AdminAnons />
             </ProtectedRoute>
           } />
+          <Route path="/admin/students" element={
+            <ProtectedRoute>
+              <AdminStudents />
+            </ProtectedRoute>
+          } />
           <Route path="/news" element={
             <>
               <Header />
@@ -109,6 +116,15 @@ function App() {
               <Header />
               <main className="flex-1">
                 <Students />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/students/anons" element={
+            <>
+              <Header />
+              <main className="flex-1">
+                <Anons />
               </main>
               <Footer />
             </>

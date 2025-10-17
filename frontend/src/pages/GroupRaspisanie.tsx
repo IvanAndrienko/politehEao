@@ -23,18 +23,14 @@ interface ScheduleData {
 export default function GroupRaspisanie() {
   const { groupCode } = useParams<{ groupCode: string }>();
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
 
   const [scheduleData, setScheduleData] = useState<ScheduleData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Сбрасываем состояние при изменении группы
-    setIsVisible(false);
     setLoading(true);
     loadSchedule();
-    const timer = setTimeout(() => setIsVisible(true), 50);
-    return () => clearTimeout(timer);
   }, [groupCode]);
 
   const loadSchedule = async () => {
@@ -83,29 +79,29 @@ export default function GroupRaspisanie() {
   }
 
   return (
-    <div className={`transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+    <div>
       {/* Героическая секция с заголовком */}
-      <div className={`bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12 transition-all duration-700 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12">
         <div className="max-w-screen-2xl mx-auto px-4">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => navigate('/students/raspisanie')}
-              className="flex items-center text-blue-200 hover:text-white transition-colors duration-200"
-            >
-              <FaArrowLeft className="w-5 h-5 mr-2" />
-              Назад к группам
-            </button>
-            <div className="text-center flex-1">
-              <FaCalendarAlt className={`w-12 h-12 mx-auto mb-4 text-blue-200 transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`} />
-              <h1 className={`text-3xl md:text-4xl font-bold mb-2 text-white transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>Группа {groupCode}</h1>
-              <p className={`text-blue-100 transition-all duration-700 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>{groupInfo.name}</p>
-            </div>
-            <div className="w-24"></div> {/* Для центрирования */}
+          <div className="text-center">
+            <FaCalendarAlt className="w-12 h-12 mx-auto mb-4 text-blue-200" />
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 text-white">Группа {groupCode}</h1>
+            <p className="text-blue-100">{groupInfo.name}</p>
           </div>
         </div>
       </div>
 
-      <div className={`max-w-screen-2xl mx-auto px-4 py-8 transition-all duration-700 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div className="max-w-screen-2xl mx-auto px-4 py-8">
+        {/* Кнопка назад */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('/students/raspisanie')}
+            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <FaArrowLeft className="w-4 h-4 mr-2" />
+            Назад к группам
+          </button>
+        </div>
 
         {/* Расписание по дням в виде таблицы */}
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
@@ -120,8 +116,7 @@ export default function GroupRaspisanie() {
             {groupInfo.schedule.slice(0, 5).map((daySchedule, dayIndex) => (
               <div
                 key={dayIndex}
-                className={`min-h-[300px] p-4 border-r border-gray-100 last:border-r-0 transition-all duration-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-                style={{ transitionDelay: `${800 + dayIndex * 100}ms` }}
+                className="min-h-[300px] p-4 border-r border-gray-100 last:border-r-0"
               >
                 {daySchedule.lessons.length > 0 ? (
                   <div className="space-y-2">
@@ -159,7 +154,7 @@ export default function GroupRaspisanie() {
         </div>
 
         {/* Дополнительная информация */}
-        <div className={`mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6 transition-all duration-700 delay-1200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-3">Важная информация</h3>
           <ul className="text-blue-800 space-y-2">
             <li className="flex items-start">
