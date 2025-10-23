@@ -11,6 +11,8 @@ import {
   FaGraduationCap,
   FaDownload
 } from 'react-icons/fa';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
 export default function Students() {
   const navigate = useNavigate();
@@ -43,6 +45,8 @@ export default function Students() {
   useEffect(() => {
     loadAnnouncements();
     loadServices();
+    loadDocuments();
+    loadStudentLife();
   }, []);
 
   const loadAnnouncements = async () => {
@@ -69,51 +73,40 @@ export default function Students() {
     }
   };
 
-  const [services, setServices] = useState<any[]>([]);
-  const [loadingServices, setLoadingServices] = useState(true);
-
-  const [documents, setDocuments] = useState([
-    { name: "Справка об обучении", format: "PDF", description: "Для предоставления по месту требования" },
-    { name: "Академическая справка", format: "PDF", description: "С указанием изученных дисциплин и оценок" },
-    { name: "Заявление на академический отпуск", format: "DOC", description: "Форма заявления для оформления отпуска" },
-    { name: "Заявление на перевод", format: "DOC", description: "Для перевода на другую специальность/форму обучения" }
-  ]);
-
-  const [studentLife, setStudentLife] = useState([
-    {
-      title: 'Творческие мероприятия',
-      description: 'Участвуйте в концертах, фестивалях и творческих конкурсах',
-      image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop'
-    },
-    {
-      title: 'Спорт и здоровье',
-      description: 'Спортивные секции, соревнования и турниры для всех желающих',
-      image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop'
-    },
-    {
-      title: 'Волонтерство',
-      description: 'Социальные проекты и волонтерские программы для активных студентов',
-      image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=400&h=300&fit=crop'
-    }
-  ]);
-
-  const [loadingStudentData, setLoadingStudentData] = useState(true);
-
-  useEffect(() => {
-    loadStudentData();
-  }, []);
-
-  const loadStudentData = async () => {
+  const loadDocuments = async () => {
     try {
-      // Здесь будет API вызов для загрузки данных студенческого портала
-      // Пока используем заглушки
-      await new Promise(resolve => setTimeout(resolve, 500)); // Имитация загрузки
+      const response = await fetch('/api/student-documents');
+      const data = await response.json();
+      setDocuments(data);
     } catch (error) {
-      console.error('Error loading student data:', error);
+      console.error('Error loading documents:', error);
+    } finally {
+      setLoadingDocuments(false);
+    }
+  };
+
+  const loadStudentLife = async () => {
+    try {
+      const response = await fetch('/api/student-life');
+      const data = await response.json();
+      setStudentLife(data);
+    } catch (error) {
+      console.error('Error loading student life:', error);
     } finally {
       setLoadingStudentData(false);
     }
   };
+
+  const [services, setServices] = useState<any[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [loadingDocuments, setLoadingDocuments] = useState(true);
+
+  const [studentLife, setStudentLife] = useState<any[]>([]);
+
+  const [loadingStudentData, setLoadingStudentData] = useState(true);
+
 
   return (
     <div>
@@ -133,7 +126,7 @@ export default function Students() {
       <div className="max-w-screen-2xl mx-auto px-4 py-8">
         {/* Быстрый доступ */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Быстрый доступ</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Быстрый доступ</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {quickLinks.map((link, index) => (
             <div
@@ -246,46 +239,84 @@ export default function Students() {
         <section className="mb-12 bg-gray-50 py-12 -mx-4 px-4">
           <div className="max-w-screen-2xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Документы и справки</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {documents.map((doc, index) => (
-                <div key={index} className="bg-white border rounded-lg p-6 flex items-center">
-                  <FaFileAlt className="w-8 h-8 text-blue-600 mr-4 flex-shrink-0" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-1">{doc.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{doc.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        {doc.format}
-                      </span>
-                      <button className="text-blue-600 hover:text-blue-700 text-sm flex items-center">
-                        <FaDownload className="w-4 h-4 mr-1" />
-                        Скачать
-                      </button>
+            {loadingDocuments ? (
+              <p className="text-gray-600 text-center">Загрузка документов...</p>
+            ) : documents.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {documents.map((doc) => (
+                  <div key={doc.id} className="bg-white border rounded-lg p-6 flex items-center">
+                    <FaFileAlt className="w-8 h-8 text-blue-600 mr-4 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">{doc.title}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{doc.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                          {doc.fileType.split('/')[1]?.toUpperCase() || 'FILE'}
+                        </span>
+                        <button
+                          onClick={() => window.open(`/uploads/${doc.fileUrl}`, '_blank')}
+                          className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                        >
+                          <FaDownload className="w-4 h-4 mr-1" />
+                          Скачать
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-600 text-center">Документы не настроены администратором</p>
+            )}
           </div>
         </section>
 
         {/* Студенческая жизнь */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Студенческая жизнь</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Студенческая жизнь</h2>
           {loadingStudentData ? (
-            <p className="text-gray-600">Загрузка данных...</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {studentLife.map((item, index) => (
-                <div key={index} className="text-center">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder-image.png';
-                    }}
-                  />
+            <p className="text-gray-600 text-center">Загрузка данных...</p>
+          ) : studentLife.length > 0 ? (
+            <div className={`grid gap-8 ${studentLife.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : studentLife.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
+              {studentLife.map((item) => (
+                <div key={item.id} className="text-center">
+                  {item.images && item.images.length > 0 ? (
+                    <div className="relative mb-4">
+                      <Swiper
+                        modules={[Navigation, Pagination, Autoplay]}
+                        spaceBetween={10}
+                        slidesPerView={1}
+                        navigation
+                        pagination={{ clickable: true }}
+                        autoplay={{ delay: 3000, disableOnInteraction: false }}
+                        className="student-life-swiper rounded-lg overflow-hidden shadow-lg"
+                      >
+                        {item.images.map((imageUrl: string, index: number) => (
+                          <SwiperSlide key={index}>
+                            <div className="aspect-video">
+                              <img
+                                src={imageUrl}
+                                alt={`${item.title} ${index + 1}`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder-image.png';
+                                }}
+                              />
+                            </div>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                      <style>{`
+                        .student-life-swiper .swiper-button-prev {
+                          transform: scaleX(-1);
+                        }
+                      `}</style>
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
+                      <span className="text-gray-500">Изображения не загружены</span>
+                    </div>
+                  )}
                   <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
                   <p className="text-gray-600 text-sm">
                     {item.description}
@@ -293,40 +324,9 @@ export default function Students() {
                 </div>
               ))}
             </div>
+          ) : (
+            <p className="text-gray-600 text-center">Мероприятия не настроены администратором</p>
           )}
-        </section>
-
-        {/* Контакты поддержки */}
-        <section className="bg-blue-900 text-white py-12 -mx-4 px-4 rounded-lg">
-          <div className="max-w-screen-2xl mx-auto text-center">
-            <h2 className="text-2xl font-bold mb-6">Нужна помощь?</h2>
-            <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
-              Наши специалисты готовы помочь вам решить любые вопросы, связанные с обучением и студенческой жизнью
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h3 className="font-semibold mb-2">Деканат</h3>
-                <p className="text-blue-100 text-sm">
-                  Вопросы по учебному процессу<br />
-                  Кабинет 201, тел. +7 (XXX) XXX-XX-XX
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Студенческий отдел</h3>
-                <p className="text-blue-100 text-sm">
-                  Стипендии, социальная поддержка<br />
-                  Кабинет 105, тел. +7 (XXX) XXX-XX-XX
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Психологическая служба</h3>
-                <p className="text-blue-100 text-sm">
-                  Консультации и поддержка<br />
-                  Кабинет 301, тел. +7 (XXX) XXX-XX-XX
-                </p>
-              </div>
-            </div>
-          </div>
         </section>
       </div>
     </div>

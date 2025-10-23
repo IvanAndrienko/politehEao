@@ -138,3 +138,27 @@ model StudentService {
   updatedAt   DateTime @updatedAt
 }
 
+model StudentDocument {
+  id          String   @id @default(uuid())
+  title       String   // Название документа
+  description String?  // Описание
+  fileUrl     String   // Путь к файлу в uploads/documents/
+  fileName    String   // Оригинальное имя файла
+  fileSize    Int      // Размер файла в байтах
+  fileType    String   // MIME тип файла
+  category    String?  // Категория документа (справки, заявления и т.д.)
+  isActive    Boolean  @default(true) // Активен ли документ
+  order       Int      @default(0)    // Порядок отображения
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StudentLifeItem {
+  id          String   @id @default(uuid())
+  title       String   // Название мероприятия/активности
+  description String   // Описание
+  images      String[] // Массив имен файлов изображений
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

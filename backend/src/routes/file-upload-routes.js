@@ -94,4 +94,22 @@ router.post('/dormitory/images', uploadImages.array('files', 10), (req, res) => 
   }
 });
 
+// Загрузка изображений для студенческой жизни
+router.post('/student-life/images', uploadImages.array('files', 10), (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'Файлы не загружены' });
+    }
+
+    const filenames = req.files.map(file => file.filename);
+
+    res.json({
+      filenames
+    });
+  } catch (error) {
+    console.error('Ошибка загрузки изображений студенческой жизни:', error);
+    res.status(500).json({ message: 'Ошибка загрузки файлов' });
+  }
+});
+
 export default router;

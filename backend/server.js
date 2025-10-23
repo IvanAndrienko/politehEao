@@ -12,6 +12,8 @@ import filesRouter from "./src/routes/files.js";
 import admissionRouter from "./src/routes/admission.js";
 import scheduleRouter from "./src/routes/schedule.js";
 import studentsRouter from "./src/routes/students.js";
+import studentDocumentsRouter from "./src/routes/student-documents.js";
+import studentLifeRouter from "./src/routes/student-life.js";
 
 dotenv.config();
 
@@ -121,6 +123,12 @@ app.use('/api/schedule', scheduleRouter);
 
 // Роуты студенческих сервисов
 app.use('/api/students', studentsRouter);
+
+// Роуты документов для студентов
+app.use('/api/student-documents', studentDocumentsRouter);
+
+// Роуты студенческой жизни
+app.use('/api/student-life', studentLifeRouter);
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`🚀 Сервер запущен: http://localhost:${PORT}`));

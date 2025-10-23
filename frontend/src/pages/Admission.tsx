@@ -449,7 +449,7 @@ export default function Admission() {
                         navigation
                         pagination={{ clickable: true }}
                         autoplay={{ delay: 5000, disableOnInteraction: false }}
-                        className="rounded-lg overflow-hidden shadow-lg"
+                        className="dormitory-swiper rounded-lg overflow-hidden shadow-lg"
                       >
                         {dormitory.images.map((image, index) => (
                           <SwiperSlide key={index}>
@@ -480,6 +480,11 @@ export default function Admission() {
                           </SwiperSlide>
                         ))}
                       </Swiper>
+                      <style>{`
+                        .dormitory-swiper .swiper-button-prev {
+                          transform: scaleX(-1);
+                        }
+                      `}</style>
                     </div>
                   )}
                 </div>
