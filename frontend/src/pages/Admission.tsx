@@ -481,8 +481,7 @@ export default function Admission() {
                         ))}
                       </Swiper>
                       <style>{`
-                        .dormitory-swiper .swiper-button-prev {
-                          transform: scaleX(-1);
+                        .dormitory-swiper .swiper-button-prev
                         }
                       `}</style>
                     </div>

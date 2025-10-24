@@ -13,6 +13,7 @@ import admissionRouter from "./src/routes/admission.js";
 import scheduleRouter from "./src/routes/schedule.js";
 import studentsRouter from "./src/routes/students.js";
 import studentDocumentsRouter from "./src/routes/student-documents.js";
+import homeSliderRouter from "./src/routes/home-slider.js";
 import studentLifeRouter from "./src/routes/student-life.js";
 
 dotenv.config();
@@ -129,6 +130,9 @@ app.use('/api/student-documents', studentDocumentsRouter);
 
 // Роуты студенческой жизни
 app.use('/api/student-life', studentLifeRouter);
+
+// Роуты слайдера главной страницы
+app.use('/api/home-slider', homeSliderRouter);
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`🚀 Сервер запущен: http://localhost:${PORT}`));

@@ -153,6 +153,18 @@ model StudentDocument {
   updatedAt   DateTime @updatedAt
 }
 
+model HomeSlider {
+  id          String   @id @default(uuid())
+  title       String   // Заголовок слайда
+  subtitle    String?  // Подзаголовок
+  imageUrl    String   // URL изображения
+  link        String?  // Ссылка при клике
+  order       Int      @default(0) // Порядок отображения
+  isActive    Boolean  @default(true) // Активен ли слайд
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model StudentLifeItem {
   id          String   @id @default(uuid())
   title       String   // Название мероприятия/активности

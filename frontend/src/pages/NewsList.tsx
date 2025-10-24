@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { FaCalendar } from 'react-icons/fa';
 
 // Компонент для безопасного отображения изображений
@@ -98,10 +97,14 @@ export default function NewsList() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-8">
           {news.map((item) => (
-            <article key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <article
+              key={item.id}
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => window.location.href = `/news/${item.slug}`}
+            >
               {/* Изображение */}
               {item.previewImage && (
-                <div className="h-48 overflow-hidden">
+                <div className="h-64 overflow-hidden">
                   <SafeImage
                     src={`http://localhost:5000${item.previewImage}`}
                     alt={item.title}
@@ -112,10 +115,8 @@ export default function NewsList() {
 
               {/* Содержимое */}
               <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
-                  <Link to={`/news/${item.slug}`} className="hover:text-blue-600 transition-colors">
-                    {item.title}
-                  </Link>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2 hover:text-blue-600 transition-colors">
+                  {item.title}
                 </h2>
 
                 {item.shortDescription && (
@@ -128,19 +129,6 @@ export default function NewsList() {
                 <div className="flex items-center text-sm text-gray-500">
                   <FaCalendar className="mr-2" />
                   {formatDate(item.publishedAt)}
-                </div>
-
-                {/* Кнопка "Читать далее" */}
-                <div className="mt-4">
-                  <Link
-                    to={`/news/${item.slug}`}
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    Читать далее
-                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
                 </div>
               </div>
             </article>

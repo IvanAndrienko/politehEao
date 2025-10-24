@@ -332,7 +332,7 @@ export default function AdminNews() {
                   <div className="mt-2 grid grid-cols-4 gap-2">
                     {formData.images.map((image, index) => (
                       <div key={index} className="relative">
-                        <img src={`$image}`} alt={`Image ${index + 1}`} className="w-full h-20 object-cover rounded" />
+                        <img src={`${image}`} alt={`Image ${index + 1}`} className="w-full h-20 object-cover rounded" />
                         <button
                           type="button"
                           onClick={() => removeFile('images', index)}

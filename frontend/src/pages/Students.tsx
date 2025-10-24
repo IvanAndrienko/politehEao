@@ -307,9 +307,7 @@ export default function Students() {
                         ))}
                       </Swiper>
                       <style>{`
-                        .student-life-swiper .swiper-button-prev {
-                          transform: scaleX(-1);
-                        }
+                        .student-life-swiper .swiper-button-prev
                       `}</style>
                     </div>
                   ) : (
