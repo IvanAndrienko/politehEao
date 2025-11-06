@@ -123,7 +123,8 @@ export default function GroupRaspisanie() {
                     {daySchedule.lessons.map((lesson, lessonIndex) => (
                       <div
                         key={lessonIndex}
-                        className="bg-gray-50 border border-gray-100 rounded-md p-2 hover:bg-blue-50 transition-all duration-200 hover:shadow-sm"
+                        className="bg-gray-50 border border-gray-100 rounded-md p-2 hover:bg-blue-50 transition-all duration-200 hover:shadow-sm animate-slide-up"
+                        style={{ animationDelay: `${(dayIndex * 5 + lessonIndex) * 100}ms` }}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center text-blue-600 text-xs">

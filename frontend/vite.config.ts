@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), svgr()],
   server: {
     port: 3000,
+    host: true,
     proxy: {
       // все запросы к /api будут проксироваться на бэкенд
       '/api': 'http://localhost:5000',

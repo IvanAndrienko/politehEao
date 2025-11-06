@@ -96,10 +96,11 @@ export default function NewsList() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-8">
-          {news.map((item) => (
+          {news.map((item, index) => (
             <article
               key={item.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow animate-slide-up cursor-pointer"
+              style={{ animationDelay: `${index * 150}ms` }}
               onClick={() => window.location.href = `/news/${item.slug}`}
             >
               {/* Изображение */}

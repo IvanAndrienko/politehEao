@@ -1,48 +1,207 @@
-import { FaFileAlt } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaFileAlt, FaDownload } from 'react-icons/fa';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export default function Documents() {
+  const [documents, setDocuments] = useState({
+    ustavDocLink: '',
+    localActStud: '',
+    localActOrder: '',
+    localActCollec: '',
+    reportEduDocLink: '',
+    prescriptionDocLink: '',
+    priemDocLink: '',
+    modeDocLink: '',
+    tekKontrolDocLink: '',
+    perevodDocLink: '',
+    vozDocLink: ''
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDocuments();
+  }, []);
+
+  const loadDocuments = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/documents`);
+      if (response.ok) {
+        const data = await response.json();
+        setDocuments(data.documents || {});
+      }
+    } catch (error) {
+      console.error('Error loading documents:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const documentList = [
+    {
+      title: 'Устав образовательной организации',
+      key: 'ustavDocLink',
+      description: 'Основной документ, определяющий статус и деятельность образовательной организации',
+      required: true
+    },
+    {
+      title: 'Правила внутреннего распорядка обучающихся',
+      key: 'localActStud',
+      description: 'Правила поведения и внутреннего распорядка для обучающихся',
+      required: true
+    },
+    {
+      title: 'Правила внутреннего трудового распорядка',
+      key: 'localActOrder',
+      description: 'Правила трудового распорядка для работников организации',
+      required: true
+    },
+    {
+      title: 'Коллективный договор',
+      key: 'localActCollec',
+      description: 'Соглашение между работниками и работодателем',
+      required: false
+    },
+    {
+      title: 'Отчёт о результатах самообследования',
+      key: 'reportEduDocLink',
+      description: 'Результаты внутренней оценки деятельности организации',
+      required: true
+    },
+    {
+      title: 'Предписания органов государственного контроля',
+      key: 'prescriptionDocLink',
+      description: 'Предписания контролирующих органов и отчёты об их исполнении',
+      required: false
+    },
+    {
+      title: 'Правила приёма обучающихся',
+      key: 'priemDocLink',
+      description: 'Порядок и условия приёма в образовательную организацию',
+      required: true
+    },
+    {
+      title: 'Режим занятий обучающихся',
+      key: 'modeDocLink',
+      description: 'Расписание и режим учебных занятий',
+      required: true
+    },
+    {
+      title: 'Формы, периодичность и порядок текущего контроля успеваемости',
+      key: 'tekKontrolDocLink',
+      description: 'Порядок проведения текущего контроля знаний обучающихся',
+      required: true
+    },
+    {
+      title: 'Порядок и основания перевода, отчисления и восстановления обучающихся',
+      key: 'perevodDocLink',
+      description: 'Правила перевода между курсами, отчисления и восстановления',
+      required: true
+    },
+    {
+      title: 'Порядок оформления отношений между организацией и обучающимися',
+      key: 'vozDocLink',
+      description: 'Порядок заключения, изменения и прекращения договоров об образовании',
+      required: true
+    }
+  ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Загрузка документов...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Документы</h2>
 
-      <div className="text-center py-12">
-        <FaFileAlt className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Документы в разработке</h3>
-        <p className="text-gray-600">Раздел с документами техникума будет добавлен в ближайшее время</p>
-      </div>
-
-      {/* Пример структуры для будущих документов */}
-      {/*
-      <div className="space-y-4">
-        <div className="bg-white border rounded-lg p-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <FaFileAlt className="w-8 h-8 text-blue-600 mr-4" />
-            <div>
-              <h3 className="font-semibold text-gray-900">Устав образовательной организации</h3>
-              <p className="text-sm text-gray-600">PDF, 2.5 MB</p>
-            </div>
+      <div className="space-y-6">
+        {/* Основные документы */}
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="px-6 py-4 bg-blue-600 text-white">
+            <h3 className="text-lg font-medium">Основные документы</h3>
+            <p className="text-sm opacity-90">Обязательные документы образовательной организации</p>
           </div>
-          <button className="flex items-center text-blue-600 hover:text-blue-700">
-            <FaDownload className="w-4 h-4 mr-2" />
-            Скачать
-          </button>
+          <div className="divide-y divide-gray-200">
+            {documentList.slice(0, 6).map((doc) => (
+              <div key={doc.key} className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 flex items-center">
+                    {doc.title}
+                    {doc.required && <span className="text-red-500 ml-1">*</span>}
+                  </h4>
+                  <p className="text-sm text-gray-600 mt-1">{doc.description}</p>
+                </div>
+                <div className="ml-4">
+                  {documents[doc.key as keyof typeof documents] ? (
+                    <a
+                      href={`${API_URL}/uploads/${documents[doc.key as keyof typeof documents]}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                      itemProp={doc.key}
+                      download
+                    >
+                      <FaDownload className="w-4 h-4 mr-2" />
+                      Скачать
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 text-sm">
+                      {doc.key === 'prescriptionDocLink' ? 'Предписаний нет' : 'Документ отсутствует'}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="bg-white border rounded-lg p-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <FaFileAlt className="w-8 h-8 text-green-600 mr-4" />
-            <div>
-              <h3 className="font-semibold text-gray-900">Лицензия на осуществление образовательной деятельности</h3>
-              <p className="text-sm text-gray-600">PDF, 1.2 MB</p>
-            </div>
+        {/* Локальные нормативные акты */}
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="px-6 py-4 bg-green-600 text-white">
+            <h3 className="text-lg font-medium">Локальные нормативные акты</h3>
+            <p className="text-sm opacity-90">Документы, регламентирующие образовательную деятельность</p>
           </div>
-          <button className="flex items-center text-blue-600 hover:text-blue-700">
-            <FaDownload className="w-4 h-4 mr-2" />
-            Скачать
-          </button>
+          <div className="divide-y divide-gray-200">
+            {documentList.slice(6).map((doc) => (
+              <div key={doc.key} className="px-6 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 flex items-center">
+                    {doc.title}
+                    {doc.required && <span className="text-red-500 ml-1">*</span>}
+                  </h4>
+                  <p className="text-sm text-gray-600 mt-1">{doc.description}</p>
+                </div>
+                <div className="ml-4">
+                  {documents[doc.key as keyof typeof documents] ? (
+                    <a
+                      href={`${API_URL}/uploads/${documents[doc.key as keyof typeof documents]}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                      itemProp={doc.key}
+                      download
+                    >
+                      <FaDownload className="w-4 h-4 mr-2" />
+                      Скачать
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 text-sm">
+                      {doc.key === 'prescriptionDocLink' ? 'Предписаний нет' : 'Документ отсутствует'}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-      */}
     </div>
   );
 }

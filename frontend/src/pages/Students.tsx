@@ -125,7 +125,7 @@ export default function Students() {
 
       <div className="max-w-screen-2xl mx-auto px-4 py-8">
         {/* Быстрый доступ */}
-        <section className="mb-12">
+        <section className="mb-12 animate-slide-up animation-delay-200">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Быстрый доступ</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {quickLinks.map((link, index) => (
@@ -136,7 +136,8 @@ export default function Students() {
                   navigate('/students/raspisanie');
                 }
               }}
-              className={`${link.color} text-white p-6 rounded-lg transition-colors block cursor-pointer hover:shadow-lg`}
+              className={`${link.color} text-white p-6 rounded-lg transition-colors block cursor-pointer hover:shadow-lg animate-slide-up`}
+              style={{ animationDelay: `${200 + index * 100}ms` }}
             >
               <div className="flex items-center mb-3">
                 {link.icon}
@@ -151,7 +152,7 @@ export default function Students() {
         {/* Объявления и события */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Объявления для студентов Политехнического техникума */}
-          <div className="bg-white border rounded-lg p-6">
+          <div className="bg-white border rounded-lg p-6 animate-slide-up animation-delay-400">
             <div className="flex items-center mb-4">
               <FaBell className="w-6 h-6 text-blue-600 mr-2" />
               <h2 className="text-xl font-bold text-gray-900">Объявления</h2>
@@ -196,7 +197,7 @@ export default function Students() {
           </div>
 
           {/* Студенческие сервисы */}
-          <div className="bg-white border rounded-lg p-6">
+          <div className="bg-white border rounded-lg p-6 animate-slide-up animation-delay-600">
             <div className="flex items-center mb-4">
               <FaGraduationCap className="w-6 h-6 text-green-600 mr-2" />
               <h2 className="text-xl font-bold text-gray-900">Студенческие сервисы</h2>
@@ -236,15 +237,15 @@ export default function Students() {
 
 
         {/* Документы и справки */}
-        <section className="mb-12 bg-gray-50 py-12 -mx-4 px-4">
+        <section className="mb-12 bg-gray-50 py-12 -mx-4 px-4 animate-slide-up animation-delay-800">
           <div className="max-w-screen-2xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Документы и справки</h2>
             {loadingDocuments ? (
               <p className="text-gray-600 text-center">Загрузка документов...</p>
             ) : documents.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {documents.map((doc) => (
-                  <div key={doc.id} className="bg-white border rounded-lg p-6 flex items-center">
+                {documents.map((doc, index) => (
+                  <div key={doc.id} className="bg-white border rounded-lg p-6 flex items-center animate-slide-up" style={{ animationDelay: `${800 + index * 100}ms` }}>
                     <FaFileAlt className="w-8 h-8 text-blue-600 mr-4 flex-shrink-0" />
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 mb-1">{doc.title}</h3>
@@ -272,14 +273,14 @@ export default function Students() {
         </section>
 
         {/* Студенческая жизнь */}
-        <section className="mb-12">
+        <section className="mb-12 animate-slide-up animation-delay-1000">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Студенческая жизнь</h2>
           {loadingStudentData ? (
             <p className="text-gray-600 text-center">Загрузка данных...</p>
           ) : studentLife.length > 0 ? (
             <div className={`grid gap-8 ${studentLife.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : studentLife.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
-              {studentLife.map((item) => (
-                <div key={item.id} className="text-center">
+              {studentLife.map((item, index) => (
+                <div key={item.id} className="text-center animate-slide-up" style={{ animationDelay: `${1000 + index * 200}ms` }}>
                   {item.images && item.images.length > 0 ? (
                     <div className="relative mb-4">
                       <Swiper

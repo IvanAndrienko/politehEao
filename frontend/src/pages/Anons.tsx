@@ -77,11 +77,12 @@ export default function Anons() {
             {announcements.length > 0 ? announcements.map((announcement: any, index: number) => (
               <div
                 key={announcement.id || index}
-                className={`p-6 rounded-lg border-l-4 ${
+                className={`p-6 rounded-lg border-l-4 animate-slide-up ${
                   announcement.urgent
                     ? 'border-red-500 bg-red-50'
                     : 'border-blue-500 bg-blue-50'
                 }`}
+                style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-lg font-semibold text-gray-900">{announcement.title}</h3>
@@ -92,7 +93,7 @@ export default function Anons() {
                     </span>
                   )}
                 </div>
-                <p className="text-gray-700 mb-3 leading-relaxed">{announcement.content}</p>
+                <p className="text-gray-700 mb-3 leading-relaxed whitespace-pre-line break-words">{announcement.content}</p>
                 <div className="text-sm text-gray-500 border-t pt-2">
                   Опубликовано: {announcement.date}
                 </div>

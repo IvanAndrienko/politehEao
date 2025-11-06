@@ -14,6 +14,7 @@ datasource db {
 }
 
 model News {
+  // Новости сайта
   id                Int      @id @default(autoincrement())
   title             String
   slug              String   @unique
@@ -28,6 +29,7 @@ model News {
 }
 
 model Admin {
+  // Администраторы системы
   id        Int      @id @default(autoincrement())
   username  String   @unique
   password  String
@@ -35,6 +37,7 @@ model Admin {
 }
 
 model SiteSettings {
+  // Настройки сайта (контакты, соцсети)
   id        Int      @id @default(autoincrement())
   phone     String?
   email     String?
@@ -45,6 +48,7 @@ model SiteSettings {
 }
 
 model Specialty {
+  // Специальности для поступления
   id            String   @id @default(uuid())
   code          String   @unique
   name          String
@@ -58,6 +62,7 @@ model Specialty {
 }
 
 model RequiredDocument {
+  // Документы для поступления
   id          String   @id @default(uuid())
   title       String
   description String?
@@ -67,6 +72,7 @@ model RequiredDocument {
 }
 
 model ImportantDate {
+  // Важные даты поступления
   id        String   @id @default(uuid())
   date      String
   event     String
@@ -76,6 +82,7 @@ model ImportantDate {
 }
 
 model AdmissionContact {
+  // Контакты для поступления
   id        String   @id @default(uuid())
   type      String   // 'phone', 'email', 'address', 'schedule'
   title     String
@@ -128,8 +135,8 @@ model Announcement {
 
 model StudentService {
   id          String   @id @default(uuid())
-  title       String
-  description String
+  title       String   // Название мероприятия/активности
+  description String   // Описание
   url         String?  // URL ссылка для перенаправления
   icon        String   // Название иконки (например, 'FaHome')
   order       Int      @default(0) // Порядок отображения
@@ -153,6 +160,41 @@ model StudentDocument {
   updatedAt   DateTime @updatedAt
 }
 
+model OrganizationInfo {
+  id                    Int      @id @default(autoincrement())
+  fullName              String   // Полное наименование
+  shortName             String   // Сокращенное наименование
+  creationDate          String   // Дата создания
+  founderName           String   // Наименование учредителя
+  founderAddress        String   // Адрес учредителя
+  founderPhone          String   // Телефон учредителя
+  founderEmail          String   // Email учредителя
+  founderWebsite        String   // Сайт учредителя
+  legalAddress          String   // Юридический адрес
+  actualAddress         String   // Фактический адрес
+  dormitoryAddress      String   // Адрес общежития
+  workSchedule          String   // Режим работы
+  directorName          String   // ФИО директора
+  directorPhone         String   // Телефон директора
+  deputyDirectorPhone   String   // Телефон зам. директора
+  educationPhone        String   // Телефон учебной части
+  hrPhone               String   // Телефон отдела кадров
+  accountingPhone       String   // Телефон бухгалтерии
+  email                 String   // Email организации
+  website               String   // Официальный сайт
+  activityAddress       String   // Место осуществления деятельности
+  accreditationSeries   String   // Серия свидетельства аккредитации
+  accreditationNumber   String   // Номер свидетельства аккредитации
+  accreditationRegNum   String   // Регистрационный номер аккредитации
+  accreditationDate     String   // Дата выдачи аккредитации
+  accreditationExpiry   String   // Срок действия аккредитации
+  licenseSeries         String   // Серия лицензии
+  licenseNumber         String   // Номер лицензии
+  licenseExpiry         String   // Срок действия лицензии
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
 model HomeSlider {
   id          String   @id @default(uuid())
   title       String   // Заголовок слайда
@@ -173,4 +215,519 @@ model StudentLifeItem {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Structure {
+  id                    Int       @id @default(autoincrement())
+  managementInfo        String?  // Руководитель
+  managementInfo2       String?  // Коллегиальные органы управления
+  managementLocation    String?  // Место нахождения органов управления
+  managementContacts    String?  // Контакты органов управления
+  hasFilials           Boolean   @default(false)
+  filials              String[] // Массив филиалов (JSON строки)
+  hasRepresentatives   Boolean   @default(false)
+  representatives      String[] // Массив представительств (JSON строки)
+  departments          Department[]
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+}
+
+model Department {
+  id            String     @id @default(uuid())
+  structureId   Int
+  structure     Structure  @relation(fields: [structureId], references: [id], onDelete: Cascade)
+  name          String     // Наименование органа управления / структурного подразделения
+  fio           String     // ФИО руководителя
+  post          String     // Должность руководителя
+  phone         String?    // Контактный телефон
+  address       String     // Адрес местонахождения
+  site          String     // Адрес официального сайта
+  email         String     // Адреса электронной почты
+  document      String?    // Положение об органе управления/ о структурном подразделении
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model StructureDocument {
+  id          String   @id @default(uuid())
+  title       String   // Название документа
+  description String?  // Описание документа
+  fileUrl     String   // Путь к файлу
+  fileName    String   // Оригинальное имя файла
+  fileSize    Int      // Размер файла в байтах
+  fileType    String   // MIME тип файла
+  isActive    Boolean  @default(true) // Активен ли документ
+  order       Int      @default(0) // Порядок отображения
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Document {
+  id          String   @id @default(uuid())
+  field       String   @unique // Поле документа (ustavDocLink, localActStud и т.д.)
+  fileUrl     String   // Путь к файлу
+  fileName    String   // Оригинальное имя файла
+  fileSize    Int      // Размер файла в байтах
+  fileType    String   // MIME тип файла
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model EducationalProgram {
+  id            String   @id @default(uuid())
+  code          String   // Код, шифр программы
+  name          String   // Наименование программы
+  level         String   // Уровень образования
+  program       String   // Образовательная программа
+  form          String   // Формы обучения
+  description   String?  // Описание программы
+  curriculum    String?  // Учебный план
+  workPrograms  String?  // Рабочие программы
+  schedule      String?  // Календарный график
+  practices     String?  // Практики
+  documents     String?  // Методические документы
+  order         Int      @default(0) // Порядок отображения
+  isActive      Boolean  @default(true) // Активна ли программа
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+
+// === РАЗДЕЛ "ОБРАЗОВАНИЕ" В "СВЕДЕНИЯХ ОБ ОРГАНИЗАЦИИ" ===
+
+// Модель для основной информации о реализуемых уровнях образования (Таблица 3.5.2)
+model EducationProgram {
+  id            String   @id @default(uuid())
+  code          String   // Код, шифр
+  name          String   // Наименование профессии, специальности, направления подготовки
+  program       String   // Образовательная программа, направленность, профиль
+  level         String   // Уровень образования
+  form          String   // Формы обучения
+  term          String   // Нормативный срок обучения
+  subjects      String   // Учебные предметы, курсы, дисциплины
+  practices     String   // Практики
+  order         Int      @default(0) // Порядок отображения
+  isActive      Boolean  @default(true) // Активна ли программа
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Модель для детальной информации об образовательных программах (Таблица 3.5.6)
+model EducationalProgramDetail {
+  id                  String   @id @default(uuid())
+  code                String   // Код, шифр
+  name                String   // Наименование профессии, специальности, направления подготовки
+  level               String   // Уровень образования
+  program             String   // Образовательная программа, направленность, профиль
+  form                String   // Реализуемые формы обучения
+  descriptionFile     String?  // Файл описания образовательной программы
+  curriculumFile      String?  // Файл учебного плана
+  workProgramsFile    String?  // Файл рабочих программ дисциплин
+  scheduleFile        String?  // Файл календарного учебного графика
+  practicesFile       String?  // Файл рабочих программ практик
+  documentsFile       String?  // Файл методических документов
+  order               Int      @default(0) // Порядок отображения
+  isActive            Boolean  @default(true) // Активна ли программа
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+// Модель для адаптированных образовательных программ (Таблица 3.5.7)
+model AdaptedProgram {
+  id            String   @id @default(uuid())
+  code          String   // Код, шифр
+  name          String   // Наименование профессии, специальности, направления подготовки
+  level         String   // Уровень образования
+  program       String   // Образовательная программа, направленность, профиль
+  form          String   // Реализуемые формы обучения
+  description   String?  // Ссылка на описание образовательной программы
+  curriculum    String?  // Ссылка на учебный план
+  workPrograms  String[] // Массив ссылок на рабочие программы дисциплин
+  schedule      String?  // Ссылка на календарный учебный график
+  practices     String?  // Ссылка на рабочие программы практик
+  documents     String?  // Ссылка на методические документы
+  order         Int      @default(0) // Порядок отображения
+  isActive      Boolean  @default(true) // Активна ли программа
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Модель для научной деятельности (Таблица 3.5.8)
+model ScientificActivity {
+  id            String   @id @default(uuid())
+  code          String   // Код, шифр
+  name          String   // Наименование специальности, направления подготовки
+  directions    String   // Перечень научных направлений
+  program       String   // Образовательная программа, направленность, профиль
+  level         String   // Уровень образования
+  directionName String   // Название научного направления/научной школы
+  results       String   // Результаты научной деятельности
+  base          String   // Научно-исследовательская база
+  order         Int      @default(0) // Порядок отображения
+  isActive      Boolean  @default(true) // Активна ли запись
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Модель для трудоустройства выпускников (Таблица 3.5.9)
+model GraduateEmployment {
+  id            String   @id @default(uuid())
+  code          String   // Код, шифр
+  name          String   // Наименование профессии, специальности, направления подготовки
+  program       String   // Образовательная программа, направленность, профиль
+  graduates     Int      // Количество выпускников
+  employed      Int      // Количество трудоустроенных выпускников
+  year          String   // Учебный год (например, "2023/2024")
+  order         Int      @default(0) // Порядок отображения
+  isActive      Boolean  @default(true) // Активна ли запись
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Модель для хранения ссылок на документы образования
+model EducationDocument {
+  id          String   @id @default(uuid())
+  title       String   // Заголовок документа
+  description String?  // Описание документа
+  fileUrl     String   // Путь к файлу
+  fileName    String   // Оригинальное имя файла
+  fileSize    Int      // Размер файла в байтах
+  fileType    String   // MIME тип файла
+  isActive    Boolean  @default(true) // Активен ли документ
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// === РАЗДЕЛ "ОБРАЗОВАТЕЛЬНЫЕ СТАНДАРТЫ И ТРЕБОВАНИЯ" ===
+
+// Модель для образовательных стандартов и требований
+model EducationalStandard {
+  id            String   @id @default(uuid())
+  code          String   // Код, шифр программы
+  name          String   // Наименование программы
+  level         String   // Уровень образования
+  program       String   // Образовательная программа
+  form          String   // Форма обучения
+  // Федеральные государственные образовательные стандарты
+  fedDocUrl     String?  // Ссылка на ФГОС
+  fedDocName    String?  // Название файла ФГОС
+  // Образовательные стандарты
+  standartDocUrl String? // Ссылка на образовательный стандарт
+  standartDocName String? // Название файла образовательного стандарта
+  // Федеральные государственные требования
+  fedTrebUrl    String?  // Ссылка на ФГТ
+  fedTrebName   String?  // Название файла ФГТ
+  // Самостоятельно устанавливаемые требования
+  standartTrebUrl String? // Ссылка на самостоятельно устанавливаемые требования
+  standartTrebName String? // Название файла самостоятельно устанавливаемых требований
+  order         Int      @default(0) // Порядок отображения
+  isActive      Boolean  @default(true) // Активен ли стандарт
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// === РАЗДЕЛ "РУКОВОДСТВО" ===
+
+// Модель для руководства организации
+model Manager {
+  id        String   @id @default(uuid())
+  fio       String   // ФИО
+  post      String   // Должность
+  telephone String   // Контактные телефоны
+  email     String   // Адреса электронной почты
+  type      String   // Тип: 'director', 'deputy', 'filial'
+  filialName String? // Наименование филиала (для руководителей филиалов)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// === РАЗДЕЛ "ПЕДАГОГИЧЕСКИЙ СОСТАВ" ===
+
+// Модель для педагогического состава
+model Employee {
+  id                      String   @id @default(uuid())
+  fio                     String   // Ф.И.О.
+  post                    String   // Должность
+  disciplines             String   // Перечень преподаваемых дисциплин
+  educationLevel          String   // Уровень профессионального образования, квалификация
+  degree                  String?  // Учёная степень
+  academicTitle           String?  // Учёное звание
+  qualification           String?  // Сведения о повышении квалификации (за последние 3 года)
+  professionalDevelopment String?  // Сведения о профессиональной переподготовке
+  experience              String   // Стаж работы (лет)
+  programs                String   // Наименование образовательных программ
+  order                   Int      @default(0) // Порядок отображения
+  isActive                Boolean  @default(true) // Активен ли сотрудник
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+// === РАЗДЕЛ "ВАКАНТНЫЕ МЕСТА ДЛЯ ПРИЕМА (ПЕРЕВОДА) ОБУЧАЮЩИХСЯ" ===
+
+// Модель для вакантных мест
+model VacantPlace {
+  id                    String   @id @default(uuid())
+  eduCode               String   // Код, шифр группы научных специальностей
+  eduName               String   // Наименование профессии, специальности, направления подготовки
+  eduLevel              String   // Уровень образования
+  eduProf               String?  // Образовательная программа, направленность, профиль
+  eduCourse             Int      // Курс
+  eduForm               String   // Форма обучения
+  numberBFVacant        Int      @default(0) // Количество вакантных мест за счет федерального бюджета
+  numberBRVacant        Int      @default(0) // Количество вакантных мест за счет бюджета субъекта РФ
+  numberBMVacant        Int      @default(0) // Количество вакантных мест за счет местных бюджетов
+  numberPVacant         Int      @default(0) // Количество вакантных мест за счет средств физических/юридических лиц
+  order                 Int      @default(0) // Порядок отображения
+  isActive              Boolean  @default(true) // Активна ли запись
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+// === РАЗДЕЛ "МАТЕРИАЛЬНО-ТЕХНИЧЕСКОЕ ОБЕСПЕЧЕНИЕ" ===
+
+// Модель для оборудованных учебных кабинетов
+model Cabinet {
+  id          String   @id @default(uuid())
+  address     String   // Адрес места нахождения
+  name        String   // Наименование оборудованного учебного кабинета
+  equipment   String   // Оснащенность оборудованного учебного кабинета
+  accessibility String // Приспособленность для использования инвалидами
+  order       Int      @default(0) // Порядок отображения
+  isActive    Boolean  @default(true) // Активен ли кабинет
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Модель для объектов для проведения практических занятий
+model PracticeObject {
+  id          String   @id @default(uuid())
+  address     String   // Адрес места нахождения
+  name        String   // Наименование объекта для проведения практических занятий
+  equipment   String   // Оснащенность объекта для проведения практических занятий
+  accessibility String // Приспособленность для использования инвалидами
+  order       Int      @default(0) // Порядок отображения
+  isActive    Boolean  @default(true) // Активен ли объект
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Модель для библиотек
+model Library {
+  id          String   @id @default(uuid())
+  name        String   // Наименование объекта
+  address     String   // Адрес места нахождения объекта
+  area        Int      // Площадь, м²
+  seats       Int      // Количество мест
+  accessibility String // Приспособленность для использования инвалидами
+  order       Int      @default(0) // Порядок отображения
+  isActive    Boolean  @default(true) // Активна ли библиотека
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Модель для объектов спорта
+model SportObject {
+  id          String   @id @default(uuid())
+  name        String   // Наименование объекта
+  address     String   // Адрес места нахождения объекта
+  area        Int      // Площадь, м²
+  seats       Int      // Количество мест
+  accessibility String // Приспособленность для использования инвалидами
+  order       Int      @default(0) // Порядок отображения
+  isActive    Boolean  @default(true) // Активен ли объект спорта
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Модель для текстовых блоков материально-технического обеспечения
+model ObjectsTextBlock {
+  id        String   @id @default(uuid())
+  blockType String   // Тип блока: 'accessibility', 'facilities', 'adaptedFacilities', 'comNet', 'comNetOvz', 'eios', 'erList', 'erListOvz', 'techOvz', 'hostelInterOvz'
+  content   String   @db.Text // Содержимое блока
+  isActive  Boolean  @default(true) // Активен ли блок
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Модель для информации об общежитиях
+model HostelInfo {
+  id          String   @id @default(uuid())
+  hostels     Int      // Количество общежитий
+  places      Int      // Количество мест
+  adapted     Int      // Количество жилых помещений, приспособленных для инвалидов
+  internats   Int      // Количество интернатов
+  interPlaces Int      // Количество мест в интернатах
+  interAdapted Int     // Количество жилых помещений в интернате, приспособленных для инвалидов
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Модель для документов материально-технического обеспечения
+model ObjectsDocument {
+  id          String   @id @default(uuid())
+  title       String   // Название документа
+  description String?  // Описание документа
+  fileUrl     String   // Путь к файлу
+  fileName    String   // Оригинальное имя файла
+  fileSize    Int      // Размер файла в байтах
+  fileType    String   // MIME тип файла
+  category    String?  // Категория документа
+  isActive    Boolean  @default(true) // Активен ли документ
+  order       Int      @default(0) // Порядок отображения
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// === РАЗДЕЛ "СТИПЕНДИИ И МЕРЫ ПОДДЕРЖКИ ОБУЧАЮЩИХСЯ" ===
+
+// Модель для документов о стипендиях
+model GrantsDocument {
+  id          String   @id @default(uuid())
+  title       String   // Название документа
+  description String?  // Описание документа
+  fileUrl     String   // Путь к файлу
+  fileName    String   // Оригинальное имя файла
+  fileSize    Int      // Размер файла в байтах
+  fileType    String   // MIME тип файла
+  isActive    Boolean  @default(true) // Активен ли документ
+  order       Int      @default(0) // Порядок отображения
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Модель для информации о стипендиях
+model GrantsInfo {
+  id        String   @id @default(uuid())
+  content   String   @db.Text // Содержимое информации о стипендиях
+  isActive  Boolean  @default(true) // Активна ли запись
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Модель для мер социальной поддержки
+model SupportMeasure {
+  id        String   @id @default(uuid())
+  content   String   @db.Text // Содержимое мер поддержки
+  isActive  Boolean  @default(true) // Активна ли запись
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Модель для информации об общежитиях в разделе стипендий
+model GrantsHostelInfo {
+  id          String   @id @default(uuid())
+  hostels     Int      // Количество общежитий
+  places      Int      // Количество мест
+  adapted     Int      // Количество жилых помещений, приспособленных для инвалидов
+  internats   Int      // Количество интернатов
+  interPlaces Int      // Количество мест в интернатах
+  interAdapted Int     // Количество жилых помещений в интернате, приспособленных для инвалидов
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Модель для документов о плате за проживание в общежитии
+model GrantsHostelPaymentDocument {
+  id          String   @id @default(uuid())
+  title       String   // Название документа
+  description String?  // Описание документа
+  fileUrl     String   // Путь к файлу
+  fileName    String   // Оригинальное имя файла
+  fileSize    Int      // Размер файла в байтах
+  fileType    String   // MIME тип файла
+  isActive    Boolean  @default(true) // Активен ли документ
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// === РАЗДЕЛ "ПЛАТНЫЕ ОБРАЗОВАТЕЛЬНЫЕ УСЛУГИ" ===
+
+// Модель для документов о платных образовательных услугах
+model PaidEduDocument {
+  id             String   @id @default(uuid())
+  title          String?  // Название документа
+  description    String?  // Описание документа
+  fileUrl        String?  // Путь к файлу
+  fileName       String?  // Оригинальное имя файла
+  fileSize       Int?     // Размер файла в байтах
+  fileType       String?  // MIME тип файла
+  docType        String   // Тип документа: 'paidEdu', 'paidDog', 'paidSt', 'paidParents'
+  programName    String?  // Название образовательной программы (для paidSt и paidParents)
+  educationLevel String?  // Уровень образования (для paidSt и paidParents)
+  isActive       Boolean  @default(true) // Активен ли документ
+  order          Int      @default(0) // Порядок отображения
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// === РАЗДЕЛ "ФИНАНСОВО-ХОЗЯЙСТВЕННАЯ ДЕЯТЕЛЬНОСТЬ" ===
+
+// Модель для объема образовательной деятельности по источникам финансирования
+model BudgetVolume {
+  id             String   @id @default(uuid())
+  year           Int      // Год отчетности
+  federalBudget  Float?   // Федеральный бюджет (тыс. руб.)
+  regionalBudget Float?   // Бюджет субъекта РФ (тыс. руб.)
+  localBudget    Float?   // Местный бюджет (тыс. руб.)
+  paidServices   Float?   // Платные услуги (тыс. руб.)
+  isActive       Boolean  @default(true) // Активна ли запись
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Модель для поступления и расходования финансовых средств
+model BudgetFlow {
+  id             String   @id @default(uuid())
+  year           Int      // Год отчетности
+  income         String   // Поступившие финансовые и материальные средства
+  expenses       String   // Расходованные финансовые и материальные средства
+  isActive       Boolean  @default(true) // Активна ли запись
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Модель для плана финансово-хозяйственной деятельности
+model BudgetPlan {
+  id          String   @id @default(uuid())
+  title       String   // Название документа
+  description String?  // Описание документа
+  fileUrl     String   // Путь к файлу
+  fileName    String   // Оригинальное имя файла
+  fileSize    Int      // Размер файла в байтах
+  fileType    String   // MIME тип файла
+  isActive    Boolean  @default(true) // Активен ли документ
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+// === РАЗДЕЛ "ОРГАНИЗАЦИЯ ПИТАНИЯ В ОБРАЗОВАТЕЛЬНОЙ ОРГАНИЗАЦИИ" ===
+
+// Модель для объектов питания и охраны здоровья
+model Catering {
+  id          String   @id @default(uuid())
+  type        String   // 'meals' или 'health' - тип объекта (питание или охрана здоровья)
+  name        String   // Наименование объекта
+  address     String   // Адрес места нахождения объекта
+  area        Int      // Площадь объекта, м²
+  seats       Int      // Количество мест
+  accessibility String // Приспособленность для использования инвалидами
+  order       Int      @default(0) // Порядок отображения
+  isActive    Boolean  @default(true) // Активен ли объект
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// === РАЗДЕЛ "МЕЖДУНАРОДНОЕ СОТРУДНИЧЕСТВО" ===
+
+// Модель для международного сотрудничества
+model InternationalCooperation {
+  id        String   @id @default(uuid())
+  stateName String   // Название государства
+  orgName   String   // Наименование организации
+  dogReg    String   // Регистрационный номер договора
+  order     Int      @default(0) // Порядок отображения
+  isActive  Boolean  @default(true) // Активна ли запись
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// === конец РАЗДЕЛ "ОБРАЗОВАНИЕ" В "СВЕДЕНИЯХ ОБ ОРГАНИЗАЦИИ" ===
+// === конец РАЗДЕЛ "ОБРАЗОВАНИЕ" В "СВЕДЕНИЯХ ОБ ОРГАНИЗАЦИИ" ===
 

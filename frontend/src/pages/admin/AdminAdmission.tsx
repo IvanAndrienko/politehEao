@@ -713,7 +713,7 @@ export default function AdminAdmission() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <input
                       type="text"
-                      placeholder="Дата (01.06)"
+                      placeholder="Дата строго в формате: 1 сентября 2025, 19 мая 2026"
                       className="px-3 py-2 border rounded-md"
                       value={editingDate === 'new' ? newDate.date || '' : dates.find(d => d.id === editingDate)?.date || ''}
                       onChange={(e) => {
@@ -771,28 +771,30 @@ export default function AdminAdmission() {
 
               {/* Список дат */}
               <div className="space-y-4">
-                {dates.map((date) => (
-                  <div key={date.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 text-blue-700 font-bold text-lg">{date.date}</div>
-                      <div className="text-gray-700 font-medium">{date.event}</div>
+                {dates.map((date) => {
+                  const dateParts = date.date.split(' ');
+                  const dayMonth = dateParts.slice(0, 2).join(' ');
+                  const year = dateParts[2];
+                  return (
+                    <div key={date.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className="text-center flex-shrink-0 w-24">
+                          <div className="text-blue-700 font-bold text-base leading-tight">{dayMonth}</div>
+                          <div className="text-blue-600 font-semibold text-sm">{year}</div>
+                        </div>
+                        <div className="text-gray-700 font-medium">{date.event}</div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleDeleteDate(date.id)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => setEditingDate(date.id)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteDate(date.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

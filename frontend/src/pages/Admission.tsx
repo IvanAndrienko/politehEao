@@ -238,7 +238,7 @@ export default function Admission() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {admissionSteps.map((step, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
+              <div key={index} className="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300 animate-slide-up" style={{ animationDelay: `${index * 200}ms` }}>
                 <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                   {step.step}
                 </div>
@@ -252,7 +252,7 @@ export default function Admission() {
         {/* Секция с документами и важными датами */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           {/* Необходимые документы */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white rounded-xl shadow-lg p-8 animate-slide-up animation-delay-200">
             <div className="flex items-center mb-6">
               <FaFileAlt className="w-8 h-8 text-blue-600 mr-3" />
               <h3 className="text-2xl font-bold text-gray-900">Необходимые документы</h3>
@@ -273,25 +273,33 @@ export default function Admission() {
           </div>
 
           {/* Важные даты */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white rounded-xl shadow-lg p-8 animate-slide-up animation-delay-400">
             <div className="flex items-center mb-6">
               <FaCalendar className="w-8 h-8 text-blue-600 mr-3" />
               <h3 className="text-2xl font-bold text-gray-900">Важные даты</h3>
             </div>
 
             <div className="space-y-4">
-              {dates.map((item) => (
-                <div key={item.id} className="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                  <div className="w-20 text-blue-700 font-bold text-lg mr-4">{item.date}</div>
-                  <div className="text-gray-700 font-medium">{item.event}</div>
-                </div>
-              ))}
+              {dates.map((item) => {
+                const dateParts = item.date.split(' ');
+                const dayMonth = dateParts.slice(0, 2).join(' ');
+                const year = dateParts[2];
+                return (
+                  <div key={item.id} className="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                    <div className="text-center mr-6 flex-shrink-0 w-28">
+                      <div className="text-blue-700 font-bold text-base leading-tight">{dayMonth}</div>
+                      <div className="text-blue-600 font-semibold text-sm">{year}</div>
+                    </div>
+                    <div className="text-gray-700 font-medium">{item.event}</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
 
         {/* Контакты приемной комиссии и карта */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl p-8 mb-16">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl p-8 mb-16 animate-slide-up animation-delay-600">
           <h3 className="text-3xl font-bold mb-8 text-center">Приемная комиссия</h3>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -360,7 +368,7 @@ export default function Admission() {
         </div>
 
         {/* Таблица специальностей с планом набора */}
-        <div className="mb-16">
+        <div className="mb-16 animate-slide-up animation-delay-800">
           <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Специальности</h3>
 
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -413,7 +421,7 @@ export default function Admission() {
 
         {/* Блок общежития */}
         {(dormitory.description || dormitory.address || dormitory.images.length > 0) && (
-          <div className="mb-16">
+          <div className="mb-16 animate-slide-up animation-delay-1000">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-8">
                 <div className="flex items-center mb-6">

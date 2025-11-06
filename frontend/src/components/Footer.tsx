@@ -38,9 +38,7 @@ export default function Footer() {
           <div className="space-y-4 w-full md:w-[45%]">
             {/* Логотип с инициалами */}
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                <div className="text-white font-bold text-lg">ПТ</div>
-              </div>
+              <img src="/logo-gray.png" alt="Logo" className="w-22 h-22" />
               <div>
                 <h3 className="font-bold text-lg">ОГПОБУ</h3>
                 <p className="text-sm text-gray-300">«Политехнический техникум»</p>
@@ -59,30 +57,30 @@ export default function Footer() {
             <h4 className="font-semibold text-lg">Контактная информация</h4>
             <div className="space-y-3">
               {/* Адрес */}
-              <div className="flex items-start space-x-3">
+              <a
+                href={`https://yandex.ru/maps/?text=${encodeURIComponent(settings.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start space-x-3 hover:text-blue-300 transition-colors"
+              >
                 <FaMapMarkerAlt className="text-blue-400 mt-1 flex-shrink-0" size={18} />
                 <div className="text-sm">
                   <p>{settings.address.split(',')[0]}</p>
                   <p>{settings.address.split(',').slice(1).join(',').trim()}</p>
                 </div>
-              </div>
+              </a>
 
               {/* Телефон */}
-              <div className="flex items-center space-x-3">
+              <a href={`tel:${settings.phone}`} className="flex items-center space-x-3 hover:text-blue-300 transition-colors">
                 <FaPhone className="text-blue-400 flex-shrink-0" size={18} />
                 <p className="text-sm">{settings.phone}</p>
-              </div>
+              </a>
 
               {/* Email */}
-              <div className="flex items-center space-x-3">
+              <a href={`mailto:${settings.email}`} className="flex items-center space-x-3 hover:text-blue-300 transition-colors">
                 <FaEnvelope className="text-blue-400 flex-shrink-0" size={18} />
-                <a
-                  href={`mailto:${settings.email}`}
-                  className="text-sm hover:text-blue-300 transition-colors"
-                >
-                  {settings.email}
-                </a>
-              </div>
+                <p className="text-sm">{settings.email}</p>
+              </a>
             </div>
           </div>
 
