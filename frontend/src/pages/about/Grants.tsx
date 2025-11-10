@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaFileDownload, FaHome, FaMoneyBillWave } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl, assetUrl } from '../../lib/api.ts';
 
 interface GrantsDocument {
   id: string;
@@ -64,11 +63,11 @@ export default function Grants() {
         hostelRes,
         paymentRes
       ] = await Promise.all([
-        fetch(`${API_URL}/api/grants/documents`),
-        fetch(`${API_URL}/api/grants/info`),
-        fetch(`${API_URL}/api/grants/support`),
-        fetch(`${API_URL}/api/grants/hostel-info`),
-        fetch(`${API_URL}/api/grants/hostel-payment-document`)
+        fetch(apiUrl('/api/grants/documents')),
+        fetch(apiUrl('/api/grants/info')),
+        fetch(apiUrl('/api/grants/support')),
+        fetch(apiUrl('/api/grants/hostel-info')),
+        fetch(apiUrl('/api/grants/hostel-payment-document'))
       ]);
 
       if (documentsRes.ok) {
@@ -132,7 +131,7 @@ export default function Grants() {
                 <p className="text-xs text-gray-500">{doc.fileName} ({(doc.fileSize / 1024).toFixed(1)} KB)</p>
               </div>
               <a
-                href={`${API_URL}${doc.fileUrl}`}
+                href={assetUrl(doc.fileUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center"
@@ -239,7 +238,7 @@ export default function Grants() {
         </h3>
         {hostelPaymentDocument ? (
           <a
-            href={`${API_URL}${hostelPaymentDocument.fileUrl}`}
+            href={assetUrl(hostelPaymentDocument.fileUrl)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"

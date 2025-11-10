@@ -53,6 +53,7 @@ export default function TiptapEditor({ content, onChange, placeholder }: TiptapE
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2 p-2 border-b border-gray-300 bg-gray-50">
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('bold') ? 'bg-blue-100 text-blue-600' : ''}`}
           title="Жирный"
@@ -60,6 +61,7 @@ export default function TiptapEditor({ content, onChange, placeholder }: TiptapE
           <FaBold className="w-4 h-4" />
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('italic') ? 'bg-blue-100 text-blue-600' : ''}`}
           title="Курсив"
@@ -68,6 +70,7 @@ export default function TiptapEditor({ content, onChange, placeholder }: TiptapE
         </button>
         <div className="w-px h-6 bg-gray-300 mx-1" />
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('bulletList') ? 'bg-blue-100 text-blue-600' : ''}`}
           title="Маркированный список"
@@ -75,6 +78,7 @@ export default function TiptapEditor({ content, onChange, placeholder }: TiptapE
           <FaListUl className="w-4 h-4" />
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('orderedList') ? 'bg-blue-100 text-blue-600' : ''}`}
           title="Нумерованный список"
@@ -82,6 +86,7 @@ export default function TiptapEditor({ content, onChange, placeholder }: TiptapE
           <FaListOl className="w-4 h-4" />
         </button>
         <button
+          type="button"
           onClick={() => {
             const url = window.prompt('Введите URL ссылки:');
             if (url) {
@@ -95,6 +100,7 @@ export default function TiptapEditor({ content, onChange, placeholder }: TiptapE
         </button>
         <div className="w-px h-6 bg-gray-300 mx-1" />
         <button
+          type="button"
           onClick={() => editor.chain().focus().undo().run()}
           className="p-2 rounded hover:bg-gray-200"
           title="Отменить"
@@ -103,6 +109,7 @@ export default function TiptapEditor({ content, onChange, placeholder }: TiptapE
           <FaUndo className="w-4 h-4" />
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().redo().run()}
           className="p-2 rounded hover:bg-gray-200"
           title="Повторить"

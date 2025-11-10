@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaTelegram, FaVk } from 'react-icons/fa';
+import { apiUrl } from '../lib/api.ts';
 
 /**
  * Компонент футера сайта
@@ -18,7 +19,7 @@ export default function Footer() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/settings');
+        const response = await fetch(apiUrl('/api/settings'));
         if (response.ok) {
           const data = await response.json();
           setSettings(data);

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaGraduationCap, FaFileAlt, FaDownload, FaUsers, FaBriefcase, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl, assetUrl } from '../../lib/api.ts';
 
 export default function Education() {
   const [educationData, setEducationData] = useState({
@@ -25,9 +24,33 @@ export default function Education() {
 
   const loadEducationData = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/education`);
+      // Пробуем загрузить из объединенного API
+      const response = await fetch(apiUrl('/api/page-data?page=education'));
       if (response.ok) {
-        const data = await response.json();
+        const result = await response.json();
+        if (result.success && result.data) {
+          const { educationPrograms, educationalProgramDetails, adaptedPrograms } = result.data;
+          setEducationData({
+            programs: educationPrograms || [],
+            programsDetail: educationalProgramDetails || [],
+            documents: [], // Документы не включены в объединенный API
+            graduateEmployment: [], // Трудоустройство не включено в объединенный API
+            settings: {
+              showPrograms: true,
+              showProgramsDetail: true,
+              showEmployment: true,
+              showDocuments: true
+            }
+          });
+          return;
+        }
+      }
+
+      // Fallback на старый запрос
+      console.warn('Page data API failed, falling back to individual request');
+      const fallbackResponse = await fetch(apiUrl('/api/education'));
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
         setEducationData({
           programs: data.programs || [],
           programsDetail: data.programsDetail || [],
@@ -193,7 +216,7 @@ export default function Education() {
                   <p className="text-sm text-gray-600 mb-4">{doc.description}</p>
                 )}
                 <a
-                  href={doc.fileUrl}
+                  href={assetUrl(doc.fileUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -275,29 +298,29 @@ export default function Education() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {program.descriptionFile ? (
-                        <a href={program.descriptionFile} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="opMain">Описание</a>
+                        <a href={assetUrl(program.descriptionFile)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="opMain">Описание</a>
                       ) : program.description ? (
-                        <a href={program.description} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="opMain">Описание</a>
+                        <a href={assetUrl(program.description)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="opMain">Описание</a>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {program.curriculumFile ? (
-                        <a href={program.curriculumFile} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationPlan">Учебный план</a>
+                        <a href={assetUrl(program.curriculumFile)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationPlan">Учебный план</a>
                       ) : program.curriculum ? (
-                        <a href={program.curriculum} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationPlan">Учебный план</a>
+                        <a href={assetUrl(program.curriculum)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationPlan">Учебный план</a>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {program.workProgramsFile ? (
-                        <a href={program.workProgramsFile} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationRpd">Рабочие программы дисциплин</a>
+                        <a href={assetUrl(program.workProgramsFile)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationRpd">Рабочие программы дисциплин</a>
                       ) : program.workPrograms && program.workPrograms.length > 0 ? (
                         program.workPrograms.map((link: string, idx: number) => (
                           <div key={idx}>
-                            <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationRpd">РПД {idx + 1}</a>
+                            <a href={assetUrl(link)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationRpd">РПД {idx + 1}</a>
                           </div>
                         ))
                       ) : (
@@ -306,27 +329,27 @@ export default function Education() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {program.scheduleFile ? (
-                        <a href={program.scheduleFile} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationShedule">График</a>
+                        <a href={assetUrl(program.scheduleFile)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationShedule">График</a>
                       ) : program.schedule ? (
-                        <a href={program.schedule} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationShedule">График</a>
+                        <a href={assetUrl(program.schedule)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="educationShedule">График</a>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {program.practicesFile ? (
-                        <a href={program.practicesFile} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="eduPr">Рабочие программы практик</a>
+                        <a href={assetUrl(program.practicesFile)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="eduPr">Рабочие программы практик</a>
                       ) : program.practices ? (
-                        <a href={program.practices} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="eduPr">Рабочие программы практик</a>
+                        <a href={assetUrl(program.practices)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="eduPr">Рабочие программы практик</a>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {program.documentsFile ? (
-                        <a href={program.documentsFile} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="methodology">Документы</a>
+                        <a href={assetUrl(program.documentsFile)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="methodology">Документы</a>
                       ) : program.documents ? (
-                        <a href={program.documents} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="methodology">Документы</a>
+                        <a href={assetUrl(program.documents)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700" itemProp="methodology">Документы</a>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}

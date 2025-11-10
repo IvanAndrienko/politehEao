@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaFile, FaImage, FaEye, FaFolder, FaFileAlt } from 'react-icons/fa';
+import { apiUrl, assetUrl } from '../../lib/api.ts';
 
 interface FileItem {
   name: string;
@@ -30,7 +31,7 @@ export default function AdminFiles() {
   // Загрузка файлов
   const loadFiles = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/files');
+      const response = await fetch(apiUrl('/api/files'));
       if (response.ok) {
         const data = await response.json();
         setFiles(data.files || []);
@@ -98,7 +99,7 @@ export default function AdminFiles() {
 
     try {
       const deletePromises = selectedFiles.map(async (filePath) => {
-        const response = await fetch(`http://localhost:5000/api/files?path=${encodeURIComponent(filePath)}`, {
+        const response = await fetch(apiUrl(`/api/files?path=${encodeURIComponent(filePath)}`), {
           method: 'DELETE',
         });
 
@@ -290,7 +291,7 @@ export default function AdminFiles() {
                     <span>{new Date(file.modified).toLocaleDateString('ru-RU')}</span>
 
                     <a
-                      href={`http://localhost:5000/uploads/${file.path}`}
+                      href={assetUrl(`/uploads/${file.path}`)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 p-1"

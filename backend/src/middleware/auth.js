@@ -4,7 +4,7 @@ const auth = (req, res, next) => {
   const authHeader = req.header('Authorization');
 
   if (!authHeader) {
-    return res.status(401).json({ message: 'Нет токена авторизации' });
+    return res.status(401).json({ message: 'Authorization token missing' });
   }
 
   const token = authHeader.replace('Bearer ', '');
@@ -14,7 +14,7 @@ const auth = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Неверный токен авторизации' });
+    res.status(401).json({ message: 'Invalid or expired authorization token' });
   }
 };
 

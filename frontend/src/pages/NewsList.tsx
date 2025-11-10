@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { FaCalendar } from 'react-icons/fa';
+import { apiUrl, assetUrl } from '../lib/api.ts';
 
 // Компонент для безопасного отображения изображений
 const SafeImage = ({ src, alt, className, ...props }: { src?: string; alt?: string; className?: string; [key: string]: any }) => {
   const [imageExists, setImageExists] = useState(true);
+  const resolvedSrc = assetUrl(src);
 
   useEffect(() => {
-    if (src) {
+    if (resolvedSrc) {
       const img = new Image();
       img.onload = () => setImageExists(true);
       img.onerror = () => setImageExists(false);
-      img.src = src;
+      img.src = resolvedSrc;
     }
-  }, [src]);
+  }, [resolvedSrc]);
 
   if (!imageExists) {
     return (
@@ -26,7 +28,7 @@ const SafeImage = ({ src, alt, className, ...props }: { src?: string; alt?: stri
     );
   }
 
-  return <img src={src} alt={alt} className={className} {...props} />;
+  return <img src={resolvedSrc} alt={alt} className={className} {...props} />;
 };
 
 interface NewsItem {
@@ -47,12 +49,14 @@ export default function NewsList() {
   // Загрузка новостей
   const loadNews = async (page = 1) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/news?page=${page}&limit=12`);
+      const response = await fetch(apiUrl(`/api/news?page=${page}&limit=12`));
       if (response.ok) {
         const data = await response.json();
         setNews(data.news || []);
         setTotalPages(data.pagination?.pages || 1);
         setCurrentPage(page);
+        // Прокрутка наверх страницы
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
       console.error('Ошибка загрузки новостей:', error);
@@ -71,6 +75,94 @@ export default function NewsList() {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  // Функция для рендеринга кнопок пагинации с сокращением
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxVisiblePages = 5; // Максимальное количество видимых страниц
+
+    if (totalPages <= maxVisiblePages) {
+      // Если страниц мало, показываем все
+      for (let i = 1; i <= totalPages; i++) {
+        buttons.push(
+          <button
+            key={i}
+            onClick={() => loadNews(i)}
+            className={`px-4 py-2 border rounded-md ${
+              i === currentPage
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      // Логика сокращения пагинации
+      const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+      // Кнопка первой страницы
+      if (startPage > 1) {
+        buttons.push(
+          <button
+            key={1}
+            onClick={() => loadNews(1)}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            1
+          </button>
+        );
+        if (startPage > 2) {
+          buttons.push(
+            <span key="start-ellipsis" className="px-2 py-2 text-gray-500">
+              ...
+            </span>
+          );
+        }
+      }
+
+      // Видимые страницы
+      for (let i = startPage; i <= endPage; i++) {
+        buttons.push(
+          <button
+            key={i}
+            onClick={() => loadNews(i)}
+            className={`px-4 py-2 border rounded-md ${
+              i === currentPage
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      // Кнопка последней страницы
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          buttons.push(
+            <span key="end-ellipsis" className="px-2 py-2 text-gray-500">
+              ...
+            </span>
+          );
+        }
+        buttons.push(
+          <button
+            key={totalPages}
+            onClick={() => loadNews(totalPages)}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            {totalPages}
+          </button>
+        );
+      }
+    }
+
+    return buttons;
   };
 
   if (loading) {
@@ -107,7 +199,7 @@ export default function NewsList() {
               {item.previewImage && (
                 <div className="h-64 overflow-hidden">
                   <SafeImage
-                    src={`http://localhost:5000${item.previewImage}`}
+                    src={item.previewImage || undefined}
                     alt={item.title}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
@@ -139,31 +231,25 @@ export default function NewsList() {
 
       {/* Пагинация */}
       {totalPages > 1 && (
-        <div className="flex justify-center space-x-2">
+        <div className="flex justify-center items-center space-x-2">
           <button
-            onClick={() => loadNews(currentPage - 1)}
+            onClick={() => {
+              loadNews(currentPage - 1);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             disabled={currentPage === 1}
             className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Предыдущая
           </button>
 
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => loadNews(page)}
-              className={`px-4 py-2 border rounded-md ${
-                page === currentPage
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              {page}
-            </button>
-          ))}
+          {renderPaginationButtons()}
 
           <button
-            onClick={() => loadNews(currentPage + 1)}
+            onClick={() => {
+              loadNews(currentPage + 1);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             disabled={currentPage === totalPages}
             className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >

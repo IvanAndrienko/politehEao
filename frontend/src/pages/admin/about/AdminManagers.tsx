@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaUser, FaSave, FaGraduationCap } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl } from '../../../lib/api.ts';
 
 interface Manager {
   id: string;
@@ -34,11 +33,7 @@ export default function AdminManagers() {
 
   const loadManagers = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/admin/managers`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await fetch(apiUrl('/api/admin/managers'));
       if (response.ok) {
         const data = await response.json();
         setManagers(data);
@@ -54,16 +49,15 @@ export default function AdminManagers() {
     e.preventDefault();
     try {
       const url = editingManager
-        ? `${API_URL}/api/admin/managers/${editingManager.id}`
-        : `${API_URL}/api/admin/managers`;
+        ? apiUrl(`/api/admin/managers/${editingManager.id}`)
+        : apiUrl('/api/admin/managers');
 
       const method = editingManager ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
@@ -82,11 +76,8 @@ export default function AdminManagers() {
     if (!confirm('Вы уверены, что хотите удалить этого сотрудника?')) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/admin/managers/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+      const response = await fetch(apiUrl(`/api/admin/managers/${id}`), {
+        method: 'DELETE'
       });
 
       if (response.ok) {

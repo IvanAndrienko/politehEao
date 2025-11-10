@@ -4,6 +4,10 @@ import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import apicache from "apicache";
+import authMiddleware from "./src/middleware/auth.js";
 import authRouter from "./src/routes/auth.js";
 import settingsRouter from "./src/routes/settings.js";
 import newsRouter from "./src/routes/news.js";
@@ -15,6 +19,7 @@ import studentsRouter from "./src/routes/students.js";
 import studentDocumentsRouter from "./src/routes/student-documents.js";
 import organizationRouter from "./src/routes/about/organization.js";
 import homeSliderRouter from "./src/routes/home-slider.js";
+import pageDataRouter from "./src/routes/page-data.js";
 import studentLifeRouter from "./src/routes/student-life.js";
 import structureRouter from "./src/routes/about/structure.js";
 import structureDocumentsRouter from "./src/routes/about/structure-documents.js";
@@ -38,8 +43,70 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 
-app.use(cors());
-app.use(express.json());
+// Инициализация кэширования
+const cache = apicache.middleware;
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
+
+// Разные лимиты для разных типов запросов
+const contentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 минут
+  max: 1000, // 1000 запросов для контента
+  message: "Слишком много запросов на контент, попробуйте позже.",
+  skip: (req) => {
+    // Не применяем к статическим файлам
+    return req.path.startsWith('/uploads/') ||
+           req.path.startsWith('/static/');
+  }
+});
+
+const strictLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 минут
+  max: 10, // Только 10 попыток для форм/авторизации
+  message: "Слишком много попыток, подождите 15 минут.",
+});
+
+// Применяем разные лимиты к разным роутам
+app.use('/api/auth', strictLimiter);
+app.use('/api/upload', strictLimiter);
+app.use('/api/admin', strictLimiter);
+app.use(contentLimiter);
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+const AUTH_FREE_PATHS = new Set(['/api/auth/login']);
+
+app.use((req, res, next) => {
+  if (!MUTATING_METHODS.has(req.method) || !req.path.startsWith('/api')) {
+    return next();
+  }
+
+  if (AUTH_FREE_PATHS.has(req.path)) {
+    return next();
+  }
+
+  return authMiddleware(req, res, next);
+});
 
 // Статические файлы для загрузок с обработкой ошибок
 app.use('/uploads', (req, res, next) => {
@@ -52,6 +119,11 @@ app.use('/uploads', (req, res, next) => {
     const fileName = path.basename(filePath);
     const encodedFileName = encodeURIComponent(fileName);
     res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFileName}`);
+    // Добавляем CORS заголовки для изображений
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   }
 
   // Проверяем существование файла
@@ -128,11 +200,22 @@ app.use('/uploads', (req, res, next) => {
 // Роуты аутентификации
 app.use('/api/auth', authRouter);
 
-// Роуты настроек сайта
-app.use('/api/settings', settingsRouter);
+// Роуты настроек сайта с кэшированием
+app.use('/api/settings', cache('30 minutes'), settingsRouter);
 
-// Роуты новостей
-app.use('/api/news', newsRouter);
+// Роуты новостей с умным кэшированием
+app.use('/api/news', (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const hasAuth = authHeader && authHeader.startsWith('Bearer ');
+
+  if (hasAuth) {
+    // Для админов - НЕ кэшируем вообще
+    next();
+  } else {
+    // Для пользователей - кэш 1 минуту
+    cache('1 minute')(req, res, next);
+  }
+}, newsRouter);
 
 // Роуты загрузки файлов
 app.use('/api/upload', uploadRouter);
@@ -155,8 +238,23 @@ app.use('/api/student-documents', studentDocumentsRouter);
 // Роуты студенческой жизни
 app.use('/api/student-life', studentLifeRouter);
 
-// Роуты слайдера главной страницы
-app.use('/api/home-slider', homeSliderRouter);
+// Роуты слайдера главной страницы с кэшированием
+app.use('/api/home-slider', cache('10 minutes'), homeSliderRouter);
+
+// Роуты объединенных данных страницы с умным кэшированием
+app.use('/api/page-data', (req, res, next) => {
+  // Проверяем, авторизован ли пользователь (есть ли токен в заголовках)
+  const authHeader = req.headers.authorization;
+  const hasAuth = authHeader && authHeader.startsWith('Bearer ');
+
+  if (hasAuth) {
+    // Для авторизованных пользователей (админов) - НЕ кэшируем вообще
+    next();
+  } else {
+    // Для обычных пользователей - кэш 1 минуту
+    cache('1 minute')(req, res, next);
+  }
+}, pageDataRouter);
 
 // Роуты информации об организации
 app.use('/api/organization', organizationRouter);

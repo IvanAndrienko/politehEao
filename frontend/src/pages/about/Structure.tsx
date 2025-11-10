@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaBuilding, FaMapMarkerAlt, FaGlobe, FaFileAlt, FaDownload } from 'react-icons/fa';
+import { assetUrl } from '../../lib/api.ts';
 
 export default function Structure() {
   const [structureData, setStructureData] = useState({
@@ -501,8 +502,8 @@ export default function Structure() {
                     )}
                   </div>
                 </div>
-                <a
-                  href={`http://localhost:5000/uploads/${doc.fileUrl}`}
+                  <a
+                    href={assetUrl(doc.fileUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium"

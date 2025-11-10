@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaFileAlt, FaGraduationCap } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl } from '../../../lib/api.ts';
 
 interface EducationalStandard {
   id: string;
@@ -47,11 +46,7 @@ export default function AdminEduStandarts() {
 
   const loadStandards = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/admin/education/standards`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await fetch(apiUrl('/api/admin/education/standards'));
       if (response.ok) {
         const data = await response.json();
         setStandards(data);
@@ -67,16 +62,15 @@ export default function AdminEduStandarts() {
     e.preventDefault();
     try {
       const url = editingStandard
-        ? `${API_URL}/api/admin/education/standards/${editingStandard.id}`
-        : `${API_URL}/api/admin/education/standards`;
+        ? apiUrl(`/api/admin/education/standards/${editingStandard.id}`)
+        : apiUrl('/api/admin/education/standards');
 
       const method = editingStandard ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
@@ -95,11 +89,8 @@ export default function AdminEduStandarts() {
     if (!confirm('Вы уверены, что хотите удалить этот стандарт?')) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/admin/education/standards/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+      const response = await fetch(apiUrl(`/api/admin/education/standards/${id}`), {
+        method: 'DELETE'
       });
 
       if (response.ok) {
@@ -154,7 +145,7 @@ export default function AdminEduStandarts() {
     formDataUpload.append('file', file);
 
     try {
-      const response = await fetch(`${API_URL}/api/upload/education/documents`, {
+      const response = await fetch(apiUrl('/api/upload/education/documents'), {
         method: 'POST',
         body: formDataUpload
       });

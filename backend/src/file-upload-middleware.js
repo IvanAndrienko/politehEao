@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Папки для загрузок
+// Папки для загрузок - используем uploads в корне проекта
 const uploadsDir = path.join(process.cwd(), 'uploads');
 const imagesDir = path.join(uploadsDir, 'images');
 const documentsDir = path.join(uploadsDir, 'documents');
@@ -134,7 +134,9 @@ export const uploadImages = multer({
   storage: imageStorage,
   fileFilter: imageFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB
+    fileSize: 5 * 1024 * 1024, // 5MB на файл
+    files: 50, // Максимум 50 файлов
+    fieldSize: 50 * 1024 * 1024 // 50MB общий размер поля
   }
 });
 
@@ -143,6 +145,20 @@ export const uploadDocuments = multer({
   storage: documentStorage,
   fileFilter: documentFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB
+    fileSize: 10 * 1024 * 1024, // 10MB на файл
+    files: 50, // Максимум 50 файлов
+    fieldSize: 100 * 1024 * 1024 // 100MB общий размер поля
   }
 });
+
+// Функция для проверки количества файлов перед загрузкой
+export const validateFileCount = (maxFiles) => {
+  return (req, res, next) => {
+    if (req.files && req.files.length > maxFiles) {
+      return res.status(400).json({
+        message: `Превышено максимальное количество файлов. Максимум: ${maxFiles} файлов.`
+      });
+    }
+    next();
+  };
+};

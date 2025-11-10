@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaUser, FaDownload, FaGraduationCap } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl } from '../../lib/api.ts';
 
 interface Manager {
   id: string;
@@ -23,7 +22,7 @@ export default function Managers() {
 
   const loadManagers = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/managers`);
+      const response = await fetch(apiUrl('/api/managers'));
       if (response.ok) {
         const data = await response.json();
         setManagers(data);

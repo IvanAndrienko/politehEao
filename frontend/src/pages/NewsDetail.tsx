@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaCalendar, FaArrowLeft, FaDownload, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { apiUrl, assetUrl } from '../lib/api.ts';
 
 // Компонент для безопасного отображения изображений
 const SafeImage = ({ src, alt, className, ...props }: { src?: string; alt?: string; className?: string; [key: string]: any }) => {
   const [imageExists, setImageExists] = useState(true);
+  const resolvedSrc = assetUrl(src);
 
   useEffect(() => {
-    if (src) {
+    if (resolvedSrc) {
       const img = new Image();
       img.onload = () => setImageExists(true);
       img.onerror = () => setImageExists(false);
-      img.src = src;
+      img.src = resolvedSrc;
     }
-  }, [src]);
+  }, [resolvedSrc]);
 
   if (!imageExists) {
     return (
@@ -28,7 +30,7 @@ const SafeImage = ({ src, alt, className, ...props }: { src?: string; alt?: stri
   }
   
 
-  return <img src={src} alt={alt} className={className} {...props} />;
+  return <img src={resolvedSrc} alt={alt} className={className} {...props} />;
 };
 
 interface NewsDetail {
@@ -56,7 +58,7 @@ export default function NewsDetail() {
       if (!slug) return;
 
       try {
-        const response = await fetch(`http://localhost:5000/api/news/${slug}`);
+        const response = await fetch(apiUrl(`/api/news/${slug}`));
         if (response.ok) {
           const data = await response.json();
           setNews(data);
@@ -162,7 +164,7 @@ export default function NewsDetail() {
       {news.previewImage && (
         <div className="mb-8">
           <SafeImage
-            src={`http://localhost:5000${news.previewImage}`}
+            src={news.previewImage || undefined}
             alt={news.title}
             className="w-full h-auto rounded-lg shadow-md"
           />
@@ -192,7 +194,7 @@ export default function NewsDetail() {
             {news.images.map((image, index) => (
               <div key={index} className="aspect-square overflow-hidden rounded-lg shadow-md cursor-pointer" onClick={() => openModal(index)}>
                 <SafeImage
-                  src={`http://localhost:5000${image}`}
+                  src={image}
                   alt={`Изображение ${index + 1}`}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
@@ -215,8 +217,8 @@ export default function NewsDetail() {
                     {attachment.split('/').pop()}
                   </span>
                 </div>
-                <a
-                  href={`http://localhost:5000${attachment}`}
+                  <a
+                    href={assetUrl(attachment)}
                   download
                   className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
@@ -268,7 +270,7 @@ export default function NewsDetail() {
           <div className="relative max-w-4xl max-h-full p-4 border shadow-lg rounded-md bg-white"> 
             {/* Изображение */}
             <SafeImage
-              src={`http://localhost:5000${news.images[currentImageIndex]}`}
+              src={news.images[currentImageIndex]}
               alt={`Изображение ${currentImageIndex + 1}`}
               className="max-w-full max-h-[80vh] object-contain rounded-lg"
             />
@@ -280,3 +282,4 @@ export default function NewsDetail() {
     </div>
   );
 }
+

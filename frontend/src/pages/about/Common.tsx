@@ -11,9 +11,22 @@ export default function GeneralInfo() {
 
   const loadOrganizationData = async () => {
     try {
-      const response = await fetch('/api/organization');
+      // Пробуем загрузить из объединенного API
+      const response = await fetch('/api/page-data?page=common');
       if (response.ok) {
-        const data = await response.json();
+        const result = await response.json();
+        if (result.success && result.data) {
+          const { organizationInfo } = result.data;
+          setOrganizationData(organizationInfo || {});
+          return;
+        }
+      }
+
+      // Fallback на старый запрос
+      console.warn('Page data API failed, falling back to individual request');
+      const fallbackResponse = await fetch('/api/organization');
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
         setOrganizationData(data);
       }
     } catch (error) {

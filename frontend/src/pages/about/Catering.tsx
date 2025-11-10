@@ -23,12 +23,25 @@ export default function Catering() {
 
   const loadCatering = async () => {
     try {
-      const response = await fetch('/api/catering');
+      // Пробуем загрузить из объединенного API
+      const response = await fetch('/api/page-data?page=catering');
       if (response.ok) {
-        const data = await response.json();
+        const result = await response.json();
+        if (result.success && result.data) {
+          const { catering } = result.data;
+          setCatering(Array.isArray(catering) ? catering : []);
+          return;
+        }
+      }
+
+      // Fallback на старый запрос
+      console.warn('Page data API failed, falling back to individual request');
+      const fallbackResponse = await fetch('/api/catering');
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
         setCatering(Array.isArray(data) ? data : []);
       } else {
-        console.error('Error loading catering:', response.statusText);
+        console.error('Error loading catering:', fallbackResponse.statusText);
         setCatering([]);
       }
     } catch (error) {

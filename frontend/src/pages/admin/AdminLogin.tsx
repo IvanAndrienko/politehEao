@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../../lib/api.ts';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -7,13 +9,13 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (token) {
-      window.location.href = '/admin/dashboard';
+    if (localStorage.getItem('adminToken')) {
+      navigate('/admin/dashboard', { replace: true });
     }
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +23,7 @@ export default function AdminLogin() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,15 +33,15 @@ export default function AdminLogin() {
 
       const data = await response.json();
 
-      if (response.ok) {
-        localStorage.setItem('adminToken', data.token);
-        // Перенаправление на dashboard
-        window.location.href = '/admin/dashboard';
-      } else {
-        setError(data.message || 'Ошибка входа');
+      if (!response.ok) {
+        setError(data.message || 'Не удалось выполнить вход');
+        return;
       }
+
+      localStorage.setItem('adminToken', data.token);
+      navigate('/admin/dashboard', { replace: true });
     } catch (err) {
-      setError('Ошибка сети');
+      setError('Ошибка при выполнении запроса');
     } finally {
       setLoading(false);
     }
@@ -56,7 +58,7 @@ export default function AdminLogin() {
             Вход в админ-панель
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Политехнический техникум
+            Используйте учетные данные администратора
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -92,7 +94,7 @@ export default function AdminLogin() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   required
                   className="appearance-none rounded-none relative block w-full px-10 pr-12 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                   placeholder="Пароль"

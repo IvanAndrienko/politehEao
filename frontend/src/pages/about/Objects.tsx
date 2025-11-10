@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaBuilding, FaFlask, FaBook, FaHome, FaWifi, FaLaptop, FaUniversalAccess } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl } from '../../lib/api.ts';
 
 interface Cabinet {
   id: string;
@@ -68,13 +67,13 @@ export default function Objects() {
     try {
       // Загружаем данные из API
       const [cabinetsRes, practiceRes, librariesRes, sportRes, textRes, hostelRes, docsRes] = await Promise.all([
-        fetch(`${API_URL}/api/objects/cabinets`),
-        fetch(`${API_URL}/api/objects/practice-objects`),
-        fetch(`${API_URL}/api/objects/libraries`),
-        fetch(`${API_URL}/api/objects/sport-objects`),
-        fetch(`${API_URL}/api/objects/text-blocks`),
-        fetch(`${API_URL}/api/objects/hostel-info`),
-        fetch(`${API_URL}/api/objects/documents`)
+        fetch(apiUrl('/api/objects/cabinets')),
+        fetch(apiUrl('/api/objects/practice-objects')),
+        fetch(apiUrl('/api/objects/libraries')),
+        fetch(apiUrl('/api/objects/sport-objects')),
+        fetch(apiUrl('/api/objects/text-blocks')),
+        fetch(apiUrl('/api/objects/hostel-info')),
+        fetch(apiUrl('/api/objects/documents'))
       ]);
 
       const cabinetsData = await cabinetsRes.json();
@@ -526,8 +525,8 @@ export default function Objects() {
           <p className="text-gray-700 mb-4">
             Информация о формировании платы за проживание в общежитии:
           </p>
-          <a
-            href={`${API_URL}/api/objects/hostel-payment-document/download`}
+            <a
+              href={apiUrl('/api/objects/hostel-payment-document/download')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
@@ -558,8 +557,8 @@ export default function Objects() {
                 )}
               </div>
               <div className="flex space-x-2">
-                <a
-                  href={`${API_URL}/api/objects/documents/${doc.id}/download`}
+                  <a
+                    href={apiUrl(`/api/objects/documents/${doc.id}/download`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:text-blue-900 font-medium"

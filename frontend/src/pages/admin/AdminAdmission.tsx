@@ -472,14 +472,16 @@ export default function AdminAdmission() {
                       type="number"
                       placeholder="Бюджетные места"
                       className="px-3 py-2 border rounded-md"
-                      value={editingSpecialty === 'new' ? newSpecialty.budgetPlaces || '' : specialties.find(s => s.id === editingSpecialty)?.budgetPlaces || ''}
+                      value={editingSpecialty === 'new' ? newSpecialty.budgetPlaces ?? '' : specialties.find(s => s.id === editingSpecialty)?.budgetPlaces ?? ''}
                       onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = value === '' ? null : parseInt(value);
                         if (editingSpecialty === 'new') {
-                          setNewSpecialty({ ...newSpecialty, budgetPlaces: parseInt(e.target.value) || null });
+                          setNewSpecialty({ ...newSpecialty, budgetPlaces: numValue });
                         } else {
                           const specialty = specialties.find(s => s.id === editingSpecialty);
                           if (specialty) {
-                            setSpecialties(specialties.map(s => s.id === editingSpecialty ? { ...s, budgetPlaces: parseInt(e.target.value) || null } : s));
+                            setSpecialties(specialties.map(s => s.id === editingSpecialty ? { ...s, budgetPlaces: numValue } : s));
                           }
                         }
                       }}
@@ -488,14 +490,16 @@ export default function AdminAdmission() {
                       type="number"
                       placeholder="Платные места"
                       className="px-3 py-2 border rounded-md"
-                      value={editingSpecialty === 'new' ? newSpecialty.paidPlaces || '' : specialties.find(s => s.id === editingSpecialty)?.paidPlaces || ''}
+                      value={editingSpecialty === 'new' ? newSpecialty.paidPlaces ?? '' : specialties.find(s => s.id === editingSpecialty)?.paidPlaces ?? ''}
                       onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = value === '' ? null : parseInt(value);
                         if (editingSpecialty === 'new') {
-                          setNewSpecialty({ ...newSpecialty, paidPlaces: parseInt(e.target.value) || null });
+                          setNewSpecialty({ ...newSpecialty, paidPlaces: numValue });
                         } else {
                           const specialty = specialties.find(s => s.id === editingSpecialty);
                           if (specialty) {
-                            setSpecialties(specialties.map(s => s.id === editingSpecialty ? { ...s, paidPlaces: parseInt(e.target.value) || null } : s));
+                            setSpecialties(specialties.map(s => s.id === editingSpecialty ? { ...s, paidPlaces: numValue } : s));
                           }
                         }
                       }}

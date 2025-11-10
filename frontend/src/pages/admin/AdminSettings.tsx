@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaSave, FaSpinner} from 'react-icons/fa';
+import { apiUrl } from '../../lib/api.ts';
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState({
@@ -20,7 +21,7 @@ export default function AdminSettings() {
 
   const loadSettings = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/settings');
+      const response = await fetch(apiUrl('/api/settings'));
       if (response.ok) {
         const data = await response.json();
         setSettings(data);
@@ -39,7 +40,7 @@ export default function AdminSettings() {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/settings', {
+      const response = await fetch(apiUrl('/api/settings'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

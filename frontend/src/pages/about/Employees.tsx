@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaUser, FaGraduationCap } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl } from '../../lib/api.ts';
 
 interface Employee {
   id: string;
@@ -27,7 +26,7 @@ export default function Employees() {
 
   const loadEmployees = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/employees`);
+      const response = await fetch(apiUrl('/api/employees'));
       if (response.ok) {
         const data = await response.json();
         setEmployees(data);

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { FaFileAlt, FaDownload } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { FaDownload } from 'react-icons/fa';
+import { apiUrl, assetUrl } from '../../lib/api.ts';
 
 export default function Documents() {
   const [documents, setDocuments] = useState({
@@ -25,9 +24,22 @@ export default function Documents() {
 
   const loadDocuments = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/documents`);
+      // Пробуем загрузить из объединенного API
+      const response = await fetch(apiUrl('/api/page-data?page=documents'));
       if (response.ok) {
-        const data = await response.json();
+        const result = await response.json();
+        if (result.success && result.data) {
+          const { documents } = result.data;
+          setDocuments(documents || {});
+          return;
+        }
+      }
+
+      // Fallback на старый запрос
+      console.warn('Page data API failed, falling back to individual request');
+      const fallbackResponse = await fetch(apiUrl('/api/documents'));
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
         setDocuments(data.documents || {});
       }
     } catch (error) {
@@ -141,7 +153,7 @@ export default function Documents() {
                 <div className="ml-4">
                   {documents[doc.key as keyof typeof documents] ? (
                     <a
-                      href={`${API_URL}/uploads/${documents[doc.key as keyof typeof documents]}`}
+                      href={assetUrl(documents[doc.key as keyof typeof documents])}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -181,7 +193,7 @@ export default function Documents() {
                 <div className="ml-4">
                   {documents[doc.key as keyof typeof documents] ? (
                     <a
-                      href={`${API_URL}/uploads/${documents[doc.key as keyof typeof documents]}`}
+                      href={assetUrl(documents[doc.key as keyof typeof documents])}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"

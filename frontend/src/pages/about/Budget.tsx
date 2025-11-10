@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl, assetUrl } from '../../lib/api.ts';
 
 interface BudgetVolume {
   id: string;
@@ -43,10 +42,25 @@ export default function Budget() {
 
   const loadBudgetData = async () => {
     try {
+      // Пробуем загрузить из объединенного API
+      const response = await fetch(apiUrl('/api/page-data?page=budget'));
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          const { budgetVolumes, budgetFlows, budgetPlans } = result.data;
+          setVolumes(budgetVolumes || []);
+          setFlows(budgetFlows || []);
+          setPlans(budgetPlans || []);
+          return;
+        }
+      }
+
+      // Fallback на старые отдельные запросы
+      console.warn('Page data API failed, falling back to individual requests');
       const [volumesRes, flowsRes, plansRes] = await Promise.all([
-        fetch(`${API_URL}/api/budget/volume`),
-        fetch(`${API_URL}/api/budget/flow`),
-        fetch(`${API_URL}/api/budget/plan`)
+        fetch(apiUrl('/api/budget/volume')),
+        fetch(apiUrl('/api/budget/flow')),
+        fetch(apiUrl('/api/budget/plan'))
       ]);
 
       if (volumesRes.ok) {
@@ -206,7 +220,7 @@ export default function Budget() {
                     </p>
                   </div>
                   <a
-                    href={plan.fileUrl}
+                    href={assetUrl(plan.fileUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"

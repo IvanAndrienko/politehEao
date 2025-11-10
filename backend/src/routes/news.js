@@ -10,8 +10,21 @@ const prisma = new PrismaClient();
 // Функция для удаления файла
 const deleteFile = (filePath) => {
   try {
-    if (filePath && fs.existsSync(path.join('uploads', filePath))) {
-      fs.unlinkSync(path.join('uploads', filePath));
+    if (!filePath) return;
+
+    const cleanPath = filePath.startsWith('/') ? filePath.slice(1) : filePath;
+
+    // ПРАВИЛЬНЫЙ путь - process.cwd() уже указывает на backend/
+    const fullPath = path.join(process.cwd(), cleanPath);
+
+    console.log('Попытка удалить файл:', fullPath);
+    console.log('Оригинальный путь:', filePath);
+
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+      console.log('Файл успешно удален:', fullPath);
+    } else {
+      console.log('Файл не найден:', fullPath);
     }
   } catch (error) {
     console.error('Ошибка удаления файла:', filePath, error);
@@ -37,27 +50,29 @@ const deleteNewsFiles = (news) => {
 };
 
 
-// GET /api/news - Получить все новости
+// GET /api/news - Получить все новости (оптимизированный запрос)
 router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
 
-    const news = await prisma.news.findMany({
-      orderBy: { publishedAt: 'desc' },
-      skip: parseInt(skip),
-      take: parseInt(limit),
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        shortDescription: true,
-        previewImage: true,
-        publishedAt: true,
-      },
-    });
-
-    const total = await prisma.news.count();
+    // Оптимизированный запрос: получаем все данные одним запросом
+    const [news, total] = await Promise.all([
+      prisma.news.findMany({
+        orderBy: { publishedAt: 'desc' },
+        skip: parseInt(skip),
+        take: parseInt(limit),
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          shortDescription: true,
+          previewImage: true,
+          publishedAt: true,
+        },
+      }),
+      prisma.news.count()
+    ]);
 
     res.json({
       news,
@@ -152,6 +167,15 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { title, shortDescription, fullText, previewImage, attachments, images } = req.body;
 
+    // Получить текущую новость для сравнения
+    const currentNews = await prisma.news.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!currentNews) {
+      return res.status(404).json({ message: 'Новость не найдена' });
+    }
+
     let slug = undefined;
     if (title) {
       slug = slugify(title, {
@@ -171,6 +195,33 @@ router.put('/:id', async (req, res) => {
         return res.status(400).json({ message: 'Новость с таким названием уже существует' });
       }
     }
+
+    // Найти файлы, которые нужно удалить
+    const filesToDelete = [];
+
+    // Проверить превью изображение
+    if (previewImage !== undefined && previewImage !== currentNews.previewImage) {
+      if (currentNews.previewImage) {
+        filesToDelete.push(currentNews.previewImage);
+      }
+    }
+
+    // Проверить изображения
+    if (images && Array.isArray(images)) {
+      const currentImages = currentNews.images || [];
+      const imagesToDelete = currentImages.filter(img => !images.includes(img));
+      filesToDelete.push(...imagesToDelete);
+    }
+
+    // Проверить вложения
+    if (attachments && Array.isArray(attachments)) {
+      const currentAttachments = currentNews.attachments || [];
+      const attachmentsToDelete = currentAttachments.filter(att => !attachments.includes(att));
+      filesToDelete.push(...attachmentsToDelete);
+    }
+
+    // Удалить ненужные файлы
+    filesToDelete.forEach(filePath => deleteFile(filePath));
 
     const news = await prisma.news.update({
       where: { id: parseInt(id) },

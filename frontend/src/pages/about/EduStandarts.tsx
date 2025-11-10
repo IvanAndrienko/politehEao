@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { FaFileAlt, FaDownload, FaGraduationCap } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { FaDownload, FaGraduationCap } from 'react-icons/fa';
+import { apiUrl, assetUrl } from '../../lib/api.ts';
 
 interface EducationalStandard {
   id: string;
@@ -30,9 +29,22 @@ export default function EduStandarts() {
 
   const loadStandards = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/education/standards`);
+      // Пробуем загрузить из объединенного API
+      const response = await fetch(apiUrl('/api/page-data?page=edu-standards'));
       if (response.ok) {
-        const data = await response.json();
+        const result = await response.json();
+        if (result.success && result.data) {
+          const { educationalStandards } = result.data;
+          setStandards(educationalStandards || []);
+          return;
+        }
+      }
+
+      // Fallback на старый запрос
+      console.warn('Page data API failed, falling back to individual request');
+      const fallbackResponse = await fetch(apiUrl('/api/education/standards'));
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
         setStandards(data);
       }
     } catch (error) {
@@ -107,7 +119,7 @@ export default function EduStandarts() {
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {standard.fedDocUrl ? (
                       <a
-                        href={standard.fedDocUrl}
+                        href={assetUrl(standard.fedDocUrl)}
                         className="inline-flex items-center text-blue-600 hover:text-blue-700"
                         itemProp="eduFedDoc"
                         target="_blank"
@@ -123,7 +135,7 @@ export default function EduStandarts() {
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {standard.standartDocUrl ? (
                       <a
-                        href={standard.standartDocUrl}
+                        href={assetUrl(standard.standartDocUrl)}
                         className="inline-flex items-center text-blue-600 hover:text-blue-700"
                         itemProp="eduStandartDoc"
                         target="_blank"
@@ -139,7 +151,7 @@ export default function EduStandarts() {
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {standard.fedTrebUrl ? (
                       <a
-                        href={standard.fedTrebUrl}
+                        href={assetUrl(standard.fedTrebUrl)}
                         className="inline-flex items-center text-blue-600 hover:text-blue-700"
                         itemProp="eduFedTreb"
                         target="_blank"
@@ -155,7 +167,7 @@ export default function EduStandarts() {
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {standard.standartTrebUrl ? (
                       <a
-                        href={standard.standartTrebUrl}
+                        href={assetUrl(standard.standartTrebUrl)}
                         className="inline-flex items-center text-blue-600 hover:text-blue-700"
                         itemProp="eduStandartTreb"
                         target="_blank"

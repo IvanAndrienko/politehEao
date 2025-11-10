@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaFileAlt, FaSave, FaEdit, FaUpload, FaDownload, FaTrash } from 'react-icons/fa';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl, assetUrl } from '../../../lib/api.ts';
 
 export default function AdminDocuments() {
   const [documents, setDocuments] = useState({
@@ -32,7 +31,7 @@ export default function AdminDocuments() {
 
   const loadDocuments = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/documents`);
+      const response = await fetch(apiUrl('/api/documents'));
       if (response.ok) {
         const data = await response.json();
         setDocuments(data.documents || {});
@@ -48,7 +47,7 @@ export default function AdminDocuments() {
   const saveDocuments = async () => {
     setSaving(true);
     try {
-      const response = await fetch(`${API_URL}/api/documents`, {
+      const response = await fetch(apiUrl('/api/documents'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +100,7 @@ export default function AdminDocuments() {
     formData.append('field', field);
 
     try {
-      const response = await fetch(`${API_URL}/api/documents/upload`, {
+      const response = await fetch(apiUrl('/api/documents/upload'), {
         method: 'POST',
         body: formData,
       });
@@ -125,7 +124,7 @@ export default function AdminDocuments() {
   const removeDocument = async (field: string) => {
     if (confirm('Вы уверены, что хотите удалить этот документ?')) {
       try {
-        const response = await fetch(`${API_URL}/api/documents/${field}`, {
+        const response = await fetch(apiUrl(`/api/documents/${field}`), {
           method: 'DELETE',
         });
 
@@ -307,7 +306,7 @@ export default function AdminDocuments() {
                       <div className="text-sm text-gray-700 mb-2">
                         <strong>Текущий файл:</strong> {getFieldValue(doc.key) ? (
                           <a
-                            href={`${API_URL}/uploads/${getFieldValue(doc.key)}`}
+                            href={assetUrl(getFieldValue(doc.key))}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-700 ml-1"
@@ -351,7 +350,7 @@ export default function AdminDocuments() {
                       {/* Скачать */}
                       {getFieldValue(doc.key) && (
                         <a
-                          href={`${API_URL}/uploads/${getFieldValue(doc.key)}`}
+                          href={assetUrl(getFieldValue(doc.key))}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium transition-colors"

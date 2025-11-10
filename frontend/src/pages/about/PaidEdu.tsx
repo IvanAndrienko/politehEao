@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { apiUrl, assetUrl } from '../../lib/api.ts';
 
 interface PaidEduDocument {
   id: string;
@@ -37,7 +36,7 @@ export default function PaidEdu() {
 
   const loadDocuments = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/paid-edu/documents`);
+      const response = await fetch(apiUrl('/api/paid-edu/documents'));
       if (response.ok) {
         const data = await response.json();
         setDocuments(data);
@@ -85,7 +84,7 @@ export default function PaidEdu() {
                       <p className="text-xs text-gray-500">{doc.fileName} ({doc.fileSize ? (doc.fileSize / 1024).toFixed(1) : 0} KB)</p>
                     </div>
                     <a
-                      href={`${API_URL}${doc.fileUrl}`}
+                      href={assetUrl(doc.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
@@ -125,7 +124,7 @@ export default function PaidEdu() {
                       <p className="text-xs text-gray-500">{doc.fileName} ({doc.fileSize ? (doc.fileSize / 1024).toFixed(1) : 0} KB)</p>
                     </div>
                     <a
-                      href={`${API_URL}${doc.fileUrl}`}
+                      href={assetUrl(doc.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
@@ -175,7 +174,7 @@ export default function PaidEdu() {
                         <td className="px-6 py-4 text-sm text-gray-900">
                           {doc.fileUrl ? (
                             <a
-                              href={`${API_URL}${doc.fileUrl}`}
+                              href={assetUrl(doc.fileUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-purple-600 hover:text-purple-700 underline"
@@ -230,7 +229,7 @@ export default function PaidEdu() {
                         <td className="px-6 py-4 text-sm text-gray-900">
                           {doc.fileUrl ? (
                             <a
-                              href={`${API_URL}${doc.fileUrl}`}
+                              href={assetUrl(doc.fileUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-orange-600 hover:text-orange-700 underline"

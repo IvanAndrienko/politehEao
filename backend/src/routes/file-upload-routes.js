@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadImages, uploadDocuments } from '../file-upload-middleware.js';
+import { uploadImages, uploadDocuments, validateFileCount } from '../file-upload-middleware.js';
 
 const router = express.Router();
 
@@ -24,7 +24,7 @@ router.post('/news/preview', uploadImages.single('file'), (req, res) => {
 });
 
 // Загрузка изображений для новости (несколько файлов)
-router.post('/news/images', uploadImages.array('files', 10), (req, res) => {
+router.post('/news/images', validateFileCount(50), uploadImages.array('files', 50), (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: 'Файлы не загружены' });
@@ -46,7 +46,7 @@ router.post('/news/images', uploadImages.array('files', 10), (req, res) => {
 });
 
 // Загрузка документов/вложений для новости
-router.post('/news/documents', uploadDocuments.array('files', 10), (req, res) => {
+router.post('/news/documents', validateFileCount(50), uploadDocuments.array('files', 50), (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: 'Файлы не загружены' });

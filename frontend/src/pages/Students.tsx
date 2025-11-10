@@ -43,56 +43,55 @@ export default function Students() {
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true);
 
   useEffect(() => {
-    loadAnnouncements();
-    loadServices();
-    loadDocuments();
-    loadStudentLife();
+    loadStudentData();
   }, []);
 
-  const loadAnnouncements = async () => {
+  const loadStudentData = async () => {
     try {
-      const response = await fetch('/api/schedule/announcements');
-      const data = await response.json();
-      setAnnouncements(data);
+      // Пробуем загрузить из объединенного API
+      const response = await fetch('/api/page-data?page=students');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          const { announcements, services, documents, studentLife } = result.data;
+          setAnnouncements(announcements || []);
+          setServices(services || []);
+          setDocuments(documents || []);
+          setStudentLife(studentLife || []);
+          setLoadingAnnouncements(false);
+          setLoadingServices(false);
+          setLoadingDocuments(false);
+          setLoadingStudentData(false);
+          return;
+        }
+      }
+
+      // Fallback на старые отдельные запросы
+      console.warn('Page data API failed, falling back to individual requests');
+      const [announcementsRes, servicesRes, documentsRes, studentLifeRes] = await Promise.all([
+        fetch('/api/schedule/announcements'),
+        fetch('/api/students/services'),
+        fetch('/api/student-documents'),
+        fetch('/api/student-life')
+      ]);
+
+      const [announcementsData, servicesData, documentsData, studentLifeData] = await Promise.all([
+        announcementsRes.json(),
+        servicesRes.json(),
+        documentsRes.json(),
+        studentLifeRes.json()
+      ]);
+
+      setAnnouncements(announcementsData);
+      setServices(servicesData);
+      setDocuments(documentsData);
+      setStudentLife(studentLifeData);
     } catch (error) {
-      console.error('Error loading announcements:', error);
+      console.error('Error loading student data:', error);
     } finally {
       setLoadingAnnouncements(false);
-    }
-  };
-
-  const loadServices = async () => {
-    try {
-      const response = await fetch('/api/students/services');
-      const data = await response.json();
-      setServices(data);
-    } catch (error) {
-      console.error('Error loading services:', error);
-    } finally {
       setLoadingServices(false);
-    }
-  };
-
-  const loadDocuments = async () => {
-    try {
-      const response = await fetch('/api/student-documents');
-      const data = await response.json();
-      setDocuments(data);
-    } catch (error) {
-      console.error('Error loading documents:', error);
-    } finally {
       setLoadingDocuments(false);
-    }
-  };
-
-  const loadStudentLife = async () => {
-    try {
-      const response = await fetch('/api/student-life');
-      const data = await response.json();
-      setStudentLife(data);
-    } catch (error) {
-      console.error('Error loading student life:', error);
-    } finally {
       setLoadingStudentData(false);
     }
   };

@@ -105,12 +105,37 @@ export default function Admission() {
   const loadAdmissionData = async () => {
     try {
       setLoading(true);
+
+      // Получаем токен из localStorage для авторизованных запросов
+      const token = localStorage.getItem('adminToken');
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // Пробуем загрузить из объединенного API
+      const response = await fetch('/api/page-data?page=admission', { headers });
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          const { specialties, documents, dates, contacts, dormitory } = result.data;
+          setSpecialties(specialties || []);
+          setDocuments(documents || []);
+          setDates(dates || []);
+          setContacts(contacts || []);
+          setDormitory(dormitory || { description: null, address: null, images: [] });
+          return;
+        }
+      }
+
+      // Fallback на старые отдельные запросы
+      console.warn('Page data API failed, falling back to individual requests');
       const [specialtiesRes, documentsRes, datesRes, contactsRes, dormitoryRes] = await Promise.all([
-        fetch('/api/admission/specialties'),
-        fetch('/api/admission/documents'),
-        fetch('/api/admission/dates'),
-        fetch('/api/admission/contacts'),
-        fetch('/api/admission/dormitory')
+        fetch('/api/admission/specialties', { headers }),
+        fetch('/api/admission/documents', { headers }),
+        fetch('/api/admission/dates', { headers }),
+        fetch('/api/admission/contacts', { headers }),
+        fetch('/api/admission/dormitory', { headers })
       ]);
 
       const [specialtiesData, documentsData, datesData, contactsData, dormitoryData] = await Promise.all([
@@ -386,7 +411,7 @@ export default function Admission() {
                   <tr className="bg-blue-700">
                     <th colSpan={5} className="px-4 py-2"></th>
                     <th className="px-4 py-2 text-center text-sm">
-                      <div className="grid grid-cols-2 gap-1">
+                      <div className="flex justify-center gap-2">
                         <span>Бюджет</span>
                         <span>Платные</span>
                       </div>
@@ -404,10 +429,10 @@ export default function Admission() {
                       <td className="px-4 py-4 text-center">
                         <div className="grid grid-cols-2 gap-2">
                           <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">
-                            {specialty.budgetPlaces}
+                            {specialty.budgetPlaces ?? 0}
                           </div>
                           <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">
-                            {specialty.paidPlaces}
+                            {specialty.paidPlaces ?? 0}
                           </div>
                         </div>
                       </td>
@@ -521,3 +546,4 @@ export default function Admission() {
     </div>
   );
 }
+

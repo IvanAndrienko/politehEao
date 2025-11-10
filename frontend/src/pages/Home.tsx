@@ -43,62 +43,96 @@ export default function Home() {
 
   const loadHomeData = async () => {
     try {
-      // Загружаем слайды из API
-      const slidesResponse = await fetch('/api/home-slider');
-      const slidesData = await slidesResponse.json();
+      // Загружаем все данные одним запросом
+      const response = await fetch('/api/page-data?page=home');
+      const result = await response.json();
 
-      // Если слайды есть в БД, используем их, иначе заглушки
-      if (slidesData && slidesData.length > 0) {
-        setSliderItems(slidesData.map((slide: any) => ({
-          id: slide.id,
-          title: slide.title,
-          subtitle: slide.subtitle,
-          image: slide.imageUrl, // Исправлено: используем imageUrl из API
-          link: slide.link
+      if (result.success && result.data) {
+        const { settings, homeSlider, news, announcements } = result.data;
+
+        // Обрабатываем слайды
+        if (homeSlider && homeSlider.length > 0) {
+          setSliderItems(homeSlider.map((slide: any) => ({
+            id: slide.id,
+            title: slide.title,
+            subtitle: slide.subtitle,
+            image: slide.imageUrl,
+            link: slide.link
+          })));
+        } else {
+          // Заглушки, если в БД нет слайдов
+          setSliderItems([
+            {
+              id: '1',
+              title: 'Добро пожаловать в Политехнический техникум!',
+              subtitle: 'Лучшее образование для вашего будущего',
+              image: '/placeholder-image.png',
+              link: '/about'
+            },
+            {
+              id: '2',
+              title: 'Современные специальности',
+              subtitle: 'Программирование, дизайн, инженерия',
+              image: '/placeholder-image.png',
+              link: '/specialties'
+            },
+            {
+              id: '3',
+              title: 'Активная студенческая жизнь',
+              subtitle: 'Спорт, творчество, волонтерство',
+              image: '/placeholder-image.png',
+              link: '/students'
+            }
+          ]);
+        }
+
+        // Обрабатываем новости
+        setNews(news || []);
+
+        // Обрабатываем объявления
+        setEvents((announcements || []).slice(0, 4).map((announcement: any) => ({
+          id: announcement.id,
+          title: announcement.title,
+          description: announcement.content,
+          date: new Date().toISOString(),
+          location: '',
+          type: announcement.urgent ? 'urgent' : 'announcement'
         })));
       } else {
-        // Заглушки, если в БД нет слайдов
-        setSliderItems([
-          {
-            id: '1',
-            title: 'Добро пожаловать в Политехнический техникум!',
-            subtitle: 'Лучшее образование для вашего будущего',
-            image: '/placeholder-image.png',
-            link: '/about'
-          },
-          {
-            id: '2',
-            title: 'Современные специальности',
-            subtitle: 'Программирование, дизайн, инженерия',
-            image: '/placeholder-image.png',
-            link: '/specialties'
-          },
-          {
-            id: '3',
-            title: 'Активная студенческая жизнь',
-            subtitle: 'Спорт, творчество, волонтерство',
-            image: '/placeholder-image.png',
-            link: '/students'
-          }
-        ]);
+        // Fallback на старый способ загрузки
+        console.warn('Page data API failed, falling back to individual requests');
+
+        // Загружаем слайды из API
+        const slidesResponse = await fetch('/api/home-slider');
+        const slidesData = await slidesResponse.json();
+
+        if (slidesData && slidesData.length > 0) {
+          setSliderItems(slidesData.map((slide: any) => ({
+            id: slide.id,
+            title: slide.title,
+            subtitle: slide.subtitle,
+            image: slide.imageUrl,
+            link: slide.link
+          })));
+        }
+
+        // Загружаем новости
+        const newsResponse = await fetch('/api/news?limit=6');
+        const newsData = await newsResponse.json();
+        setNews(newsData.news || []);
+
+        // Загружаем объявления
+        const eventsResponse = await fetch('/api/schedule/announcements?limit=4');
+        const eventsData = await eventsResponse.json();
+        setEvents(eventsData.slice(0, 4).map((announcement: any) => ({
+          id: announcement.id,
+          title: announcement.title,
+          description: announcement.content,
+          date: new Date().toISOString(),
+          location: '',
+          type: announcement.urgent ? 'urgent' : 'announcement'
+        })));
       }
-
-      // Загружаем новости
-      const newsResponse = await fetch('/api/news?limit=6');
-      const newsData = await newsResponse.json();
-      setNews(newsData.news || []);
-
-      // Загружаем объявления как события (только последние 4)
-      const eventsResponse = await fetch('/api/schedule/announcements?limit=4');
-      const eventsData = await eventsResponse.json();
-      setEvents(eventsData.slice(0, 4).map((announcement: any) => ({
-        id: announcement.id,
-        title: announcement.title,
-        description: announcement.content,
-        date: new Date().toISOString(), // Используем текущую дату для отображения
-        location: '',
-        type: announcement.urgent ? 'urgent' : 'announcement'
-      })));
 
     } catch (error) {
       console.error('Error loading home data:', error);

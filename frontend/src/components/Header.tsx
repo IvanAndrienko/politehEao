@@ -20,9 +20,20 @@ export default function Header() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/settings');
+        // Пробуем загрузить из объединенного API
+        const response = await fetch('/api/page-data?page=header');
         if (response.ok) {
-          const data = await response.json();
+          const result = await response.json();
+          if (result.success && result.data.settings) {
+            setSettings(result.data.settings);
+            return;
+          }
+        }
+
+        // Fallback на старый способ
+        const fallbackResponse = await fetch('/api/settings');
+        if (fallbackResponse.ok) {
+          const data = await fallbackResponse.json();
           setSettings(data);
         }
       } catch (error) {
