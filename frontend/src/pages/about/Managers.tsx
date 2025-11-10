@@ -10,12 +10,12 @@ interface Manager {
   email: string;
   type: 'director' | 'deputy' | 'filial';
   filialName?: string;
-}
+}   
 
-export default function Managers() {1231231232131223
+export default function Managers() {
   const [managers, setManagers] = useState<Manager[]>([]);
-  const [loading, setLoading] = useState(true);rfgergergergerg
-fghfdghfg
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     loadManagers();
   }, []);
