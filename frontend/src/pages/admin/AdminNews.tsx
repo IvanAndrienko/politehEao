@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash} from 'react-icons/fa';
+import TiptapEditor from '../../components/TiptapEditor';
 
 interface News {
   id: number;
@@ -147,7 +148,7 @@ export default function AdminNews() {
 
       if (response.ok) {
         const data = await response.json();
-        setFormData({ ...formData, images: [...formData.images, ...data.urls] });
+        setFormData({ ...formData, images: [...formData.images, ...data.files.map((f: any) => f.url)] });
       } else {
         alert('Ошибка загрузки изображений');
       }
@@ -172,7 +173,7 @@ export default function AdminNews() {
 
       if (response.ok) {
         const data = await response.json();
-        setFormData({ ...formData, attachments: [...formData.attachments, ...data.urls] });
+        setFormData({ ...formData, attachments: [...formData.attachments, ...data.files.map((f: any) => f.url)] });
       } else {
         alert('Ошибка загрузки документов');
       }
@@ -191,17 +192,28 @@ export default function AdminNews() {
   };
 
   // Редактирование новости
-  const handleEdit = (newsItem: News) => {
-    setEditingNews(newsItem);
-    setFormData({
-      title: newsItem.title,
-      shortDescription: newsItem.shortDescription || '',
-      fullText: '', // Нужно загрузить полную новость
-      previewImage: newsItem.previewImage || '',
-      attachments: [],
-      images: []
-    });
-    setShowForm(true);
+  const handleEdit = async (newsItem: News) => {
+    try {
+      const response = await fetch(`/api/news/${newsItem.slug}`);
+      if (response.ok) {
+        const fullNews = await response.json();
+        setEditingNews(newsItem);
+        setFormData({
+          title: fullNews.title,
+          shortDescription: fullNews.shortDescription || '',
+          fullText: fullNews.fullText,
+          previewImage: fullNews.previewImage || '',
+          attachments: fullNews.attachments || [],
+          images: fullNews.images || []
+        });
+        setShowForm(true);
+      } else {
+        alert('Ошибка загрузки полной новости');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+      alert('Ошибка загрузки новости');
+    }
   };
 
   if (loading) {
@@ -290,12 +302,9 @@ export default function AdminNews() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Полный текст новости *
                 </label>
-                <textarea
-                  required
-                  value={formData.fullText}
-                  onChange={(e) => setFormData({ ...formData, fullText: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={8}
+                <TiptapEditor
+                  content={formData.fullText}
+                  onChange={(content) => setFormData({ ...formData, fullText: content })}
                   placeholder="Полный текст новости"
                 />
               </div>
@@ -312,7 +321,7 @@ export default function AdminNews() {
                 />
                 {formData.previewImage && (
                   <div className="mt-2">
-                    <img src={`$formData.previewImage}`} alt="Preview" className="w-32 h-32 object-cover rounded" />
+                    <img src={`${formData.previewImage}`} alt="Preview" className="w-32 h-32 object-cover rounded" />
                   </div>
                 )}
               </div>

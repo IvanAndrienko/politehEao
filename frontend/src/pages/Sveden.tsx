@@ -1,8 +1,19 @@
 import { Link, useParams } from 'react-router-dom';
-import { FaBuilding, FaUsers, FaFileAlt, FaAward, FaGraduationCap, FaUser, FaHome, FaDollarSign, FaGlobe, FaUtensils, FaArrowLeft } from 'react-icons/fa';
+import { FaBuilding, FaUsers, FaFileAlt, FaAward, FaGraduationCap, FaUser, FaHome, FaRubleSign, FaGlobe, FaUtensils, FaArrowLeft } from 'react-icons/fa';
 import Common from './about/Common';
 import Structure from './about/Structure';
 import DocumentsComponent from './about/Documents';
+import Education from './about/Education';
+import EduStandarts from './about/EduStandarts';
+import Objects from './about/Objects';
+import Employees from './about/Employees';
+import Managers from './about/Managers';
+import International from './about/International';
+import Grants from './about/Grants';
+import PaidEdu from './about/PaidEdu';
+import Budget from './about/Budget';
+import VacantPlaces from './about/VacantPlaces';
+import Catering from './about/Catering';
 
 export default function Sveden() {
   const { section } = useParams<{ section?: string }>();
@@ -15,13 +26,13 @@ export default function Sveden() {
       description: 'Общая информация об образовательной организации'
     },
     {
-      id: 'structure',
-      title: 'Структура и органы управления',
+      id: 'struct',
+      title: 'Структура и органы управления образовательной организацией',
       icon: <FaUsers className="w-6 h-6" />,
       description: 'Организационная структура техникума'
     },
     {
-      id: 'documents',
+      id: 'document',
       title: 'Документы',
       icon: <FaFileAlt className="w-6 h-6" />,
       description: 'Устав, лицензии и другие документы'
@@ -33,56 +44,62 @@ export default function Sveden() {
       description: 'Образовательные программы и стандарты'
     },
     {
-      id: 'leadership',
+      id: 'eduStandarts',
+      title: 'Образовательные стандарты и требования',
+      icon: <FaGraduationCap className="w-6 h-6" />,
+      description: 'Стандарты и требования к образованию'
+    },
+    {
+      id: 'managers',
       title: 'Руководство',
       icon: <FaUser className="w-6 h-6" />,
       description: 'Администрация техникума'
     },
     {
-      id: 'teachers',
+      id: 'employees',
       title: 'Педагогический состав',
       icon: <FaGraduationCap className="w-6 h-6" />,
       description: 'Информация о преподавателях'
     },
     {
-      id: 'facilities',
-      title: 'Материально-техническое обеспечение',
+      id: 'objects',
+      title: 'Материально-техническое обеспечение и оснащённость образовательного процесса. Доступная среда',
       icon: <FaHome className="w-6 h-6" />,
       description: 'Оборудование и инфраструктура'
     },
     {
-      id: 'paid-services',
-      title: 'Платные образовательные услуги',
-      icon: <FaDollarSign className="w-6 h-6" />,
-      description: 'Информация о платных услугах'
-    },
-    {
-      id: 'financial',
-      title: 'Финансово-хозяйственная деятельность',
-      icon: <FaDollarSign className="w-6 h-6" />,
-      description: 'Финансовая отчетность'
-    },
-    {
-      id: 'vacancies',
-      title: 'Вакантные места',
-      icon: <FaUsers className="w-6 h-6" />,
-      description: 'Свободные места для поступления'
-    },
-    {
-      id: 'scholarships',
-      title: 'Стипендии и меры поддержки',
+      id: 'grants',
+      title: 'Стипендии и меры поддержки обучающихся',
       icon: <FaAward className="w-6 h-6" />,
       description: 'Социальная поддержка обучающихся'
     },
     {
-      id: 'international',
+      id: 'paid_edu',
+      title: 'Платные образовательные услуги',
+      icon: <FaRubleSign className="w-6 h-6" />,
+      description: 'Информация о платных услугах'
+    },
+    {
+      id: 'budget',
+      title: 'Финансово-хозяйственная деятельность',
+      icon: <FaRubleSign className="w-6 h-6" />,
+      description: 'Финансовая отчетность'
+    },
+    {
+      id: 'vacant',
+      title: 'Вакантные места для приема (перевода) обучающихся',
+      icon: <FaUsers className="w-6 h-6" />,
+      description: 'Свободные места для поступления'
+    },
+    {
+      id: 'inter',
       title: 'Международное сотрудничество',
       icon: <FaGlobe className="w-6 h-6" />,
       description: 'Международные связи и проекты'
     },
     {
-      id: 'nutrition',
-      title: 'Организация питания',
+      id: 'catering',
+      title: 'Организация питания в образовательной организации',
       icon: <FaUtensils className="w-6 h-6" />,
       description: 'Столовая и питание в техникуме'
     }
@@ -108,18 +125,9 @@ export default function Sveden() {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
           <div className="max-w-screen-2xl mx-auto px-4">
-            <div className="flex items-center space-x-4 mb-4">
-              <Link
-                to="/sveden"
-                className="flex items-center text-blue-200 hover:text-white transition-colors"
-              >
-                <FaArrowLeft className="w-5 h-5 mr-2" />
-                Назад к разделам
-              </Link>
-            </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 mb-4">
               <div className="text-blue-200">{currentSection.icon}</div>
               <h1 className="text-3xl md:text-4xl font-bold">{currentSection.title}</h1>
             </div>
@@ -127,13 +135,34 @@ export default function Sveden() {
         </div>
 
         <div className="max-w-screen-2xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-lg shadow-md p-8">
+          {/* Кнопка назад */}
+          <div className="mb-6">
+            <button
+              onClick={() => window.location.href = '/sveden'}
+              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              <FaArrowLeft className="w-4 h-4 mr-2" />
+              Назад к разделам
+            </button>
+          </div>
+          <div className="bg-white rounded-lg shadow-md p-8 animate-slide-up">
             {section === 'common' && <Common />}
-            {section === 'structure' && <Structure />}
-            {section === 'documents' && <DocumentsComponent />}
+            {section === 'struct' && <Structure />}
+            {section === 'document' && <DocumentsComponent />}
+            {section === 'education' && <Education />}
+            {section === 'eduStandarts' && <EduStandarts />}
+            {section === 'objects' && <Objects />}
+            {section === 'managers' && <Managers />}
+            {section === 'employees' && <Employees />}
+            {section === 'grants' && <Grants />}
+            {section === 'paid_edu' && <PaidEdu />}
+            {section === 'budget' && <Budget />}
+            {section === 'vacant' && <VacantPlaces />}
+            {section === 'catering' && <Catering />}
+            {section === 'inter' && <International />}
             {/* Для других секций можно добавить соответствующие компоненты */}
-            {!['common', 'structure', 'documents'].includes(section) && (
-              <div className="text-center py-12">
+            {!['common', 'struct', 'document', 'education', 'eduStandarts', 'objects', 'managers', 'employees', 'grants', 'paid_edu', 'budget', 'vacant', 'catering', 'inter'].includes(section) && (
+              <div className="text-center py-12 animate-slide-up">
                 <div className="text-gray-400 mb-4">{currentSection.icon}</div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{currentSection.title}</h3>
                 <p className="text-gray-600">Информация будет добавлена в ближайшее время</p>
@@ -163,11 +192,12 @@ export default function Sveden() {
 
       <div className="max-w-screen-2xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {svedenSections.map((section) => (
+          {svedenSections.map((section, index) => (
             <Link
               key={section.id}
               to={`/sveden/${section.id}`}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-200 hover:border-blue-300 block"
+              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-200 hover:border-blue-300 block animate-slide-up"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="flex items-center space-x-3 mb-3">
                 <div className="text-blue-600">{section.icon}</div>

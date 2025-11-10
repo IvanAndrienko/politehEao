@@ -74,10 +74,31 @@ router.delete('/', async (req, res) => {
       }
     });
 
-    if (newsWithFile.length > 0) {
+    // Проверить использование в других таблицах
+    const documentsWithFile = await prisma.document.findMany({
+      where: { fileUrl: filename }
+    });
+
+    const studentDocumentsWithFile = await prisma.studentDocument.findMany({
+      where: { fileUrl: filename }
+    });
+
+    const structureDocumentsWithFile = await prisma.structureDocument.findMany({
+      where: { fileUrl: filename }
+    });
+
+    const totalUsage = newsWithFile.length + documentsWithFile.length +
+                      studentDocumentsWithFile.length + structureDocumentsWithFile.length;
+
+    if (totalUsage > 0) {
       return res.status(400).json({
-        message: 'Файл используется в новостях и не может быть удален',
-        newsCount: newsWithFile.length
+        message: 'Файл используется в системе и не может быть удален',
+        usage: {
+          news: newsWithFile.length,
+          documents: documentsWithFile.length,
+          studentDocuments: studentDocumentsWithFile.length,
+          structureDocuments: structureDocumentsWithFile.length
+        }
       });
     }
 

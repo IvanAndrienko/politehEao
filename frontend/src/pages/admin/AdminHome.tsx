@@ -232,7 +232,7 @@ export default function AdminHome() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                       <p className="text-xs text-gray-500 mt-1">
-                        Формат: 23:9 (широкоформатное изображение). Максимальный размер: 5MB.
+                        Формат: 23:7 (ВСЕ ИЗОБРОЖЕНИЯ ДОЛЖНЫ БЫТЬ ОДНОГО ФОРМАТА!). Максимальный размер: 5MB.
                       </p>
                     </div>
                     <div className="flex space-x-4">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { FaCalendar, FaArrowLeft, FaDownload } from 'react-icons/fa';
+import { FaCalendar, FaArrowLeft, FaDownload, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 // Компонент для безопасного отображения изображений
 const SafeImage = ({ src, alt, className, ...props }: { src?: string; alt?: string; className?: string; [key: string]: any }) => {
@@ -48,6 +48,8 @@ export default function NewsDetail() {
   const [news, setNews] = useState<NewsDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const loadNews = async () => {
@@ -81,6 +83,35 @@ export default function NewsDetail() {
       minute: '2-digit'
     });
   };
+
+  const openModal = (index: number) => {
+    setCurrentImageIndex(index);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % news!.images.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + news!.images.length) % news!.images.length);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (!modalOpen) return;
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'ArrowLeft') prevImage();
+    if (e.key === 'ArrowRight') nextImage();
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [modalOpen]);
 
   if (loading) {
     return (
@@ -133,7 +164,7 @@ export default function NewsDetail() {
           <SafeImage
             src={`http://localhost:5000${news.previewImage}`}
             alt={news.title}
-            className="w-full max-h-96 object-cover rounded-lg shadow-md"
+            className="w-full h-auto rounded-lg shadow-md"
           />
         </div>
       )}
@@ -147,18 +178,19 @@ export default function NewsDetail() {
 
       {/* Полный текст */}
       <div className="prose prose-lg max-w-none mb-8">
-        <div className="text-gray-800 leading-relaxed whitespace-pre-line">
-          {news.fullText}
-        </div>
+        <div
+          className="text-gray-800 leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: news.fullText }}
+        />
       </div>
 
       {/* Галерея изображений */}
       {news.images && news.images.length > 0 && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Галерея</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {news.images.map((image, index) => (
-              <div key={index} className="aspect-square overflow-hidden rounded-lg shadow-md">
+              <div key={index} className="aspect-square overflow-hidden rounded-lg shadow-md cursor-pointer" onClick={() => openModal(index)}>
                 <SafeImage
                   src={`http://localhost:5000${image}`}
                   alt={`Изображение ${index + 1}`}
@@ -193,6 +225,53 @@ export default function NewsDetail() {
                 </a>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно для просмотра изображений */}
+      {modalOpen && news && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 animate-fade-in backdrop-blur-sm backdrop-brightness-50">
+        
+          {/* Кнопки навигации */}
+            {news.images.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600 hover:text-blue-800 bg-white rounded-full p-3 shadow-lg"
+                >
+                  <FaChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-600 hover:text-blue-800 bg-white rounded-full p-3 shadow-lg"
+                >
+                  <FaChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+
+            {/* Кнопка закрытия */}
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-blue-600 hover:text-blue-800 z-10 bg-white rounded-full p-3 shadow-lg"
+            >
+              <FaTimes className="w-6 h-6" />
+            </button>
+            {/* Индикатор */}
+            {news.images.length > 1 && (
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-50 px-3 py-1 rounded-full text-sm">
+                {currentImageIndex + 1} / {news.images.length}
+              </div>
+            )}
+
+          <div className="relative max-w-4xl max-h-full p-4 border shadow-lg rounded-md bg-white"> 
+            {/* Изображение */}
+            <SafeImage
+              src={`http://localhost:5000${news.images[currentImageIndex]}`}
+              alt={`Изображение ${currentImageIndex + 1}`}
+              className="max-w-full max-h-[80vh] object-contain rounded-lg"
+            />
           </div>
         </div>
       )}

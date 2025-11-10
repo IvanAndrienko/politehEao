@@ -88,7 +88,8 @@ export default function Raspisanie() {
           {groups.map((group, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group transform hover:-translate-y-1"
+              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group transform hover:-translate-y-1 animate-slide-up"
+              style={{ animationDelay: `${index * 150}ms` }}
               onClick={() => handleGroupClick(group.code)}
             >
               <div className="flex items-center justify-between mb-3">

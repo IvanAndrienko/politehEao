@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Папки для загрузок
-const uploadsDir = path.join(__dirname, '..', 'uploads');
+const uploadsDir = path.join(process.cwd(), 'uploads');
 const imagesDir = path.join(uploadsDir, 'images');
 const documentsDir = path.join(uploadsDir, 'documents');
 
@@ -20,9 +20,34 @@ if (!fs.existsSync(documentsDir)) {
   fs.mkdirSync(documentsDir, { recursive: true });
 }
 
-// Функция для декодирования русских символов в имени файла
-const decodeFileName = (originalName) => {
-  return Buffer.from(originalName, 'latin1').toString('utf8');
+// Функция для декодирования русских символов и санитизации имени файла
+const sanitizeFileName = (originalName) => {
+  // Перекодировка имени файла из latin1 в utf8 (multer передает в latin1)
+  let decoded;
+  try {
+    decoded = Buffer.from(originalName, 'latin1').toString('utf8');
+  } catch (e) {
+    decoded = originalName;
+  }
+
+  // Получаем расширение и нормализуем его
+  const ext = path.extname(decoded).toLowerCase();
+
+  // Проверяем наличие расширения
+  if (!ext) {
+    throw new Error('Файл должен иметь расширение');
+  }
+
+  // Получаем имя без расширения и санитизируем
+  const name = path.basename(decoded, path.extname(decoded))
+    .replace(/[^a-zA-Z0-9а-яА-ЯёЁ\s\-_.]/g, '-') // Заменяем спецсимволы на дефисы
+    .replace(/\s+/g, '-') // Заменяем пробелы на дефисы
+    .replace(/-+/g, '-') // Убираем множественные дефисы
+    .replace(/^-|-$/g, '') // Убираем дефисы в начале и конце
+    .substring(0, 100); // Ограничиваем длину имени файла
+
+  // Возвращаем оригинальное имя для отображения и санитизированное для сохранения
+  return { name, ext, originalName: decoded };
 };
 
 // Настройки хранилища для изображений
@@ -31,11 +56,13 @@ const imageStorage = multer.diskStorage({
     cb(null, imagesDir);
   },
   filename: (req, file, cb) => {
-    const originalName = decodeFileName(file.originalname);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(originalName);
-    const name = path.basename(originalName, ext);
-    cb(null, `${name}-${uniqueSuffix}${ext}`);
+    try {
+      const { name, ext } = sanitizeFileName(file.originalname);
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, `${name}-${uniqueSuffix}${ext}`);
+    } catch (error) {
+      cb(error);
+    }
   }
 });
 
@@ -45,11 +72,15 @@ const documentStorage = multer.diskStorage({
     cb(null, documentsDir);
   },
   filename: (req, file, cb) => {
-    const originalName = decodeFileName(file.originalname);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(originalName);
-    const name = path.basename(originalName, ext);
-    cb(null, `${name}-${uniqueSuffix}${ext}`);
+    try {
+      const { name, ext, originalName } = sanitizeFileName(file.originalname);
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      // Сохраняем оригинальное имя для отображения, но используем санитизированное для файла
+      file.originalname = originalName; // Перезаписываем для возврата в API
+      cb(null, `${name}-${uniqueSuffix}${ext}`);
+    } catch (error) {
+      cb(error);
+    }
   }
 });
 
