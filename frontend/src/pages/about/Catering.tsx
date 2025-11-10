@@ -16,7 +16,7 @@ interface CateringObject {
 export default function Catering() {
   const [catering, setCatering] = useState<CateringObject[]>([]);
   const [loading, setLoading] = useState(true);
-
+   
   useEffect(() => {
     loadCatering();
   }, []);
