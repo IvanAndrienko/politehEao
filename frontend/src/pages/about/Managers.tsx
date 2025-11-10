@@ -12,10 +12,10 @@ interface Manager {
   filialName?: string;
 }
 
-export default function Managers() {
+export default function Managers() {1231231232131223
   const [managers, setManagers] = useState<Manager[]>([]);
-  const [loading, setLoading] = useState(true);
-
+  const [loading, setLoading] = useState(true);rfgergergergerg
+fghfdghfg
   useEffect(() => {
     loadManagers();
   }, []);
