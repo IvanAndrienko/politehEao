@@ -1,22 +1,22 @@
-/**
- * Страница "Абитуриенту" - информация о поступлении в Политехнический техникум
+﻿/**
+ * РЎС‚СЂР°РЅРёС†Р° "РђР±РёС‚СѓСЂРёРµРЅС‚Сѓ" - РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїРѕСЃС‚СѓРїР»РµРЅРёРё РІ РџРѕР»РёС‚РµС…РЅРёС‡РµСЃРєРёР№ С‚РµС…РЅРёРєСѓРј
  *
- * Содержит:
- * - Процесс поступления (4 шага)
- * - Необходимые документы (загружаются из БД)
- * - Важные даты (загружаются из БД)
- * - Преимущества обучения
- * - Контакты приемной комиссии (загружаются из БД) и интерактивная карта Яндекса (г. Биробиджан)
- * - Таблица специальностей с планом набора (бюджетные/платные места, загружаются из БД)
- * - Контактная информация
+ * РЎРѕРґРµСЂР¶РёС‚:
+ * - РџСЂРѕС†РµСЃСЃ РїРѕСЃС‚СѓРїР»РµРЅРёСЏ (4 С€Р°РіР°)
+ * - РќРµРѕР±С…РѕРґРёРјС‹Рµ РґРѕРєСѓРјРµРЅС‚С‹ (Р·Р°РіСЂСѓР¶Р°СЋС‚СЃСЏ РёР· Р‘Р”)
+ * - Р’Р°Р¶РЅС‹Рµ РґР°С‚С‹ (Р·Р°РіСЂСѓР¶Р°СЋС‚СЃСЏ РёР· Р‘Р”)
+ * - РџСЂРµРёРјСѓС‰РµСЃС‚РІР° РѕР±СѓС‡РµРЅРёСЏ
+ * - РљРѕРЅС‚Р°РєС‚С‹ РїСЂРёРµРјРЅРѕР№ РєРѕРјРёСЃСЃРёРё (Р·Р°РіСЂСѓР¶Р°СЋС‚СЃСЏ РёР· Р‘Р”) Рё РёРЅС‚РµСЂР°РєС‚РёРІРЅР°СЏ РєР°СЂС‚Р° РЇРЅРґРµРєСЃР° (Рі. Р‘РёСЂРѕР±РёРґР¶Р°РЅ)
+ * - РўР°Р±Р»РёС†Р° СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚РµР№ СЃ РїР»Р°РЅРѕРј РЅР°Р±РѕСЂР° (Р±СЋРґР¶РµС‚РЅС‹Рµ/РїР»Р°С‚РЅС‹Рµ РјРµСЃС‚Р°, Р·Р°РіСЂСѓР¶Р°СЋС‚СЃСЏ РёР· Р‘Р”)
+ * - РљРѕРЅС‚Р°РєС‚РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { FaFileAlt, FaCheckCircle, FaCalendar, FaGraduationCap, FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaHome } from 'react-icons/fa';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
-// Декларация типов для Яндекс.Карт
+// Р”РµРєР»Р°СЂР°С†РёСЏ С‚РёРїРѕРІ РґР»СЏ РЇРЅРґРµРєСЃ.РљР°СЂС‚
 declare global {
   interface Window {
     ymaps: any;
@@ -58,36 +58,73 @@ interface DormitoryData {
   address: string | null;
   images: string[];
 }
+const DEFAULT_MAP_COORDINATES: [number, number] = [48.758344, 132.88787];
+const DEFAULT_MAP_ADDRESS = "г. Биробиджан, ул. Шолом-Алейхема, д. 15";
 
-// Шаги процесса поступления
+const parseMapCoordinateValue = (value?: string | null): [number, number] | null => {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const trimmed = value.trim();
+
+    if (trimmed.startsWith('{')) {
+      const parsed = JSON.parse(trimmed);
+      const latRaw = parsed.lat ?? parsed.latitude;
+      const lngRaw = parsed.lng ?? parsed.longitude;
+      const lat = latRaw !== undefined ? parseFloat(latRaw) : NaN;
+      const lng = lngRaw !== undefined ? parseFloat(lngRaw) : NaN;
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        return [lat, lng];
+      }
+    }
+
+    const separator = trimmed.includes(',') ? ',' : trimmed.includes(';') ? ';' : null;
+    if (separator) {
+      const [latPart, lngPart] = trimmed.split(separator);
+      const lat = parseFloat(latPart);
+      const lng = parseFloat(lngPart);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        return [lat, lng];
+      }
+    }
+  } catch {
+    // ignore parse errors
+  }
+
+  return null;
+};
+
+// РЁР°РіРё РїСЂРѕС†РµСЃСЃР° РїРѕСЃС‚СѓРїР»РµРЅРёСЏ
 const admissionSteps = [
   {
     step: 1,
-    title: "Подготовка документов",
-    description: "Соберите необходимые документы согласно списку"
+    title: "РџРѕРґРіРѕС‚РѕРІРєР° РґРѕРєСѓРјРµРЅС‚РѕРІ",
+    description: "РЎРѕР±РµСЂРёС‚Рµ РЅРµРѕР±С…РѕРґРёРјС‹Рµ РґРѕРєСѓРјРµРЅС‚С‹ СЃРѕРіР»Р°СЃРЅРѕ СЃРїРёСЃРєСѓ"
   },
   {
     step: 2,
-    title: "Подача заявления",
-    description: "Подайте заявление и документы в приемную комиссию"
+    title: "РџРѕРґР°С‡Р° Р·Р°СЏРІР»РµРЅРёСЏ",
+    description: "РџРѕРґР°Р№С‚Рµ Р·Р°СЏРІР»РµРЅРёРµ Рё РґРѕРєСѓРјРµРЅС‚С‹ РІ РїСЂРёРµРјРЅСѓСЋ РєРѕРјРёСЃСЃРёСЋ"
   },
   {
     step: 3,
-    title: "Участие в конкурсе",
-    description: "Дождитесь результатов конкурсного отбора"
+    title: "РЈС‡Р°СЃС‚РёРµ РІ РєРѕРЅРєСѓСЂСЃРµ",
+    description: "Р”РѕР¶РґРёС‚РµСЃСЊ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РєРѕРЅРєСѓСЂСЃРЅРѕРіРѕ РѕС‚Р±РѕСЂР°"
   },
   {
     step: 4,
-    title: "Зачисление",
-    description: "Получите приказ о зачислении и приступите к обучению"
+    title: "Р—Р°С‡РёСЃР»РµРЅРёРµ",
+    description: "РџРѕР»СѓС‡РёС‚Рµ РїСЂРёРєР°Р· Рѕ Р·Р°С‡РёСЃР»РµРЅРёРё Рё РїСЂРёСЃС‚СѓРїРёС‚Рµ Рє РѕР±СѓС‡РµРЅРёСЋ"
   }
 ];
 
-// Данные теперь загружаются динамически из API
+// Р”Р°РЅРЅС‹Рµ С‚РµРїРµСЂСЊ Р·Р°РіСЂСѓР¶Р°СЋС‚СЃСЏ РґРёРЅР°РјРёС‡РµСЃРєРё РёР· API
 
-// Компонент страницы "Абитуриенту" с информацией о поступлении
+// РљРѕРјРїРѕРЅРµРЅС‚ СЃС‚СЂР°РЅРёС†С‹ "РђР±РёС‚СѓСЂРёРµРЅС‚Сѓ" СЃ РёРЅС„РѕСЂРјР°С†РёРµР№ Рѕ РїРѕСЃС‚СѓРїР»РµРЅРёРё
 export default function Admission() {
-  // Состояния для данных
+  // РЎРѕСЃС‚РѕСЏРЅРёСЏ РґР»СЏ РґР°РЅРЅС‹С…
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [documents, setDocuments] = useState<RequiredDocument[]>([]);
   const [dates, setDates] = useState<ImportantDate[]>([]);
@@ -96,8 +133,16 @@ export default function Admission() {
   const [loading, setLoading] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState(false);
+  const mapRef = useRef<any>(null);
+  const placemarkRef = useRef<any>(null);
+  const mapAddress = contacts.find((c) => c.type === 'address')?.value || DEFAULT_MAP_ADDRESS;
+  const mapCoordinates = useMemo<[number, number]>(() => {
+    const mapContact = contacts.find((c) => c.type === 'map');
+    const parsed = parseMapCoordinateValue(mapContact?.value);
+    return parsed ?? DEFAULT_MAP_COORDINATES;
+  }, [contacts]);
 
-  // Загрузка данных при монтировании компонента
+  // Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С… РїСЂРё РјРѕРЅС‚РёСЂРѕРІР°РЅРёРё РєРѕРјРїРѕРЅРµРЅС‚Р°
   useEffect(() => {
     loadAdmissionData();
   }, []);
@@ -106,14 +151,14 @@ export default function Admission() {
     try {
       setLoading(true);
 
-      // Получаем токен из localStorage для авторизованных запросов
+      // РџРѕР»СѓС‡Р°РµРј С‚РѕРєРµРЅ РёР· localStorage РґР»СЏ Р°РІС‚РѕСЂРёР·РѕРІР°РЅРЅС‹С… Р·Р°РїСЂРѕСЃРѕРІ
       const token = localStorage.getItem('adminToken');
       const headers: Record<string, string> = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      // Пробуем загрузить из объединенного API
+      // РџСЂРѕР±СѓРµРј Р·Р°РіСЂСѓР·РёС‚СЊ РёР· РѕР±СЉРµРґРёРЅРµРЅРЅРѕРіРѕ API
       const response = await fetch('/api/page-data?page=admission', { headers });
       if (response.ok) {
         const result = await response.json();
@@ -128,7 +173,7 @@ export default function Admission() {
         }
       }
 
-      // Fallback на старые отдельные запросы
+      // Fallback РЅР° СЃС‚Р°СЂС‹Рµ РѕС‚РґРµР»СЊРЅС‹Рµ Р·Р°РїСЂРѕСЃС‹
       console.warn('Page data API failed, falling back to individual requests');
       const [specialtiesRes, documentsRes, datesRes, contactsRes, dormitoryRes] = await Promise.all([
         fetch('/api/admission/specialties', { headers }),
@@ -152,59 +197,59 @@ export default function Admission() {
       setContacts(contactsData);
       setDormitory(dormitoryData);
     } catch (error) {
-      console.error('Ошибка загрузки данных:', error);
+      console.error('РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Инициализация Яндекс.Карты при загрузке компонента
+  // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РЇРЅРґРµРєСЃ.РљР°СЂС‚С‹ РїСЂРё Р·Р°РіСЂСѓР·РєРµ РєРѕРјРїРѕРЅРµРЅС‚Р°
   useEffect(() => {
     const initMap = () => {
       if (window.ymaps && !mapLoaded) {
-        // Проверяем, что элемент карты существует и видим
+        // РџСЂРѕРІРµСЂСЏРµРј, С‡С‚Рѕ СЌР»РµРјРµРЅС‚ РєР°СЂС‚С‹ СЃСѓС‰РµСЃС‚РІСѓРµС‚ Рё РІРёРґРёРј
         const mapElement = document.getElementById('map');
         if (!mapElement || mapElement.offsetWidth === 0) {
-          // Если элемент не готов, ждем еще немного
+          // Р•СЃР»Рё СЌР»РµРјРµРЅС‚ РЅРµ РіРѕС‚РѕРІ, Р¶РґРµРј РµС‰Рµ РЅРµРјРЅРѕРіРѕ
           setTimeout(initMap, 500);
           return;
         }
 
         window.ymaps.ready(() => {
           try {
-            // Координаты Биробиджана
+            // РљРѕРѕСЂРґРёРЅР°С‚С‹ Р‘РёСЂРѕР±РёРґР¶Р°РЅР°
             const birobidzhanCoords = [48.758344, 132.887870];
 
-            // Создаем карту
+            // РЎРѕР·РґР°РµРј РєР°СЂС‚Сѓ
             const map = new window.ymaps.Map('map', {
               center: birobidzhanCoords,
               zoom: 15,
               controls: ['zoomControl', 'fullscreenControl']
             });
 
-            // Добавляем метку техникума
+            // Р”РѕР±Р°РІР»СЏРµРј РјРµС‚РєСѓ С‚РµС…РЅРёРєСѓРјР°
             const placemark = new window.ymaps.Placemark(birobidzhanCoords, {
-              hintContent: 'Политехнический техникум',
-              balloonContent: 'г. Биробиджан, ул. Техникумовская, д. 15'
+              hintContent: 'РџРѕР»РёС‚РµС…РЅРёС‡РµСЃРєРёР№ С‚РµС…РЅРёРєСѓРј',
+              balloonContent: 'Рі. Р‘РёСЂРѕР±РёРґР¶Р°РЅ, СѓР». РўРµС…РЅРёРєСѓРјРѕРІСЃРєР°СЏ, Рґ. 15'
             });
 
             map.geoObjects.add(placemark);
             setMapLoaded(true);
           } catch (error) {
-            console.error('Ошибка инициализации карты:', error);
+            console.error('РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєР°СЂС‚С‹:', error);
             setMapError(true);
           }
         });
       }
     };
 
-    // Небольшая задержка для обеспечения готовности DOM
+    // РќРµР±РѕР»СЊС€Р°СЏ Р·Р°РґРµСЂР¶РєР° РґР»СЏ РѕР±РµСЃРїРµС‡РµРЅРёСЏ РіРѕС‚РѕРІРЅРѕСЃС‚Рё DOM
     const timer = setTimeout(() => {
-      // Проверяем, загружен ли API Яндекс.Карт
+      // РџСЂРѕРІРµСЂСЏРµРј, Р·Р°РіСЂСѓР¶РµРЅ Р»Рё API РЇРЅРґРµРєСЃ.РљР°СЂС‚
       if (window.ymaps) {
         initMap();
       } else {
-        // Если API еще не загружен, ждем его загрузки
+        // Р•СЃР»Рё API РµС‰Рµ РЅРµ Р·Р°РіСЂСѓР¶РµРЅ, Р¶РґРµРј РµРіРѕ Р·Р°РіСЂСѓР·РєРё
         const checkYmaps = setInterval(() => {
           if (window.ymaps) {
             clearInterval(checkYmaps);
@@ -212,7 +257,7 @@ export default function Admission() {
           }
         }, 100);
 
-        // Очищаем интервал через 10 секунд, если API не загрузился
+        // РћС‡РёС‰Р°РµРј РёРЅС‚РµСЂРІР°Р» С‡РµСЂРµР· 10 СЃРµРєСѓРЅРґ, РµСЃР»Рё API РЅРµ Р·Р°РіСЂСѓР·РёР»СЃСЏ
         setTimeout(() => {
           clearInterval(checkYmaps);
           if (!mapLoaded) {
@@ -230,7 +275,7 @@ export default function Admission() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Загрузка данных...</p>
+          <p className="mt-4 text-gray-600">Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…...</p>
         </div>
       </div>
     );
@@ -238,26 +283,26 @@ export default function Admission() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Героическая секция с заголовком */}
+      {/* Р“РµСЂРѕРёС‡РµСЃРєР°СЏ СЃРµРєС†РёСЏ СЃ Р·Р°РіРѕР»РѕРІРєРѕРј */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <div className="max-w-none mx-0">
           <div className="text-center">
             <FaGraduationCap className="w-16 h-16 mx-auto mb-6 text-blue-200" />
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Абитуриенту</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">РђР±РёС‚СѓСЂРёРµРЅС‚Сѓ</h1>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
-              Ваш путь к успешной карьере начинается здесь. Узнайте все о поступлении в Политехнический техникум
+              Р’Р°С€ РїСѓС‚СЊ Рє СѓСЃРїРµС€РЅРѕР№ РєР°СЂСЊРµСЂРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ Р·РґРµСЃСЊ. РЈР·РЅР°Р№С‚Рµ РІСЃРµ Рѕ РїРѕСЃС‚СѓРїР»РµРЅРёРё РІ РџРѕР»РёС‚РµС…РЅРёС‡РµСЃРєРёР№ С‚РµС…РЅРёРєСѓРј
             </p>
           </div>
         </div>
       </div>
 
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Секция процесса поступления */}
+        {/* РЎРµРєС†РёСЏ РїСЂРѕС†РµСЃСЃР° РїРѕСЃС‚СѓРїР»РµРЅРёСЏ */}
         <section className="mb-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Процесс поступления</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">РџСЂРѕС†РµСЃСЃ РїРѕСЃС‚СѓРїР»РµРЅРёСЏ</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Простые шаги к получению качественного профессионального образования
+              РџСЂРѕСЃС‚С‹Рµ С€Р°РіРё Рє РїРѕР»СѓС‡РµРЅРёСЋ РєР°С‡РµСЃС‚РІРµРЅРЅРѕРіРѕ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ
             </p>
           </div>
 
@@ -274,13 +319,13 @@ export default function Admission() {
           </div>
         </section>
 
-        {/* Секция с документами и важными датами */}
+        {/* РЎРµРєС†РёСЏ СЃ РґРѕРєСѓРјРµРЅС‚Р°РјРё Рё РІР°Р¶РЅС‹РјРё РґР°С‚Р°РјРё */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {/* Необходимые документы */}
+          {/* РќРµРѕР±С…РѕРґРёРјС‹Рµ РґРѕРєСѓРјРµРЅС‚С‹ */}
           <div className="bg-white rounded-xl shadow-lg p-8 animate-slide-up animation-delay-200">
             <div className="flex items-center mb-6">
               <FaFileAlt className="w-8 h-8 text-blue-600 mr-3" />
-              <h3 className="text-2xl font-bold text-gray-900">Необходимые документы</h3>
+              <h3 className="text-2xl font-bold text-gray-900">РќРµРѕР±С…РѕРґРёРјС‹Рµ РґРѕРєСѓРјРµРЅС‚С‹</h3>
             </div>
 
             <ul className="space-y-4 mb-8">
@@ -297,11 +342,11 @@ export default function Admission() {
 
           </div>
 
-          {/* Важные даты */}
+          {/* Р’Р°Р¶РЅС‹Рµ РґР°С‚С‹ */}
           <div className="bg-white rounded-xl shadow-lg p-8 animate-slide-up animation-delay-400">
             <div className="flex items-center mb-6">
               <FaCalendar className="w-8 h-8 text-blue-600 mr-3" />
-              <h3 className="text-2xl font-bold text-gray-900">Важные даты</h3>
+              <h3 className="text-2xl font-bold text-gray-900">Р’Р°Р¶РЅС‹Рµ РґР°С‚С‹</h3>
             </div>
 
             <div className="space-y-4">
@@ -323,14 +368,16 @@ export default function Admission() {
           </div>
         </div>
 
-        {/* Контакты приемной комиссии и карта */}
+        {/* РљРѕРЅС‚Р°РєС‚С‹ РїСЂРёРµРјРЅРѕР№ РєРѕРјРёСЃСЃРёРё Рё РєР°СЂС‚Р° */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl p-8 mb-16 animate-slide-up animation-delay-600">
-          <h3 className="text-3xl font-bold mb-8 text-center">Приемная комиссия</h3>
+          <h3 className="text-3xl font-bold mb-8 text-center">РџСЂРёРµРјРЅР°СЏ РєРѕРјРёСЃСЃРёСЏ</h3>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Контакты приемной комиссии */}
+            {/* РљРѕРЅС‚Р°РєС‚С‹ РїСЂРёРµРјРЅРѕР№ РєРѕРјРёСЃСЃРёРё */}
             <div className="space-y-6">
-              {contacts.map((contact) => {
+              {contacts
+                .filter((contact) => contact.type !== 'map')
+                .map((contact) => {
                 const getIcon = (type: string) => {
                   switch (type) {
                     case 'phone': return <FaPhone className="w-6 h-6 text-blue-200 mr-4 flex-shrink-0" />;
@@ -343,11 +390,11 @@ export default function Admission() {
 
                 const getTitle = (type: string) => {
                   switch (type) {
-                    case 'phone': return 'Телефон';
+                    case 'phone': return 'РўРµР»РµС„РѕРЅ';
                     case 'email': return 'Email';
-                    case 'address': return 'Адрес';
-                    case 'schedule': return 'График приема документов';
-                    default: return 'Контакт';
+                    case 'address': return 'РђРґСЂРµСЃ';
+                    case 'schedule': return 'Р“СЂР°С„РёРє РїСЂРёРµРјР° РґРѕРєСѓРјРµРЅС‚РѕРІ';
+                    default: return 'РљРѕРЅС‚Р°РєС‚';
                   }
                 };
 
@@ -363,14 +410,14 @@ export default function Admission() {
               })}
             </div>
 
-            {/* Карта */}
+            {/* РљР°СЂС‚Р° */}
             <div className="bg-white rounded-lg overflow-hidden shadow-lg">
               <div id="map" className="h-96 w-full">
                 {!mapLoaded && !mapError && (
                   <div className="h-full w-full flex items-center justify-center bg-gray-100">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                      <p className="text-gray-600">Загрузка карты...</p>
+                      <p className="text-gray-600">Р—Р°РіСЂСѓР·РєР° РєР°СЂС‚С‹...</p>
                     </div>
                   </div>
                 )}
@@ -382,8 +429,8 @@ export default function Admission() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                         </svg>
                       </div>
-                      <p className="text-gray-600 font-medium">Карта недоступна</p>
-                      <p className="text-gray-500 text-sm mt-1">Проверьте подключение к интернету</p>
+                      <p className="text-gray-600 font-medium">РљР°СЂС‚Р° РЅРµРґРѕСЃС‚СѓРїРЅР°</p>
+                      <p className="text-gray-500 text-sm mt-1">РџСЂРѕРІРµСЂСЊС‚Рµ РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє РёРЅС‚РµСЂРЅРµС‚Сѓ</p>
                     </div>
                   </div>
                 )}
@@ -392,28 +439,28 @@ export default function Admission() {
           </div>
         </div>
 
-        {/* Таблица специальностей с планом набора */}
+        {/* РўР°Р±Р»РёС†Р° СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚РµР№ СЃ РїР»Р°РЅРѕРј РЅР°Р±РѕСЂР° */}
         <div className="mb-16 animate-slide-up animation-delay-800">
-          <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Специальности</h3>
+          <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">РЎРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё</h3>
 
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-blue-600 text-white">
                   <tr>
-                    <th className="px-4 py-4 text-left font-semibold">Код</th>
-                    <th className="px-4 py-4 text-left font-semibold">Наименование специальности</th>
-                    <th className="px-4 py-4 text-left font-semibold">Срок обучения</th>
-                    <th className="px-4 py-4 text-left font-semibold">Форма обучения</th>
-                    <th className="px-4 py-4 text-left font-semibold">Квалификация</th>
-                    <th className="px-4 py-4 text-center font-semibold">План набора</th>
+                    <th className="px-4 py-4 text-left font-semibold">РљРѕРґ</th>
+                    <th className="px-4 py-4 text-left font-semibold">РќР°РёРјРµРЅРѕРІР°РЅРёРµ СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё</th>
+                    <th className="px-4 py-4 text-left font-semibold">РЎСЂРѕРє РѕР±СѓС‡РµРЅРёСЏ</th>
+                    <th className="px-4 py-4 text-left font-semibold">Р¤РѕСЂРјР° РѕР±СѓС‡РµРЅРёСЏ</th>
+                    <th className="px-4 py-4 text-left font-semibold">РљРІР°Р»РёС„РёРєР°С†РёСЏ</th>
+                    <th className="px-4 py-4 text-center font-semibold">РџР»Р°РЅ РЅР°Р±РѕСЂР°</th>
                   </tr>
                   <tr className="bg-blue-700">
                     <th colSpan={5} className="px-4 py-2"></th>
                     <th className="px-4 py-2 text-center text-sm">
                       <div className="flex justify-center gap-2">
-                        <span>Бюджет</span>
-                        <span>Платные</span>
+                        <span>Р‘СЋРґР¶РµС‚</span>
+                        <span>РџР»Р°С‚РЅС‹Рµ</span>
                       </div>
                     </th>
                   </tr>
@@ -444,35 +491,35 @@ export default function Admission() {
           </div>
         </div>
 
-        {/* Блок общежития */}
+        {/* Р‘Р»РѕРє РѕР±С‰РµР¶РёС‚РёСЏ */}
         {(dormitory.description || dormitory.address || dormitory.images.length > 0) && (
           <div className="mb-16 animate-slide-up animation-delay-1000">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-8">
                 <div className="flex items-center mb-6">
                   <FaHome className="w-8 h-8 text-blue-600 mr-3" />
-                  <h3 className="text-3xl font-bold text-gray-900">Общежитие</h3>
+                  <h3 className="text-3xl font-bold text-gray-900">РћР±С‰РµР¶РёС‚РёРµ</h3>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Описание и адрес */}
+                  {/* РћРїРёСЃР°РЅРёРµ Рё Р°РґСЂРµСЃ */}
                   <div className="space-y-6">
                     {dormitory.description && (
                       <div>
-                        <h4 className="text-xl font-semibold text-gray-900 mb-3">Условия проживания</h4>
+                        <h4 className="text-xl font-semibold text-gray-900 mb-3">РЈСЃР»РѕРІРёСЏ РїСЂРѕР¶РёРІР°РЅРёСЏ</h4>
                         <p className="text-gray-700 leading-relaxed whitespace-pre-line">{dormitory.description}</p>
                       </div>
                     )}
 
                     {dormitory.address && (
                       <div>
-                        <h4 className="text-xl font-semibold text-gray-900 mb-3">Адрес</h4>
+                        <h4 className="text-xl font-semibold text-gray-900 mb-3">РђРґСЂРµСЃ</h4>
                         <p className="text-gray-700">{dormitory.address}</p>
                       </div>
                     )}
                   </div>
 
-                  {/* Слайдер изображений */}
+                  {/* РЎР»Р°Р№РґРµСЂ РёР·РѕР±СЂР°Р¶РµРЅРёР№ */}
                   {dormitory.images.length > 0 && (
                     <div className="relative">
                       <Swiper
@@ -489,7 +536,7 @@ export default function Admission() {
                             <div className="aspect-video">
                               <img
                                 src={image}
-                                alt={`Общежитие ${index + 1}`}
+                                alt={`РћР±С‰РµР¶РёС‚РёРµ ${index + 1}`}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
@@ -502,7 +549,7 @@ export default function Admission() {
                                           <svg class="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                           </svg>
-                                          <p class="text-sm">Изображение недоступно</p>
+                                          <p class="text-sm">РР·РѕР±СЂР°Р¶РµРЅРёРµ РЅРµРґРѕСЃС‚СѓРїРЅРѕ</p>
                                         </div>
                                       </div>
                                     `;
@@ -525,15 +572,15 @@ export default function Admission() {
           </div>
         )}
 
-        {/* Контактная информация */}
+        {/* РљРѕРЅС‚Р°РєС‚РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ */}
         <div className="bg-blue-600 text-white rounded-xl p-8 text-center">
-          <h3 className="text-2xl font-bold mb-4">Остались вопросы?</h3>
+          <h3 className="text-2xl font-bold mb-4">РћСЃС‚Р°Р»РёСЃСЊ РІРѕРїСЂРѕСЃС‹?</h3>
           <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-            Свяжитесь с нашей приемной комиссией для получения подробной консультации
+            РЎРІСЏР¶РёС‚РµСЃСЊ СЃ РЅР°С€РµР№ РїСЂРёРµРјРЅРѕР№ РєРѕРјРёСЃСЃРёРµР№ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РїРѕРґСЂРѕР±РЅРѕР№ РєРѕРЅСЃСѓР»СЊС‚Р°С†РёРё
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <div className="flex items-center justify-center">
-              <span className="font-semibold">Телефон:</span>
+              <span className="font-semibold">РўРµР»РµС„РѕРЅ:</span>
               <span className="ml-2">{contacts.find(c => c.type === 'phone')?.value || '+7 (999) 123-45-67'}</span>
             </div>
             <div className="flex items-center justify-center">
@@ -546,4 +593,6 @@ export default function Admission() {
     </div>
   );
 }
+
+
 

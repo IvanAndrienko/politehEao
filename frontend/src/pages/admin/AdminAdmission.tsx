@@ -29,7 +29,55 @@ interface AdmissionContact {
   type: string;
   title: string;
   value: string;
+  order?: number;
 }
+
+const DEFAULT_MAP_COORDS = {
+  lat: '48.758344',
+  lng: '132.887870',
+};
+
+const parseMapCoordinateValue = (value?: string | null) => {
+  if (!value) {
+    return { lat: '', lng: '' };
+  }
+
+  try {
+    const trimmed = value.trim();
+
+    if (trimmed.startsWith('{')) {
+      const parsed = JSON.parse(trimmed);
+      return {
+        lat: parsed.lat !== undefined ? String(parsed.lat) : '',
+        lng: parsed.lng !== undefined ? String(parsed.lng) : '',
+      };
+    }
+
+    const separator = trimmed.includes(',') ? ',' : trimmed.includes(';') ? ';' : null;
+    if (separator) {
+      const [latPart, lngPart] = trimmed.split(separator);
+      return {
+        lat: latPart?.trim() || '',
+        lng: lngPart?.trim() || '',
+      };
+    }
+
+    return { lat: trimmed, lng: '' };
+  } catch {
+    return { lat: '', lng: '' };
+  }
+};
+
+const formatMapContactValue = (value?: string | null) => {
+  const coords = parseMapCoordinateValue(value);
+  if (coords.lat && coords.lng) {
+    return `${coords.lat}, ${coords.lng}`;
+  }
+  if (coords.lat || coords.lng) {
+    return `${coords.lat || '-'}, ${coords.lng || '-'}`;
+  }
+  return `${DEFAULT_MAP_COORDS.lat}, ${DEFAULT_MAP_COORDS.lng}`;
+};
 
 export default function AdminAdmission() {
   const [activeTab, setActiveTab] = useState<'specialties' | 'documents' | 'dates' | 'contacts' | 'dormitory'>('specialties');
@@ -52,6 +100,38 @@ export default function AdminAdmission() {
 
   // РљРѕРЅС‚Р°РєС‚С‹
   const [contacts, setContacts] = useState<AdmissionContact[]>([]);
+  const mapContact = contacts.find((contact) => contact.type === 'map');
+  const parsedMapCoordinates = parseMapCoordinateValue(mapContact?.value);
+
+  const handleMapCoordinateChange = (coordinate: 'lat' | 'lng', rawValue: string) => {
+    const sanitizedValue = rawValue.replace(',', '.').trim();
+    const currentContact = contacts.find((contact) => contact.type === 'map');
+    const currentCoords = parseMapCoordinateValue(currentContact?.value);
+    const nextCoords = {
+      lat: coordinate === 'lat' ? sanitizedValue : currentCoords.lat,
+      lng: coordinate === 'lng' ? sanitizedValue : currentCoords.lng
+    };
+    const nextValue = JSON.stringify(nextCoords);
+
+    if (currentContact) {
+      setContacts(
+        contacts.map((contact) =>
+          contact.id === currentContact.id ? { ...contact, value: nextValue } : contact
+        )
+      );
+    } else {
+      setContacts([
+        ...contacts,
+        {
+          id: 'map',
+          type: 'map',
+          title: 'пїЅ?пїЅ?пїЅ?пїЅпїЅ?пїЅ?пїЅ?пїЅ? пїЅпїЅпїЅ?пїЅ?пїЅ?пїЅ',
+          value: nextValue,
+          order: 5
+        }
+      ]);
+    }
+  };
 
   // РћР±С‰РµР¶РёС‚РёРµ
   const [dormitory, setDormitory] = useState<{
@@ -911,6 +991,36 @@ export default function AdminAdmission() {
 РЎСѓР±Р±РѕС‚Р°, РІРѕСЃРєСЂРµСЃРµРЅСЊРµ вЂ“ РІС‹С…РѕРґРЅРѕР№ РґРµРЅСЊ."
                       className="w-full px-3 py-2 border rounded-md"
                       rows={6}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Координаты метки на карте</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <span className="block text-sm text-gray-600 mb-1">Широта</span>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder={DEFAULT_MAP_COORDS.lat}
+                          className="w-full px-3 py-2 border rounded-md"
+                          value={parsedMapCoordinates.lat || ''}
+                          onChange={(e) => handleMapCoordinateChange('lat', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <span className="block text-sm text-gray-600 mb-1">Долгота</span>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder={DEFAULT_MAP_COORDS.lng}
+                          className="w-full px-3 py-2 border rounded-md"
+                          value={parsedMapCoordinates.lng || ''}
+                          onChange={(e) => handleMapCoordinateChange('lng', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Координаты используются на странице «Приёмная комиссия». Указывайте десятичные значения, например 48.758344.
+                    </p>
+                  </div>
                       value={contacts.find(c => c.type === 'schedule')?.value || ''}
                       onChange={(e) => {
                         const scheduleContact = contacts.find(c => c.type === 'schedule');
