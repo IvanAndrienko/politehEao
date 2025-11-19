@@ -4,6 +4,28 @@ import { PrismaClient } from '@prisma/client';
 const router = express.Router();
 const prisma = new PrismaClient();
 
+const formatAnnouncement = (announcement) => {
+  const date =
+    announcement?.date instanceof Date
+      ? announcement.date.toLocaleDateString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
+      : announcement?.date;
+
+  return {
+    id: announcement?.id,
+    title: announcement?.title,
+    content: announcement?.content,
+    date,
+    urgent:
+      typeof announcement?.urgent === 'boolean'
+        ? announcement.urgent
+        : Boolean(announcement?.isUrgent)
+  };
+};
+
 // GET /api/page-data - Объединенный эндпоинт для данных страницы
 router.get('/', async (req, res) => {
   try {
@@ -52,7 +74,7 @@ router.get('/', async (req, res) => {
       ]);
 
       data.news = news;
-      data.announcements = announcements;
+      data.announcements = announcements.map(formatAnnouncement);
     } else if (page === 'admission') {
       // Данные для страницы поступления
       const [specialties, documents, dates, contacts, dormitory] = await Promise.all([
@@ -86,7 +108,7 @@ router.get('/', async (req, res) => {
         prisma.studentLifeItem.findMany()
       ]);
 
-      data.announcements = announcements;
+      data.announcements = announcements.map(formatAnnouncement);
       data.services = services;
       data.documents = documents;
       data.studentLife = studentLife;

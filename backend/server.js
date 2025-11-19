@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
@@ -41,7 +40,6 @@ import cateringRouter from "./src/routes/catering.js";
 dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient();
 
 // Инициализация кэширования
 const cache = apicache.middleware;
@@ -73,8 +71,15 @@ const contentLimiter = rateLimit({
 
 const strictLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 минут
-  max: 10, // Только 10 попыток для форм/авторизации
-  message: "Слишком много попыток, подождите 15 минут.",
+  max: 120, // Только 10 попыток для форм/авторизации
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
+  handler: (req, res) => {
+    res.status(429).json({
+      message: "Слишком много попыток, подождите 15 минут."
+    });
+  }
 });
 
 // Применяем разные лимиты к разным роутам
@@ -83,9 +88,9 @@ app.use('/api/upload', strictLimiter);
 app.use('/api/admin', strictLimiter);
 app.use(contentLimiter);
 
-// CORS configuration
+// CORS configuration - временно разрешаем все для отладки
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+  origin: true, // Разрешаем все origins для отладки
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -310,10 +315,18 @@ app.use('/api/catering', cateringRouter);
 // Обработка ошибок multer
 app.use((err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({ error: 'Файл слишком большой (макс. 10МБ)' });
+    const limitMb = err.limit
+      ? Math.round((err.limit / (1024 * 1024)) * 10) / 10
+      : null;
+    const message = limitMb
+      ? `���� ������� ������� (����. ${limitMb} ��)`
+      : '���� ������� �������';
+    return res.status(400).json({ error: message });
   }
   next(err);
 });
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`🚀 Сервер запущен: http://localhost:${PORT}`));
+
+

@@ -1,26 +1,16 @@
-const DEFAULT_API_BASE_URL = 'http://localhost:5000';
+const normalizeBase = (value?: string) =>
+  (value ?? 'http://localhost:5000').replace(/\/$/, '')
 
-const normalizeBaseUrl = (url: string) => url.replace(/\/+$/, '');
+const API_BASE_URL = normalizeBase(import.meta.env.VITE_API_BASE_URL)
+const ASSETS_BASE_URL = normalizeBase(import.meta.env.VITE_ASSETS_BASE_URL ?? API_BASE_URL)
 
-export const API_BASE_URL = normalizeBaseUrl(
-  import.meta.env.VITE_API_URL || DEFAULT_API_BASE_URL
-);
+const buildUrl = (base: string, path = '') => {
+  if (!path) return base
+  if (/^https?:\/\//i.test(path)) return path
+  return `${base}${path.startsWith('/') ? path : `/${path}`}`
+}
 
-const shouldPrefixSlash = (path: string) => path.startsWith('/');
+export const apiUrl = (path = '') => buildUrl(API_BASE_URL, path)
+export const assetUrl = (path = '') => buildUrl(ASSETS_BASE_URL, path)
 
-export const apiUrl = (path: string) => {
-  const normalizedPath = shouldPrefixSlash(path) ? path : `/${path}`;
-  return `${API_BASE_URL}${normalizedPath}`;
-};
-
-export const assetUrl = (source?: string | null) => {
-  if (!source) {
-    return '';
-  }
-
-  if (/^https?:\/\//i.test(source)) {
-    return source;
-  }
-
-  return apiUrl(source);
-};
+export { API_BASE_URL }

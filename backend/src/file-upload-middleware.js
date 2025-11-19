@@ -1,7 +1,10 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,6 +13,16 @@ const __dirname = path.dirname(__filename);
 const uploadsDir = path.join(process.cwd(), 'uploads');
 const imagesDir = path.join(uploadsDir, 'images');
 const documentsDir = path.join(uploadsDir, 'documents');
+
+const parseFileSize = (value, fallback) => {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
+};
+
+const DEFAULT_MAX_FILE_SIZE = 30 * 1024 * 1024;
+const BASE_MAX_FILE_SIZE = parseFileSize(process.env.MAX_FILE_SIZE, DEFAULT_MAX_FILE_SIZE);
+const MAX_IMAGE_FILE_SIZE = parseFileSize(process.env.MAX_IMAGE_FILE_SIZE, BASE_MAX_FILE_SIZE);
+const MAX_DOCUMENT_FILE_SIZE = parseFileSize(process.env.MAX_DOCUMENT_FILE_SIZE, BASE_MAX_FILE_SIZE);
 
 // Создаем папки если не существуют
 if (!fs.existsSync(imagesDir)) {
@@ -134,7 +147,7 @@ export const uploadImages = multer({
   storage: imageStorage,
   fileFilter: imageFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB на файл
+    fileSize: MAX_IMAGE_FILE_SIZE,
     files: 50, // Максимум 50 файлов
     fieldSize: 50 * 1024 * 1024 // 50MB общий размер поля
   }
@@ -145,7 +158,7 @@ export const uploadDocuments = multer({
   storage: documentStorage,
   fileFilter: documentFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB на файл
+    fileSize: MAX_DOCUMENT_FILE_SIZE,
     files: 50, // Максимум 50 файлов
     fieldSize: 100 * 1024 * 1024 // 100MB общий размер поля
   }
@@ -162,3 +175,4 @@ export const validateFileCount = (maxFiles) => {
     next();
   };
 };
+

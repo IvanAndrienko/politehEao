@@ -1,5 +1,20 @@
 import { useState, useEffect } from 'react';
-import { FaGraduationCap, FaFileAlt, FaUsers, FaDownload } from 'react-icons/fa';
+import type { IconType } from 'react-icons';
+import {
+  FaGraduationCap,
+  FaFileAlt,
+  FaUsers,
+  FaDownload,
+  FaHome,
+  FaUtensils,
+  FaHeart,
+  FaLaptop,
+  FaHandsHelping,
+  FaBook,
+  FaInfoCircle,
+  FaUniversity,
+  FaBriefcase
+} from 'react-icons/fa';
 
 interface StudentService {
   id: string;
@@ -31,6 +46,24 @@ interface StudentLifeItem {
   images: string[];
 }
 
+const SERVICE_ICON_OPTIONS: Array<{ value: string; label: string; icon: IconType }> = [
+  { value: 'FaHome', label: 'Дом / общежитие', icon: FaHome },
+  { value: 'FaUtensils', label: 'Питание / столовая', icon: FaUtensils },
+  { value: 'FaHeart', label: 'Здоровье и поддержка', icon: FaHeart },
+  { value: 'FaGraduationCap', label: 'Учёба и расписание', icon: FaGraduationCap },
+  { value: 'FaLaptop', label: 'Онлайн‑сервисы', icon: FaLaptop },
+  { value: 'FaHandsHelping', label: 'Волонтёры и помощь', icon: FaHandsHelping },
+  { value: 'FaBook', label: 'Библиотека и материалы', icon: FaBook },
+  { value: 'FaInfoCircle', label: 'Справочная информация', icon: FaInfoCircle },
+  { value: 'FaUniversity', label: 'Приёмная комиссия', icon: FaUniversity },
+  { value: 'FaBriefcase', label: 'Карьерный центр', icon: FaBriefcase }
+];
+
+const SERVICE_ICON_MAP: Record<string, IconType> = SERVICE_ICON_OPTIONS.reduce((acc, option) => {
+  acc[option.value] = option.icon;
+  return acc;
+}, {} as Record<string, IconType>);
+
 export default function AdminStudents() {
   const [services, setServices] = useState<StudentService[]>([]);
   const [documents, setDocuments] = useState<StudentDocument[]>([]);
@@ -47,6 +80,7 @@ export default function AdminStudents() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savingServiceId, setSavingServiceId] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -101,8 +135,8 @@ export default function AdminStudents() {
   const addService = () => {
     const newService = {
       id: `temp-${Date.now()}`,
-      title: 'Новый сервис',
-      description: 'Описание сервиса',
+      title: '����� ������',
+      description: '������� �������� �������',
       url: '',
       icon: 'FaHome',
       order: services.length,
@@ -112,27 +146,73 @@ export default function AdminStudents() {
   };
 
   const removeService = async (id: string) => {
-    if (confirm('Вы уверены, что хотите удалить этот сервис?')) {
-      try {
-        await fetch(`/api/students/services/${id}`, {
-          method: 'DELETE',
-        });
-        setServices(services.filter(service => service.id !== id));
-      } catch (error) {
-        console.error('Error deleting service:', error);
-        alert('Ошибка при удалении сервиса');
-      }
+    if (!confirm('�� �������, ��� ������ ������� ������?')) {
+      return;
+    }
+
+    const isTemp = id.startsWith('temp-');
+    if (isTemp) {
+      setServices(services.filter(service => service.id !== id));
+      return;
+    }
+
+    try {
+      await fetch(`/api/students/services/${id}`, {
+        method: 'DELETE'
+      });
+      setServices(services.filter(service => service.id !== id));
+    } catch (error) {
+      console.error('Error deleting service:', error);
+      alert('������ ��� �������� �������');
     }
   };
 
-  const updateDocument = (id: string, field: string, value: unknown) => {
-    setDocuments(documents.map(doc =>
-      doc.id === id ? { ...doc, [field]: value } : doc
-    ));
+  const saveService = async (service: StudentService) => {
+    if (!service.title.trim()) {
+      alert('��������� �������� �������');
+      return;
+    }
+
+    const isNew = service.id.startsWith('temp-');
+    const url = isNew ? '/api/students/services' : `/api/students/services/${service.id}`;
+    const method = isNew ? 'POST' : 'PUT';
+    const payload = {
+      title: service.title,
+      description: service.description,
+      url: service.url || '',
+      icon: service.icon,
+      order: service.order ?? 0,
+      isActive: service.isActive
+    };
+
+    try {
+      setSavingServiceId(service.id);
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save service');
+      }
+
+      const savedService = await response.json();
+      setServices(prev =>
+        prev.map(item => (item.id === service.id ? savedService : item))
+      );
+      alert('������ ��������');
+    } catch (error) {
+      console.error('Error saving service:', error);
+      alert('������ ��� ���������� �������');
+    } finally {
+      setSavingServiceId(null);
+    }
   };
 
-
-  const uploadDocument = async () => {
+  const uploadDocument = async () => {  const uploadDocument = async () => {
     if (!uploadForm.file || !uploadForm.title.trim()) {
       alert('Пожалуйста, выберите файл и введите название документа');
       return;
@@ -694,4 +774,5 @@ export default function AdminStudents() {
       </div>
     </div>
   );
+}
 }

@@ -158,68 +158,80 @@ export default function Admission() {
     }
   };
 
+  // Функция для динамической загрузки скрипта Яндекс.Карт
+  const loadYandexMapsScript = () => {
+    return new Promise<void>((resolve, reject) => {
+      if (window.ymaps) {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
+      script.type = 'text/javascript';
+      script.onload = () => {
+        console.log('Yandex Maps API загружен успешно');
+        resolve();
+      };
+      script.onerror = (error) => {
+        console.error('Ошибка загрузки Yandex Maps API:', error);
+        reject(error);
+      };
+      document.head.appendChild(script);
+    });
+  };
+
   // Инициализация Яндекс.Карты при загрузке компонента
   useEffect(() => {
-    const initMap = () => {
-      if (window.ymaps && !mapLoaded) {
-        // Проверяем, что элемент карты существует и видим
-        const mapElement = document.getElementById('map');
-        if (!mapElement || mapElement.offsetWidth === 0) {
-          // Если элемент не готов, ждем еще немного
-          setTimeout(initMap, 500);
-          return;
-        }
+    const initMap = async () => {
+      try {
+        // Загружаем скрипт, если не загружен
+        await loadYandexMapsScript();
 
-        window.ymaps.ready(() => {
-          try {
-            // Координаты Биробиджана
-            const birobidzhanCoords = [48.758344, 132.887870];
-
-            // Создаем карту
-            const map = new window.ymaps.Map('map', {
-              center: birobidzhanCoords,
-              zoom: 15,
-              controls: ['zoomControl', 'fullscreenControl']
-            });
-
-            // Добавляем метку техникума
-            const placemark = new window.ymaps.Placemark(birobidzhanCoords, {
-              hintContent: 'Политехнический техникум',
-              balloonContent: 'г. Биробиджан, ул. Техникумовская, д. 15'
-            });
-
-            map.geoObjects.add(placemark);
-            setMapLoaded(true);
-          } catch (error) {
-            console.error('Ошибка инициализации карты:', error);
-            setMapError(true);
+        if (window.ymaps && !mapLoaded) {
+          // Проверяем, что элемент карты существует и видим
+          const mapElement = document.getElementById('map');
+          if (!mapElement || mapElement.offsetWidth === 0) {
+            // Если элемент не готов, ждем еще немного
+            setTimeout(initMap, 500);
+            return;
           }
-        });
+
+          window.ymaps.ready(() => {
+            try {
+              // Координаты Биробиджана
+              const birobidzhanCoords = [48.758344, 132.887870];
+
+              // Создаем карту
+              const map = new window.ymaps.Map('map', {
+                center: birobidzhanCoords,
+                zoom: 15,
+                controls: ['zoomControl', 'fullscreenControl']
+              });
+
+              // Добавляем метку техникума
+              const placemark = new window.ymaps.Placemark(birobidzhanCoords, {
+                hintContent: 'Политехнический техникум',
+                balloonContent: 'г. Биробиджан, ул. Техникумовская, д. 15'
+              });
+
+              map.geoObjects.add(placemark);
+              setMapLoaded(true);
+            } catch (error) {
+              console.error('Ошибка инициализации карты:', error);
+              setMapError(true);
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Не удалось загрузить Yandex Maps API:', error);
+        setMapError(true);
       }
     };
 
     // Небольшая задержка для обеспечения готовности DOM
     const timer = setTimeout(() => {
-      // Проверяем, загружен ли API Яндекс.Карт
-      if (window.ymaps) {
-        initMap();
-      } else {
-        // Если API еще не загружен, ждем его загрузки
-        const checkYmaps = setInterval(() => {
-          if (window.ymaps) {
-            clearInterval(checkYmaps);
-            initMap();
-          }
-        }, 100);
-
-        // Очищаем интервал через 10 секунд, если API не загрузился
-        setTimeout(() => {
-          clearInterval(checkYmaps);
-          if (!mapLoaded) {
-            setMapError(true);
-          }
-        }, 10000);
-      }
+      initMap();
     }, 1000);
 
     return () => clearTimeout(timer);

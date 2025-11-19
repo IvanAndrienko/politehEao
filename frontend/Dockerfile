@@ -12,6 +12,12 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Build arguments for API endpoints and maps
+ARG VITE_API_URL
+ARG VITE_YMAPS_API_KEY
+ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_YMAPS_API_KEY=${VITE_YMAPS_API_KEY}
+
 # Build the application
 RUN npm run build
 

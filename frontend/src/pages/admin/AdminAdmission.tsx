@@ -232,7 +232,12 @@ export default function AdminAdmission() {
       if (response.ok) {
         const data = await response.json();
         // Обновляем состояние с новыми изображениями
-        const newImages = [...dormitory.images, ...data.urls];
+        const uploadedUrls = Array.isArray(data.files)
+          ? data.files.map((file: { url: string }) => file.url)
+          : Array.isArray(data.urls)
+            ? data.urls
+            : [];
+        const newImages = [...dormitory.images, ...uploadedUrls];
         setDormitory(prev => ({
           ...prev,
           images: newImages

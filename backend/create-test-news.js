@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from './src/prisma.js';
 import slugify from 'slugify';
 
-const prisma = new PrismaClient();
 
 async function createTestNews() {
   try {

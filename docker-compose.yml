@@ -53,7 +53,11 @@ services:
 
   # Frontend
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${API_URL:-http://localhost:5000}
+        VITE_YMAPS_API_KEY: ${VITE_YMAPS_API_KEY:-}
     container_name: politeh-frontend
     restart: unless-stopped
     ports:
