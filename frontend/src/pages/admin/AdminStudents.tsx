@@ -1,20 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { IconType } from 'react-icons';
-import {
-  FaGraduationCap,
-  FaFileAlt,
-  FaUsers,
-  FaDownload,
-  FaHome,
-  FaUtensils,
-  FaHeart,
-  FaLaptop,
-  FaHandsHelping,
-  FaBook,
-  FaInfoCircle,
-  FaUniversity,
-  FaBriefcase
-} from 'react-icons/fa';
+import { FaGraduationCap, FaFileAlt, FaUsers, FaDownload } from 'react-icons/fa';
 
 interface StudentService {
   id: string;
@@ -46,24 +31,6 @@ interface StudentLifeItem {
   images: string[];
 }
 
-const SERVICE_ICON_OPTIONS: Array<{ value: string; label: string; icon: IconType }> = [
-  { value: 'FaHome', label: '–î–æ–º / –æ–±—â–µ–∂–∏—Ç–∏–µ', icon: FaHome },
-  { value: 'FaUtensils', label: '–ü–∏—Ç–∞–Ω–∏–µ / —Å—Ç–æ–ª–æ–≤–∞—è', icon: FaUtensils },
-  { value: 'FaHeart', label: '–ó–¥–æ—Ä–æ–≤—å–µ –∏ –ø–æ–¥–¥–µ—Ä–∂–∫–∞', icon: FaHeart },
-  { value: 'FaGraduationCap', label: '–£—á—ë–±–∞ –∏ —Ä–∞—Å–ø–∏—Å–∞–Ω–∏–µ', icon: FaGraduationCap },
-  { value: 'FaLaptop', label: '–û–Ω–ª–∞–π–Ω‚Äë—Å–µ—Ä–≤–∏—Å—ã', icon: FaLaptop },
-  { value: 'FaHandsHelping', label: '–í–æ–ª–æ–Ω—Ç—ë—Ä—ã –∏ –ø–æ–º–æ—â—å', icon: FaHandsHelping },
-  { value: 'FaBook', label: '–ë–∏–±–ª–∏–æ—Ç–µ–∫–∞ –∏ –º–∞—Ç–µ—Ä–∏–∞–ª—ã', icon: FaBook },
-  { value: 'FaInfoCircle', label: '–°–ø—Ä–∞–≤–æ—á–Ω–∞—è –∏–Ω—Ñ–æ—Ä–º–∞—Ü–∏—è', icon: FaInfoCircle },
-  { value: 'FaUniversity', label: '–ü—Ä–∏—ë–º–Ω–∞—è –∫–æ–º–∏—Å—Å–∏—è', icon: FaUniversity },
-  { value: 'FaBriefcase', label: '–ö–∞—Ä—å–µ—Ä–Ω—ã–π —Ü–µ–Ω—Ç—Ä', icon: FaBriefcase }
-];
-
-const SERVICE_ICON_MAP: Record<string, IconType> = SERVICE_ICON_OPTIONS.reduce((acc, option) => {
-  acc[option.value] = option.icon;
-  return acc;
-}, {} as Record<string, IconType>);
-
 export default function AdminStudents() {
   const [services, setServices] = useState<StudentService[]>([]);
   const [documents, setDocuments] = useState<StudentDocument[]>([]);
@@ -80,7 +47,6 @@ export default function AdminStudents() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [savingServiceId, setSavingServiceId] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -135,8 +101,8 @@ export default function AdminStudents() {
   const addService = () => {
     const newService = {
       id: `temp-${Date.now()}`,
-      title: 'ÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ',
-      description: 'ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ',
+      title: '¶›¶-¶-TÀ¶¶ T¡¶¶T¿¶-¶¨T¡',
+      description: '¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶ T¡¶¶T¿¶-¶¨T¡¶-',
       url: '',
       icon: 'FaHome',
       order: services.length,
@@ -146,75 +112,29 @@ export default function AdminStudents() {
   };
 
   const removeService = async (id: string) => {
-    if (!confirm('ÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ, ÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ?')) {
-      return;
-    }
-
-    const isTemp = id.startsWith('temp-');
-    if (isTemp) {
-      setServices(services.filter(service => service.id !== id));
-      return;
-    }
-
-    try {
-      await fetch(`/api/students/services/${id}`, {
-        method: 'DELETE'
-      });
-      setServices(services.filter(service => service.id !== id));
-    } catch (error) {
-      console.error('Error deleting service:', error);
-      alert('ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ');
-    }
-  };
-
-  const saveService = async (service: StudentService) => {
-    if (!service.title.trim()) {
-      alert('ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ');
-      return;
-    }
-
-    const isNew = service.id.startsWith('temp-');
-    const url = isNew ? '/api/students/services' : `/api/students/services/${service.id}`;
-    const method = isNew ? 'POST' : 'PUT';
-    const payload = {
-      title: service.title,
-      description: service.description,
-      url: service.url || '',
-      icon: service.icon,
-      order: service.order ?? 0,
-      isActive: service.isActive
-    };
-
-    try {
-      setSavingServiceId(service.id);
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save service');
+    if (confirm('¶“TÀ T√¶-¶¶T¿¶¶¶-TÀ, T«T¬¶- T≈¶-T¬¶¨T¬¶¶ T√¶+¶-¶¨¶¨T¬TÃ TÕT¬¶-T¬ T¡¶¶T¿¶-¶¨T¡?')) {
+      try {
+        await fetch(`/api/students/services/${id}`, {
+          method: 'DELETE',
+        });
+        setServices(services.filter(service => service.id !== id));
+      } catch (error) {
+        console.error('Error deleting service:', error);
+        alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ T√¶+¶-¶¨¶¶¶-¶¨¶¨ T¡¶¶T¿¶-¶¨T¡¶-');
       }
-
-      const savedService = await response.json();
-      setServices(prev =>
-        prev.map(item => (item.id === service.id ? savedService : item))
-      );
-      alert('ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ');
-    } catch (error) {
-      console.error('Error saving service:', error);
-      alert('ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ');
-    } finally {
-      setSavingServiceId(null);
     }
   };
 
-  const uploadDocument = async () => {  const uploadDocument = async () => {
+  const updateDocument = (id: string, field: string, value: unknown) => {
+    setDocuments(documents.map(doc =>
+      doc.id === id ? { ...doc, [field]: value } : doc
+    ));
+  };
+
+
+  const uploadDocument = async () => {
     if (!uploadForm.file || !uploadForm.title.trim()) {
-      alert('–ü–æ–∂–∞–ª—É–π—Å—Ç–∞, –≤—ã–±–µ—Ä–∏—Ç–µ —Ñ–∞–π–ª –∏ –≤–≤–µ–¥–∏—Ç–µ –Ω–∞–∑–≤–∞–Ω–∏–µ –¥–æ–∫—É–º–µ–Ω—Ç–∞');
+      alert('¶ﬂ¶-¶¶¶-¶¨T√¶¶T¡T¬¶-, ¶-TÀ¶-¶¶T¿¶¨T¬¶¶ Tƒ¶-¶¶¶¨ ¶¨ ¶-¶-¶¶¶+¶¨T¬¶¶ ¶-¶-¶¨¶-¶-¶-¶¨¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-');
       return;
     }
 
@@ -230,16 +150,16 @@ export default function AdminStudents() {
       });
 
       if (response.ok) {
-        alert('–î–æ–∫—É–º–µ–Ω—Ç –∑–∞–≥—Ä—É–∂–µ–Ω —É—Å–ø–µ—à–Ω–æ!');
+        alert('¶‘¶-¶¶T√¶-¶¶¶-T¬ ¶¨¶-¶¶T¿T√¶¶¶¶¶- T√T¡¶¨¶¶T»¶-¶-!');
         loadDocuments();
         setShowUploadForm(false);
         setUploadForm({ title: '', description: '', file: null });
       } else {
-        alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ –∑–∞–≥—Ä—É–∑–∫–µ –¥–æ–∫—É–º–µ–Ω—Ç–∞');
+        alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ ¶¨¶-¶¶T¿T√¶¨¶¶¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-');
       }
     } catch (error) {
       console.error('Error uploading document:', error);
-      alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ –∑–∞–≥—Ä—É–∑–∫–µ –¥–æ–∫—É–º–µ–Ω—Ç–∞');
+      alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ ¶¨¶-¶¶T¿T√¶¨¶¶¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-');
     }
   };
 
@@ -251,7 +171,7 @@ export default function AdminStudents() {
   };
 
   const removeDocument = async (id: string) => {
-    if (confirm('–í—ã —É–≤–µ—Ä–µ–Ω—ã, —á—Ç–æ —Ö–æ—Ç–∏—Ç–µ —É–¥–∞–ª–∏—Ç—å —ç—Ç–æ—Ç –¥–æ–∫—É–º–µ–Ω—Ç?')) {
+    if (confirm('¶“TÀ T√¶-¶¶T¿¶¶¶-TÀ, T«T¬¶- T≈¶-T¬¶¨T¬¶¶ T√¶+¶-¶¨¶¨T¬TÃ TÕT¬¶-T¬ ¶+¶-¶¶T√¶-¶¶¶-T¬?')) {
       try {
         await fetch(`/api/student-documents/${id}`, {
           method: 'DELETE',
@@ -259,7 +179,7 @@ export default function AdminStudents() {
         setDocuments(documents.filter(doc => doc.id !== id));
       } catch (error) {
         console.error('Error deleting document:', error);
-        alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ —É–¥–∞–ª–µ–Ω–∏–∏ –¥–æ–∫—É–º–µ–Ω—Ç–∞');
+        alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ T√¶+¶-¶¨¶¶¶-¶¨¶¨ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-');
       }
     }
   };
@@ -275,7 +195,7 @@ export default function AdminStudents() {
     try {
       for (const item of studentLife) {
         if (item.id && !item.id.startsWith('temp-')) {
-          // –û–±–Ω–æ–≤–ª—è–µ–º —Å—É—â–µ—Å—Ç–≤—É—é—â–∏–π
+          // ¶ﬁ¶-¶-¶-¶-¶¨Tœ¶¶¶- T¡T√T…¶¶T¡T¬¶-T√TŒT…¶¨¶¶
           await fetch(`/api/student-life/${item.id}`, {
             method: 'PUT',
             headers: {
@@ -284,7 +204,7 @@ export default function AdminStudents() {
             body: JSON.stringify(item),
           });
         } else {
-          // –°–æ–∑–¥–∞–µ–º –Ω–æ–≤—ã–π
+          // ¶·¶-¶¨¶+¶-¶¶¶- ¶-¶-¶-TÀ¶¶
           const { id: _unused, ...itemData } = item;
           const response = await fetch('/api/student-life', {
             method: 'POST',
@@ -297,11 +217,11 @@ export default function AdminStudents() {
           item.id = newItem.id;
         }
       }
-      alert('–ò–∑–º–µ–Ω–µ–Ω–∏—è —Å–æ—Ö—Ä–∞–Ω–µ–Ω—ã —É—Å–ø–µ—à–Ω–æ!');
+      alert('¶ÿ¶¨¶-¶¶¶-¶¶¶-¶¨Tœ T¡¶-T≈T¿¶-¶-¶¶¶-TÀ T√T¡¶¨¶¶T»¶-¶-!');
       loadStudentLife();
     } catch (error) {
       console.error('Error saving student life:', error);
-      alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ —Å–æ—Ö—Ä–∞–Ω–µ–Ω–∏–∏ –∏–∑–º–µ–Ω–µ–Ω–∏–π');
+      alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ T¡¶-T≈T¿¶-¶-¶¶¶-¶¨¶¨ ¶¨¶¨¶-¶¶¶-¶¶¶-¶¨¶¶');
     } finally {
       setSaving(false);
     }
@@ -321,9 +241,9 @@ export default function AdminStudents() {
 
       if (response.ok) {
         const data = await response.json();
-        return data.filenames; // –í–æ–∑–≤—Ä–∞—â–∞–µ–º –º–∞—Å—Å–∏–≤ –∏–º–µ–Ω —Ñ–∞–π–ª–æ–≤
+        return data.filenames; // ¶“¶-¶¨¶-T¿¶-T…¶-¶¶¶- ¶-¶-T¡T¡¶¨¶- ¶¨¶-¶¶¶- Tƒ¶-¶¶¶¨¶-¶-
       } else {
-        throw new Error('–û—à–∏–±–∫–∞ –∑–∞–≥—Ä—É–∑–∫–∏ –∏–∑–æ–±—Ä–∞–∂–µ–Ω–∏–π');
+        throw new Error('¶ﬁT»¶¨¶-¶¶¶- ¶¨¶-¶¶T¿T√¶¨¶¶¶¨ ¶¨¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨¶¶');
       }
     } catch (error) {
       console.error('Error uploading images:', error);
@@ -335,15 +255,15 @@ export default function AdminStudents() {
   const addStudentLife = () => {
     const newItem = {
       id: `temp-${Date.now()}`,
-      title: '–ù–æ–≤–æ–µ –º–µ—Ä–æ–ø—Ä–∏—è—Ç–∏–µ',
-      description: '–û–ø–∏—Å–∞–Ω–∏–µ –º–µ—Ä–æ–ø—Ä–∏—è—Ç–∏—è',
+      title: '¶›¶-¶-¶-¶¶ ¶-¶¶T¿¶-¶¨T¿¶¨TœT¬¶¨¶¶',
+      description: '¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶ ¶-¶¶T¿¶-¶¨T¿¶¨TœT¬¶¨Tœ',
       images: []
     };
     setStudentLife([...studentLife, newItem]);
   };
 
   const removeStudentLife = async (id: string) => {
-    if (confirm('–í—ã —É–≤–µ—Ä–µ–Ω—ã, —á—Ç–æ —Ö–æ—Ç–∏—Ç–µ —É–¥–∞–ª–∏—Ç—å —ç—Ç–æ—Ç —ç–ª–µ–º–µ–Ω—Ç?')) {
+    if (confirm('¶“TÀ T√¶-¶¶T¿¶¶¶-TÀ, T«T¬¶- T≈¶-T¬¶¨T¬¶¶ T√¶+¶-¶¨¶¨T¬TÃ TÕT¬¶-T¬ TÕ¶¨¶¶¶-¶¶¶-T¬?')) {
       try {
         await fetch(`/api/student-life/${id}`, {
           method: 'DELETE',
@@ -351,7 +271,7 @@ export default function AdminStudents() {
         setStudentLife(studentLife.filter((item: StudentLifeItem) => item.id !== id));
       } catch (error) {
         console.error('Error deleting student life item:', error);
-        alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ —É–¥–∞–ª–µ–Ω–∏–∏ —ç–ª–µ–º–µ–Ω—Ç–∞');
+        alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ T√¶+¶-¶¨¶¶¶-¶¨¶¨ TÕ¶¨¶¶¶-¶¶¶-T¬¶-');
       }
     }
   };
@@ -368,7 +288,7 @@ export default function AdminStudents() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-6">
-          {/* –ö–Ω–æ–ø–∫–∞ –Ω–∞–∑–∞–¥ */}
+          {/* ¶⁄¶-¶-¶¨¶¶¶- ¶-¶-¶¨¶-¶+ */}
           <div className="flex items-center justify-between">
             <button
               onClick={() => window.history.back()}
@@ -377,7 +297,7 @@ export default function AdminStudents() {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              –ù–∞–∑–∞–¥
+              ¶›¶-¶¨¶-¶+
             </button>
             <button
               onClick={() => {
@@ -390,34 +310,34 @@ export default function AdminStudents() {
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              –û–±–Ω–æ–≤–∏—Ç—å
+              ¶ﬁ¶-¶-¶-¶-¶¨T¬TÃ
             </button>
           </div>
 
-          {/* –ó–∞–≥–æ–ª–æ–≤–æ–∫ */}
+          {/* ¶◊¶-¶¶¶-¶¨¶-¶-¶-¶¶ */}
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">–°—Ç—É–¥–µ–Ω—á–µ—Å–∫–∏–π –ø–æ—Ä—Ç–∞–ª - –ê–¥–º–∏–Ω–∏—Å—Ç—Ä–∏—Ä–æ–≤–∞–Ω–∏–µ</h1>
-            <p className="text-lg text-gray-600">–£–ø—Ä–∞–≤–ª–µ–Ω–∏–µ —Å–µ—Ä–≤–∏—Å–∞–∞–º–∏, –¥–æ–∫—É–º–µ–Ω—Ç–∞–º–∏ –∏ —Å—Ç—É–¥–µ–Ω—á–µ—Å–∫–æ–π –∂–∏–∑–Ω—å—é</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶¨¶¶ ¶¨¶-T¿T¬¶-¶¨ - ¶–¶+¶-¶¨¶-¶¨T¡T¬T¿¶¨T¿¶-¶-¶-¶-¶¨¶¶</h1>
+            <p className="text-lg text-gray-600">¶„¶¨T¿¶-¶-¶¨¶¶¶-¶¨¶¶ T¡¶¶T¿¶-¶¨T¡¶-¶-¶-¶¨, ¶+¶-¶¶T√¶-¶¶¶-T¬¶-¶-¶¨ ¶¨ T¡T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶-¶¶ ¶¶¶¨¶¨¶-TÃTŒ</p>
           </div>
           <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div className="px-4 py-8 sm:px-0">
-              {/* –°—Ç—É–¥–µ–Ω—á–µ—Å–∫–∏–µ —Å–µ—Ä–≤–∏—Å—ã */}
+              {/* ¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶¨¶¶ T¡¶¶T¿¶-¶¨T¡TÀ */}
               <div className="bg-white shadow rounded-lg mb-8">
                 <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                   <h2 className="text-lg font-medium text-gray-900 flex items-center">
                     <FaUsers className="w-5 h-5 mr-2 text-blue-600" />
-                    –°—Ç—É–¥–µ–Ω—á–µ—Å–∫–∏–µ —Å–µ—Ä–≤–∏—Å—ã
+                    ¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶¨¶¶ T¡¶¶T¿¶-¶¨T¡TÀ
                   </h2>
                   <button
                     onClick={addService}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm"
                   >
-                    –î–æ–±–∞–≤–∏—Ç—å —Å–µ—Ä–≤–∏—Å
+                    ¶‘¶-¶-¶-¶-¶¨T¬TÃ T¡¶¶T¿¶-¶¨T¡
                   </button>
                 </div>
                 <div className="p-6">
                   {loading ? (
-                    <p className="text-gray-600">–ó–∞–≥—Ä—É–∑–∫–∞ —Å–µ—Ä–≤–∏—Å–æ–≤...</p>
+                    <p className="text-gray-600">¶◊¶-¶¶T¿T√¶¨¶¶¶- T¡¶¶T¿¶-¶¨T¡¶-¶-...</p>
                   ) : (
                     <div className="space-y-6">
                       {services.map((service) => (
@@ -425,7 +345,7 @@ export default function AdminStudents() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
-                                –ù–∞–∑–≤–∞–Ω–∏–µ —Å–µ—Ä–≤–∏—Å–∞
+                                ¶›¶-¶¨¶-¶-¶-¶¨¶¶ T¡¶¶T¿¶-¶¨T¡¶-
                               </label>
                               <input
                                 type="text"
@@ -436,7 +356,7 @@ export default function AdminStudents() {
                             </div>
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
-                                –ò–∫–æ–Ω–∫–∞
+                                ¶ÿ¶¶¶-¶-¶¶¶-
                               </label>
                               <select
                                 value={service.icon}
@@ -452,7 +372,7 @@ export default function AdminStudents() {
                           </div>
                           <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              –û–ø–∏—Å–∞–Ω–∏–µ
+                              ¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶
                             </label>
                             <input
                               type="text"
@@ -463,7 +383,7 @@ export default function AdminStudents() {
                           </div>
                           <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              URL —Å—Å—ã–ª–∫–∏
+                              URL T¡T¡TÀ¶¨¶¶¶¨
                             </label>
                             <input
                               type="text"
@@ -481,13 +401,13 @@ export default function AdminStudents() {
                                 onChange={(e) => updateService(service.id, 'isActive', e.target.checked)}
                                 className="mr-2"
                               />
-                              <label className="text-sm font-medium text-gray-700">–ê–∫—Ç–∏–≤–µ–Ω</label>
+                              <label className="text-sm font-medium text-gray-700">¶–¶¶T¬¶¨¶-¶¶¶-</label>
                             </div>
                             <button
                               onClick={() => removeService(service.id)}
                               className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm"
                             >
-                              –£–¥–∞–ª–∏—Ç—å
+                              ¶„¶+¶-¶¨¶¨T¬TÃ
                             </button>
                           </div>
                         </div>
@@ -497,45 +417,45 @@ export default function AdminStudents() {
                 </div>
               </div>
 
-              {/* –î–æ–∫—É–º–µ–Ω—Ç—ã –∏ —Å–ø—Ä–∞–≤–∫–∏ */}
+              {/* ¶‘¶-¶¶T√¶-¶¶¶-T¬TÀ ¶¨ T¡¶¨T¿¶-¶-¶¶¶¨ */}
               <div className="bg-white shadow rounded-lg mb-8">
                 <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                   <h2 className="text-lg font-medium text-gray-900 flex items-center">
                     <FaFileAlt className="w-5 h-5 mr-2 text-green-600" />
-                    –î–æ–∫—É–º–µ–Ω—Ç—ã –∏ —Å–ø—Ä–∞–≤–∫–∏
+                    ¶‘¶-¶¶T√¶-¶¶¶-T¬TÀ ¶¨ T¡¶¨T¿¶-¶-¶¶¶¨
                   </h2>
                   <button
                     onClick={() => setShowUploadForm(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm"
                   >
-                    –ù–æ–≤—ã–π –¥–æ–∫—É–º–µ–Ω—Ç
+                    ¶›¶-¶-TÀ¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬
                   </button>
                 </div>
                 <div className="p-6">
                   {loadingDocuments ? (
-                    <p className="text-gray-600">–ó–∞–≥—Ä—É–∑–∫–∞ –¥–æ–∫—É–º–µ–Ω—Ç–æ–≤...</p>
+                    <p className="text-gray-600">¶◊¶-¶¶T¿T√¶¨¶¶¶- ¶+¶-¶¶T√¶-¶¶¶-T¬¶-¶-...</p>
                   ) : (
                     <div className="space-y-4">
-                      {/* –§–æ—Ä–º–∞ –∑–∞–≥—Ä—É–∑–∫–∏ –Ω–æ–≤–æ–≥–æ –¥–æ–∫—É–º–µ–Ω—Ç–∞ */}
+                      {/* ¶‰¶-T¿¶-¶- ¶¨¶-¶¶T¿T√¶¨¶¶¶¨ ¶-¶-¶-¶-¶¶¶- ¶+¶-¶¶T√¶-¶¶¶-T¬¶- */}
                       {showUploadForm && (
                         <div className="border rounded-lg p-6 bg-blue-50">
-                          <h3 className="text-lg font-medium text-gray-900 mb-4">–ó–∞–≥—Ä—É–∑–∫–∞ –Ω–æ–≤–æ–≥–æ –¥–æ–∫—É–º–µ–Ω—Ç–∞</h3>
+                          <h3 className="text-lg font-medium text-gray-900 mb-4">¶◊¶-¶¶T¿T√¶¨¶¶¶- ¶-¶-¶-¶-¶¶¶- ¶+¶-¶¶T√¶-¶¶¶-T¬¶-</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
-                                –ù–∞–∑–≤–∞–Ω–∏–µ –¥–æ–∫—É–º–µ–Ω—Ç–∞ *
+                                ¶›¶-¶¨¶-¶-¶-¶¨¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶- *
                               </label>
                               <input
                                 type="text"
                                 value={uploadForm.title}
                                 onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
-                                placeholder="–í–≤–µ–¥–∏—Ç–µ –Ω–∞–∑–≤–∞–Ω–∏–µ –¥–æ–∫—É–º–µ–Ω—Ç–∞"
+                                placeholder="¶“¶-¶¶¶+¶¨T¬¶¶ ¶-¶-¶¨¶-¶-¶-¶¨¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
                             </div>
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
-                                –§–∞–π–ª *
+                                ¶‰¶-¶¶¶¨ *
                               </label>
                               <input
                                 type="file"
@@ -545,19 +465,19 @@ export default function AdminStudents() {
                               />
                               {uploadForm.file && (
                                 <p className="text-sm text-gray-600 mt-1">
-                                  –í—ã–±—Ä–∞–Ω —Ñ–∞–π–ª: {uploadForm.file.name}
+                                  ¶“TÀ¶-T¿¶-¶- Tƒ¶-¶¶¶¨: {uploadForm.file.name}
                                 </p>
                               )}
                             </div>
                           </div>
                           <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              –û–ø–∏—Å–∞–Ω–∏–µ
+                              ¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶
                             </label>
                             <textarea
                               value={uploadForm.description}
                               onChange={(e) => setUploadForm(prev => ({ ...prev, description: e.target.value }))}
-                              placeholder="–í–≤–µ–¥–∏—Ç–µ –æ–ø–∏—Å–∞–Ω–∏–µ –¥–æ–∫—É–º–µ–Ω—Ç–∞"
+                              placeholder="¶“¶-¶¶¶+¶¨T¬¶¶ ¶-¶¨¶¨T¡¶-¶-¶¨¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-"
                               rows={3}
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
@@ -570,25 +490,25 @@ export default function AdminStudents() {
                               }}
                               className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm"
                             >
-                              –û—Ç–º–µ–Ω–∞
+                              ¶ﬁT¬¶-¶¶¶-¶-
                             </button>
                             <button
                               onClick={uploadDocument}
                               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm"
                             >
-                              –ó–∞–≥—Ä—É–∑–∏—Ç—å
+                              ¶◊¶-¶¶T¿T√¶¨¶¨T¬TÃ
                             </button>
                           </div>
                         </div>
                       )}
 
-                      {/* –°–ø–∏—Å–æ–∫ –¥–æ–∫—É–º–µ–Ω—Ç–æ–≤ */}
+                      {/* ¶·¶¨¶¨T¡¶-¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-¶- */}
                       {documents.map((doc) => (
                         <div key={doc.id} className="border rounded-lg p-4">
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
-                                –ù–∞–∑–≤–∞–Ω–∏–µ
+                                ¶›¶-¶¨¶-¶-¶-¶¨¶¶
                               </label>
                               <input
                                 type="text"
@@ -599,7 +519,7 @@ export default function AdminStudents() {
                             </div>
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
-                                –†–∞–∑–º–µ—Ä —Ñ–∞–π–ª–∞
+                                ¶‡¶-¶¨¶-¶¶T¿ Tƒ¶-¶¶¶¨¶-
                               </label>
                               <p className="text-sm text-gray-600 mt-2">
                                 {(doc.fileSize / 1024).toFixed(1)} KB
@@ -611,7 +531,7 @@ export default function AdminStudents() {
                                 className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm flex items-center"
                               >
                                 <FaDownload className="w-4 h-4 mr-1" />
-                                –°–∫–∞—á–∞—Ç—å
+                                ¶·¶¶¶-T«¶-T¬TÃ
                               </button>
                             </div>
                             <div className="flex items-end">
@@ -619,13 +539,13 @@ export default function AdminStudents() {
                                 onClick={() => removeDocument(doc.id)}
                                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm"
                               >
-                                –£–¥–∞–ª–∏—Ç—å
+                                ¶„¶+¶-¶¨¶¨T¬TÃ
                               </button>
                             </div>
                           </div>
                           <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              –û–ø–∏—Å–∞–Ω–∏–µ
+                              ¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶
                             </label>
                             <input
                               type="text"
@@ -641,7 +561,7 @@ export default function AdminStudents() {
                               onChange={(e) => updateDocument(doc.id, 'isActive', e.target.checked)}
                               className="mr-2"
                             />
-                            <label className="text-sm font-medium text-gray-700">–ê–∫—Ç–∏–≤–µ–Ω</label>
+                            <label className="text-sm font-medium text-gray-700">¶–¶¶T¬¶¨¶-¶¶¶-</label>
                           </div>
                         </div>
                       ))}
@@ -650,12 +570,12 @@ export default function AdminStudents() {
                 </div>
               </div>
 
-              {/* –°—Ç—É–¥–µ–Ω—á–µ—Å–∫–∞—è –∂–∏–∑–Ω—å */}
+              {/* ¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶-Tœ ¶¶¶¨¶¨¶-TÃ */}
               <div className="bg-white shadow rounded-lg">
                 <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                   <h2 className="text-lg font-medium text-gray-900 flex items-center">
                     <FaGraduationCap className="w-5 h-5 mr-2 text-purple-600" />
-                    –°—Ç—É–¥–µ–Ω—á–µ—Å–∫–∞—è –∂–∏–∑–Ω—å
+                    ¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶-Tœ ¶¶¶¨¶¨¶-TÃ
                   </h2>
                   <div className="flex space-x-2">
                     <button
@@ -663,19 +583,19 @@ export default function AdminStudents() {
                       disabled={saving}
                       className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-3 py-1 rounded-md text-sm"
                     >
-                      {saving ? '–°–æ—Ö—Ä–∞–Ω–µ–Ω–∏–µ...' : '–°–æ—Ö—Ä–∞–Ω–∏—Ç—å'}
+                      {saving ? '¶·¶-T≈T¿¶-¶-¶¶¶-¶¨¶¶...' : '¶·¶-T≈T¿¶-¶-¶¨T¬TÃ'}
                     </button>
                     <button
                       onClick={addStudentLife}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm"
                     >
-                      –î–æ–±–∞–≤–∏—Ç—å
+                      ¶‘¶-¶-¶-¶-¶¨T¬TÃ
                     </button>
                   </div>
                 </div>
                 <div className="p-6">
                   {loadingStudentLife ? (
-                    <p className="text-gray-600">–ó–∞–≥—Ä—É–∑–∫–∞...</p>
+                    <p className="text-gray-600">¶◊¶-¶¶T¿T√¶¨¶¶¶-...</p>
                   ) : (
                     <div className="space-y-6">
                       {studentLife.map((item) => (
@@ -683,7 +603,7 @@ export default function AdminStudents() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
-                                –ù–∞–∑–≤–∞–Ω–∏–µ –º–µ—Ä–æ–ø—Ä–∏—è—Ç–∏—è
+                                ¶›¶-¶¨¶-¶-¶-¶¨¶¶ ¶-¶¶T¿¶-¶¨T¿¶¨TœT¬¶¨Tœ
                               </label>
                               <input
                                 type="text"
@@ -694,7 +614,7 @@ export default function AdminStudents() {
                             </div>
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
-                                –ò–∑–æ–±—Ä–∞–∂–µ–Ω–∏—è ({item.images.length})
+                                ¶ÿ¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨Tœ ({item.images.length})
                               </label>
                               <input
                                 type="file"
@@ -705,10 +625,10 @@ export default function AdminStudents() {
                                     try {
                                       const filenames = await uploadStudentLifeImages(e.target.files);
                                       updateStudentLife(item.id, 'images', [...item.images, ...filenames]);
-                                      e.target.value = ''; // –°–±—Ä–æ—Å–∏—Ç—å input
+                                      e.target.value = ''; // ¶·¶-T¿¶-T¡¶¨T¬TÃ input
                                     } catch (error) {
                                       console.error('Error uploading images:', error);
-                                      alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ –∑–∞–≥—Ä—É–∑–∫–µ –∏–∑–æ–±—Ä–∞–∂–µ–Ω–∏–π');
+                                      alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ ¶¨¶-¶¶T¿T√¶¨¶¶¶¶ ¶¨¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨¶¶');
                                     }
                                   }
                                 }}
@@ -718,7 +638,7 @@ export default function AdminStudents() {
                           </div>
                           <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              –û–ø–∏—Å–∞–Ω–∏–µ
+                              ¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶
                             </label>
                             <textarea
                               value={item.description}
@@ -730,14 +650,14 @@ export default function AdminStudents() {
                           {item.images.length > 0 && (
                             <div className="mt-4">
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                –ó–∞–≥—Ä—É–∂–µ–Ω–Ω—ã–µ –∏–∑–æ–±—Ä–∞–∂–µ–Ω–∏—è
+                                ¶◊¶-¶¶T¿T√¶¶¶¶¶-¶-TÀ¶¶ ¶¨¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨Tœ
                               </label>
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                 {item.images.map((imageName: string, index: number) => (
                                   <div key={index} className="relative">
                                     <img
                                       src={`/uploads/images/${imageName}`}
-                                      alt={`–ò–∑–æ–±—Ä–∞–∂–µ–Ω–∏–µ ${index + 1}`}
+                                      alt={`¶ÿ¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨¶¶ ${index + 1}`}
                                       className="w-full h-20 object-cover rounded-md"
                                       onError={(e) => {
                                         e.currentTarget.src = '/placeholder-image.png';
@@ -747,7 +667,7 @@ export default function AdminStudents() {
                                       onClick={() => removeImageFromItem(item.id, index)}
                                       className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
                                     >
-                                      √ó
+                                      +◊
                                     </button>
                                   </div>
                                 ))}
@@ -759,7 +679,7 @@ export default function AdminStudents() {
                               onClick={() => removeStudentLife(item.id)}
                               className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm"
                             >
-                              –£–¥–∞–ª–∏—Ç—å –º–µ—Ä–æ–ø—Ä–∏—è—Ç–∏–µ
+                              ¶„¶+¶-¶¨¶¨T¬TÃ ¶-¶¶T¿¶-¶¨T¿¶¨TœT¬¶¨¶¶
                             </button>
                           </div>
                         </div>
@@ -774,5 +694,4 @@ export default function AdminStudents() {
       </div>
     </div>
   );
-}
 }
