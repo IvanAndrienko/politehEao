@@ -16,6 +16,7 @@ import admissionRouter from "./src/routes/admission.js";
 import scheduleRouter from "./src/routes/schedule.js";
 import studentsRouter from "./src/routes/students.js";
 import studentDocumentsRouter from "./src/routes/student-documents.js";
+import studentLibraryRouter from "./src/routes/student-library.js";
 import organizationRouter from "./src/routes/about/organization.js";
 import homeSliderRouter from "./src/routes/home-slider.js";
 import pageDataRouter from "./src/routes/page-data.js";
@@ -236,6 +237,7 @@ app.use('/api/schedule', scheduleRouter);
 
 // Роуты студенческих сервисов
 app.use('/api/students', studentsRouter);
+app.use('/api/students/library', studentLibraryRouter);
 
 // Роуты документов для студентов
 app.use('/api/student-documents', studentDocumentsRouter);

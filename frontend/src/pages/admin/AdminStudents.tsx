@@ -313,8 +313,43 @@ export default function AdminStudents() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-7xl mx-auto space-y-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Назад
+          </button>
+          <button
+            onClick={() => {
+              loadServices()
+              loadDocuments()
+              loadStudentLife()
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Обновить
+          </button>
+        </div>
+
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Управление разделом “Студентам”</h1>
+          <p className="text-lg text-gray-600">Настройка сервисов, документов и материалов для студентов</p>
+        </div>
+
         {/* Services */}
         <section className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">

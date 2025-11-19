@@ -4,6 +4,7 @@ import { FaTelegram, FaVk, FaSearch, FaEye, FaChevronDown, FaPhone, FaEnvelope, 
 
 export default function Header() {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showStudentsDropdown, setShowStudentsDropdown] = useState(false);
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAccessibilityMode, setIsAccessibilityMode] = useState(() => {
@@ -20,7 +21,7 @@ export default function Header() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        // Пробуем загрузить из объединенного API
+        // Пробуем загрузить настройки из общего API
         const response = await fetch('/api/page-data?page=header');
         if (response.ok) {
           const result = await response.json();
@@ -62,7 +63,7 @@ export default function Header() {
       {/* Верхняя синяя полоса */}
       <div className="bg-blue-900 text-white py-3">
         <div className="max-w-screen-2xl mx-auto px-3 flex justify-between items-center">
-          {/* Левая часть — соцсети, контакты */}
+          {/* Левая часть - соцсети, контакты */}
           <div className="flex items-center space-x-5">
             <a href={settings.telegram} className="hover:scale-110 transition-transform">
               <FaTelegram className="w-6 h-6" />
@@ -83,7 +84,7 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Правая часть — поиск, кнопки */}
+          {/* Правая часть - поиск, кнопка слабовидящих */}
           <div className="flex items-center space-x-4">
             {/* Поле поиска */}
             <form
@@ -120,7 +121,7 @@ export default function Header() {
             </button>
 
           </div>
-        </div> {/* ← закрытие flex-контейнера именно здесь */}
+        </div> {/* Закрытие flex-контейнера и меню ниже */}
       </div>
 
       {/* Нижняя белая полоса */}
@@ -134,7 +135,7 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* Навигация для десктопа */}
+          {/* Главное меню для десктопа */}
           <nav className="hidden md:flex space-x-8 text-gray-700 font-medium">
             <div className="relative group">
               <Link to="/sveden" className="hover:bg-gray-100 px-4 py-2 rounded-md transition-colors flex items-center">
@@ -159,12 +160,20 @@ export default function Header() {
             </div>
             <Link to="/news" className="hover:bg-gray-100 px-4 py-2 rounded-md transition-colors">Новости</Link>
             <Link to="/admission" className="hover:bg-gray-100 px-4 py-2 rounded-md transition-colors">Абитуриенту</Link>
-            <Link to="/students" className="hover:bg-gray-100 px-4 py-2 rounded-md transition-colors">Студенту</Link>
+            <div className="relative group">
+              <Link to="/students" className="hover:bg-gray-100 px-4 py-2 rounded-md transition-colors flex items-center">
+                Студенту <FaChevronDown className="ml-1 w-4 h-4" />
+              </Link>
+              <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 mt-1 w-64 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <Link to="/students/raspisanie" className="block px-4 py-2 hover:bg-gray-100">Расписание занятий</Link>
+                <Link to="/students/library" className="block px-4 py-2 hover:bg-gray-100">Библиотека</Link>
+              </div>
+            </div>
           </nav>
 
           {/* Мобильное меню */}
           <div className="md:hidden flex items-center space-x-2">
-            {/* Кнопка мобильного меню */}
+            {/* Кнопка открытия мобильного меню */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-white hover:text-blue-200 transition-colors p-2 bg-blue-800 rounded-md"
@@ -203,7 +212,7 @@ export default function Header() {
                   {showDropdown && (
                     <div className="ml-4 space-y-1">
                       <Link to="/sveden/common" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md" onClick={() => setIsMobileMenuOpen(false)}>Основные сведения</Link>
-                      <Link to="/sveden/struct" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md" onClick={() => setIsMobileMenuOpen(false)}>Структура и органы управления</Link>
+                      <Link to="/sveden/struct" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md" onClick={() => setIsMobileMenuOpen(false)}>Структура и управление</Link>
                       <Link to="/sveden/document" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md" onClick={() => setIsMobileMenuOpen(false)}>Документы</Link>
                       <Link to="/sveden/education" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md" onClick={() => setIsMobileMenuOpen(false)}>Образование</Link>
                       <Link to="/sveden/eduStandarts" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md" onClick={() => setIsMobileMenuOpen(false)}>Образовательные стандарты</Link>
@@ -221,7 +230,22 @@ export default function Header() {
                 </div>
                 <Link to="/news" className="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Новости</Link>
                 <Link to="/admission" className="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Абитуриенту</Link>
-                <Link to="/students" className="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Студенту</Link>
+                <div className="space-y-1">
+                  <button
+                    onClick={() => setShowStudentsDropdown(!showStudentsDropdown)}
+                    className="flex items-center justify-between w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <span>Студенту</span>
+                    <FaChevronDown className={`w-4 h-4 transition-transform ${showStudentsDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  {showStudentsDropdown && (
+                    <div className="ml-4 space-y-1">
+                                            <Link to="/students" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md" onClick={() => setIsMobileMenuOpen(false)}>Студенческий портал</Link>
+                      <Link to="/students/raspisanie" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md" onClick={() => setIsMobileMenuOpen(false)}>Расписание занятий</Link>
+                      <Link to="/students/library" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md" onClick={() => setIsMobileMenuOpen(false)}>Библиотека</Link>
+                    </div>
+                  )}
+                </div>
               </nav>
             </div>
           </div>

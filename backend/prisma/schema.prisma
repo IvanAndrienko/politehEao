@@ -14,22 +14,22 @@ datasource db {
 }
 
 model News {
-  // Новости сайта
+  // РќРѕРІРѕСЃС‚Рё СЃР°Р№С‚Р°
   id                Int      @id @default(autoincrement())
   title             String
   slug              String   @unique
   shortDescription  String?  @db.Text
   fullText          String   @db.Text
   previewImage      String?
-  attachments       String[] // Массив URL файлов/документов
-  images            String[] // Массив URL изображений для новости
+  attachments       String[] // РњР°СЃСЃРёРІ URL С„Р°Р№Р»РѕРІ/РґРѕРєСѓРјРµРЅС‚РѕРІ
+  images            String[] // РњР°СЃСЃРёРІ URL РёР·РѕР±СЂР°Р¶РµРЅРёР№ РґР»СЏ РЅРѕРІРѕСЃС‚Рё
   publishedAt       DateTime @default(now())
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
 
 model Admin {
-  // Администраторы системы
+  // РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂС‹ СЃРёСЃС‚РµРјС‹
   id        Int      @id @default(autoincrement())
   username  String   @unique
   password  String
@@ -37,7 +37,7 @@ model Admin {
 }
 
 model SiteSettings {
-  // Настройки сайта (контакты, соцсети)
+  // РќР°СЃС‚СЂРѕР№РєРё СЃР°Р№С‚Р° (РєРѕРЅС‚Р°РєС‚С‹, СЃРѕС†СЃРµС‚Рё)
   id        Int      @id @default(autoincrement())
   phone     String?
   email     String?
@@ -48,7 +48,7 @@ model SiteSettings {
 }
 
 model Specialty {
-  // Специальности для поступления
+  // РЎРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё РґР»СЏ РїРѕСЃС‚СѓРїР»РµРЅРёСЏ
   id            String   @id @default(uuid())
   code          String   @unique
   name          String
@@ -62,7 +62,7 @@ model Specialty {
 }
 
 model RequiredDocument {
-  // Документы для поступления
+  // Р”РѕРєСѓРјРµРЅС‚С‹ РґР»СЏ РїРѕСЃС‚СѓРїР»РµРЅРёСЏ
   id          String   @id @default(uuid())
   title       String
   description String?
@@ -72,7 +72,7 @@ model RequiredDocument {
 }
 
 model ImportantDate {
-  // Важные даты поступления
+  // Р’Р°Р¶РЅС‹Рµ РґР°С‚С‹ РїРѕСЃС‚СѓРїР»РµРЅРёСЏ
   id        String   @id @default(uuid())
   date      String
   event     String
@@ -82,7 +82,7 @@ model ImportantDate {
 }
 
 model AdmissionContact {
-  // Контакты для поступления
+  // РљРѕРЅС‚Р°РєС‚С‹ РґР»СЏ РїРѕСЃС‚СѓРїР»РµРЅРёСЏ
   id        String   @id @default(uuid())
   type      String   // 'phone', 'email', 'address', 'schedule'
   title     String
@@ -95,7 +95,7 @@ model Dormitory {
   id          Int      @id @default(autoincrement())
   description String?
   address     String?
-  images      String[] // Массив URL изображений
+  images      String[] // РњР°СЃСЃРёРІ URL РёР·РѕР±СЂР°Р¶РµРЅРёР№
   updatedAt   DateTime @updatedAt
 }
 
@@ -114,8 +114,8 @@ model Lesson {
   id            String     @id @default(uuid())
   groupId       String
   group         StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  dayOfWeek     Int        // 1-5 (понедельник-пятница)
-  lessonNumber  Int        // 1-5 (номер пары)
+  dayOfWeek     Int        // 1-5 (РїРѕРЅРµРґРµР»СЊРЅРёРє-РїСЏС‚РЅРёС†Р°)
+  lessonNumber  Int        // 1-5 (РЅРѕРјРµСЂ РїР°СЂС‹)
   subject       String
   teacher       String
   room          String
@@ -135,97 +135,121 @@ model Announcement {
 
 model StudentService {
   id          String   @id @default(uuid())
-  title       String   // Название мероприятия/активности
-  description String   // Описание
-  url         String?  // URL ссылка для перенаправления
-  icon        String   // Название иконки (например, 'FaHome')
-  order       Int      @default(0) // Порядок отображения
-  isActive    Boolean  @default(true) // Активен ли сервис
+  title       String   // РќР°Р·РІР°РЅРёРµ РјРµСЂРѕРїСЂРёСЏС‚РёСЏ/Р°РєС‚РёРІРЅРѕСЃС‚Рё
+  description String   // РћРїРёСЃР°РЅРёРµ
+  url         String?  // URL СЃСЃС‹Р»РєР° РґР»СЏ РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёСЏ
+  icon        String   // РќР°Р·РІР°РЅРёРµ РёРєРѕРЅРєРё (РЅР°РїСЂРёРјРµСЂ, 'FaHome')
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё СЃРµСЂРІРёСЃ
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model StudentDocument {
   id          String   @id @default(uuid())
-  title       String   // Название документа
-  description String?  // Описание
-  fileUrl     String   // Путь к файлу в uploads/documents/
-  fileName    String   // Оригинальное имя файла
-  fileSize    Int      // Размер файла в байтах
-  fileType    String   // MIME тип файла
-  category    String?  // Категория документа (справки, заявления и т.д.)
-  isActive    Boolean  @default(true) // Активен ли документ
-  order       Int      @default(0)    // Порядок отображения
+  title       String   // РќР°Р·РІР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  description String?  // РћРїРёСЃР°РЅРёРµ
+  fileUrl     String   // РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ РІ uploads/documents/
+  fileName    String   // РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+  fileSize    Int      // Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ Р±Р°Р№С‚Р°С…
+  fileType    String   // MIME С‚РёРї С„Р°Р№Р»Р°
+  category    String?  // РљР°С‚РµРіРѕСЂРёСЏ РґРѕРєСѓРјРµРЅС‚Р° (СЃРїСЂР°РІРєРё, Р·Р°СЏРІР»РµРЅРёСЏ Рё С‚.Рґ.)
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РґРѕРєСѓРјРµРЅС‚
+  order       Int      @default(0)    // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model OrganizationInfo {
   id                    Int      @id @default(autoincrement())
-  fullName              String   // Полное наименование
-  shortName             String   // Сокращенное наименование
-  creationDate          String   // Дата создания
-  founderName           String   // Наименование учредителя
-  founderAddress        String   // Адрес учредителя
-  founderPhone          String   // Телефон учредителя
-  founderEmail          String   // Email учредителя
-  founderWebsite        String   // Сайт учредителя
-  legalAddress          String   // Юридический адрес
-  actualAddress         String   // Фактический адрес
-  dormitoryAddress      String   // Адрес общежития
-  workSchedule          String   // Режим работы
-  directorName          String   // ФИО директора
-  directorPhone         String   // Телефон директора
-  deputyDirectorPhone   String   // Телефон зам. директора
-  educationPhone        String   // Телефон учебной части
-  hrPhone               String   // Телефон отдела кадров
-  accountingPhone       String   // Телефон бухгалтерии
-  email                 String   // Email организации
-  website               String   // Официальный сайт
-  activityAddress       String   // Место осуществления деятельности
-  accreditationSeries   String   // Серия свидетельства аккредитации
-  accreditationNumber   String   // Номер свидетельства аккредитации
-  accreditationRegNum   String   // Регистрационный номер аккредитации
-  accreditationDate     String   // Дата выдачи аккредитации
-  accreditationExpiry   String   // Срок действия аккредитации
-  licenseSeries         String   // Серия лицензии
-  licenseNumber         String   // Номер лицензии
-  licenseExpiry         String   // Срок действия лицензии
+  fullName              String   // РџРѕР»РЅРѕРµ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ
+  shortName             String   // РЎРѕРєСЂР°С‰РµРЅРЅРѕРµ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ
+  creationDate          String   // Р”Р°С‚Р° СЃРѕР·РґР°РЅРёСЏ
+  founderName           String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ СѓС‡СЂРµРґРёС‚РµР»СЏ
+  founderAddress        String   // РђРґСЂРµСЃ СѓС‡СЂРµРґРёС‚РµР»СЏ
+  founderPhone          String   // РўРµР»РµС„РѕРЅ СѓС‡СЂРµРґРёС‚РµР»СЏ
+  founderEmail          String   // Email СѓС‡СЂРµРґРёС‚РµР»СЏ
+  founderWebsite        String   // РЎР°Р№С‚ СѓС‡СЂРµРґРёС‚РµР»СЏ
+  legalAddress          String   // Р®СЂРёРґРёС‡РµСЃРєРёР№ Р°РґСЂРµСЃ
+  actualAddress         String   // Р¤Р°РєС‚РёС‡РµСЃРєРёР№ Р°РґСЂРµСЃ
+  dormitoryAddress      String   // РђРґСЂРµСЃ РѕР±С‰РµР¶РёС‚РёСЏ
+  workSchedule          String   // Р РµР¶РёРј СЂР°Р±РѕС‚С‹
+  directorName          String   // Р¤РРћ РґРёСЂРµРєС‚РѕСЂР°
+  directorPhone         String   // РўРµР»РµС„РѕРЅ РґРёСЂРµРєС‚РѕСЂР°
+  deputyDirectorPhone   String   // РўРµР»РµС„РѕРЅ Р·Р°Рј. РґРёСЂРµРєС‚РѕСЂР°
+  educationPhone        String   // РўРµР»РµС„РѕРЅ СѓС‡РµР±РЅРѕР№ С‡Р°СЃС‚Рё
+  hrPhone               String   // РўРµР»РµС„РѕРЅ РѕС‚РґРµР»Р° РєР°РґСЂРѕРІ
+  accountingPhone       String   // РўРµР»РµС„РѕРЅ Р±СѓС…РіР°Р»С‚РµСЂРёРё
+  email                 String   // Email РѕСЂРіР°РЅРёР·Р°С†РёРё
+  website               String   // РћС„РёС†РёР°Р»СЊРЅС‹Р№ СЃР°Р№С‚
+  activityAddress       String   // РњРµСЃС‚Рѕ РѕСЃСѓС‰РµСЃС‚РІР»РµРЅРёСЏ РґРµСЏС‚РµР»СЊРЅРѕСЃС‚Рё
+  accreditationSeries   String   // РЎРµСЂРёСЏ СЃРІРёРґРµС‚РµР»СЊСЃС‚РІР° Р°РєРєСЂРµРґРёС‚Р°С†РёРё
+  accreditationNumber   String   // РќРѕРјРµСЂ СЃРІРёРґРµС‚РµР»СЊСЃС‚РІР° Р°РєРєСЂРµРґРёС‚Р°С†РёРё
+  accreditationRegNum   String   // Р РµРіРёСЃС‚СЂР°С†РёРѕРЅРЅС‹Р№ РЅРѕРјРµСЂ Р°РєРєСЂРµРґРёС‚Р°С†РёРё
+  accreditationDate     String   // Р”Р°С‚Р° РІС‹РґР°С‡Рё Р°РєРєСЂРµРґРёС‚Р°С†РёРё
+  accreditationExpiry   String   // РЎСЂРѕРє РґРµР№СЃС‚РІРёСЏ Р°РєРєСЂРµРґРёС‚Р°С†РёРё
+  licenseSeries         String   // РЎРµСЂРёСЏ Р»РёС†РµРЅР·РёРё
+  licenseNumber         String   // РќРѕРјРµСЂ Р»РёС†РµРЅР·РёРё
+  licenseExpiry         String   // РЎСЂРѕРє РґРµР№СЃС‚РІРёСЏ Р»РёС†РµРЅР·РёРё
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }
 
 model HomeSlider {
   id          String   @id @default(uuid())
-  title       String   // Заголовок слайда
-  subtitle    String?  // Подзаголовок
-  imageUrl    String   // URL изображения
-  link        String?  // Ссылка при клике
-  order       Int      @default(0) // Порядок отображения
-  isActive    Boolean  @default(true) // Активен ли слайд
+  title       String   // Р—Р°РіРѕР»РѕРІРѕРє СЃР»Р°Р№РґР°
+  subtitle    String?  // РџРѕРґР·Р°РіРѕР»РѕРІРѕРє
+  imageUrl    String   // URL РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+  link        String?  // РЎСЃС‹Р»РєР° РїСЂРё РєР»РёРєРµ
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё СЃР»Р°Р№Рґ
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model StudentLifeItem {
   id          String   @id @default(uuid())
-  title       String   // Название мероприятия/активности
-  description String   // Описание
-  images      String[] // Массив имен файлов изображений
+  title       String   // РќР°Р·РІР°РЅРёРµ РјРµСЂРѕРїСЂРёСЏС‚РёСЏ/Р°РєС‚РёРІРЅРѕСЃС‚Рё
+  description String   // РћРїРёСЃР°РЅРёРµ
+  images      String[] // РњР°СЃСЃРёРІ РёРјРµРЅ С„Р°Р№Р»РѕРІ РёР·РѕР±СЂР°Р¶РµРЅРёР№
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
+model StudentDiscipline {
+  id          String               @id @default(uuid())
+  title       String
+  description String?
+  order       Int                  @default(0)
+  isActive    Boolean              @default(true)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  materials   DisciplineMaterial[]
+}
+
+model DisciplineMaterial {
+  id           String            @id @default(uuid())
+  disciplineId String
+  discipline   StudentDiscipline @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
+  title        String
+  fileUrl      String
+  fileName     String
+  fileSize     Int?
+  fileType     String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
 model Structure {
   id                    Int       @id @default(autoincrement())
-  managementInfo        String?  // Руководитель
-  managementInfo2       String?  // Коллегиальные органы управления
-  managementLocation    String?  // Место нахождения органов управления
-  managementContacts    String?  // Контакты органов управления
+  managementInfo        String?  // Р СѓРєРѕРІРѕРґРёС‚РµР»СЊ
+  managementInfo2       String?  // РљРѕР»Р»РµРіРёР°Р»СЊРЅС‹Рµ РѕСЂРіР°РЅС‹ СѓРїСЂР°РІР»РµРЅРёСЏ
+  managementLocation    String?  // РњРµСЃС‚Рѕ РЅР°С…РѕР¶РґРµРЅРёСЏ РѕСЂРіР°РЅРѕРІ СѓРїСЂР°РІР»РµРЅРёСЏ
+  managementContacts    String?  // РљРѕРЅС‚Р°РєС‚С‹ РѕСЂРіР°РЅРѕРІ СѓРїСЂР°РІР»РµРЅРёСЏ
   hasFilials           Boolean   @default(false)
-  filials              String[] // Массив филиалов (JSON строки)
+  filials              String[] // РњР°СЃСЃРёРІ С„РёР»РёР°Р»РѕРІ (JSON СЃС‚СЂРѕРєРё)
   hasRepresentatives   Boolean   @default(false)
-  representatives      String[] // Массив представительств (JSON строки)
+  representatives      String[] // РњР°СЃСЃРёРІ РїСЂРµРґСЃС‚Р°РІРёС‚РµР»СЊСЃС‚РІ (JSON СЃС‚СЂРѕРєРё)
   departments          Department[]
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
@@ -235,499 +259,497 @@ model Department {
   id            String     @id @default(uuid())
   structureId   Int
   structure     Structure  @relation(fields: [structureId], references: [id], onDelete: Cascade)
-  name          String     // Наименование органа управления / структурного подразделения
-  fio           String     // ФИО руководителя
-  post          String     // Должность руководителя
-  phone         String?    // Контактный телефон
-  address       String     // Адрес местонахождения
-  site          String     // Адрес официального сайта
-  email         String     // Адреса электронной почты
-  document      String?    // Положение об органе управления/ о структурном подразделении
+  name          String     // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РѕСЂРіР°РЅР° СѓРїСЂР°РІР»РµРЅРёСЏ / СЃС‚СЂСѓРєС‚СѓСЂРЅРѕРіРѕ РїРѕРґСЂР°Р·РґРµР»РµРЅРёСЏ
+  fio           String     // Р¤РРћ СЂСѓРєРѕРІРѕРґРёС‚РµР»СЏ
+  post          String     // Р”РѕР»Р¶РЅРѕСЃС‚СЊ СЂСѓРєРѕРІРѕРґРёС‚РµР»СЏ
+  phone         String?    // РљРѕРЅС‚Р°РєС‚РЅС‹Р№ С‚РµР»РµС„РѕРЅ
+  address       String     // РђРґСЂРµСЃ РјРµСЃС‚РѕРЅР°С…РѕР¶РґРµРЅРёСЏ
+  site          String     // РђРґСЂРµСЃ РѕС„РёС†РёР°Р»СЊРЅРѕРіРѕ СЃР°Р№С‚Р°
+  email         String     // РђРґСЂРµСЃР° СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹
+  document      String?    // РџРѕР»РѕР¶РµРЅРёРµ РѕР± РѕСЂРіР°РЅРµ СѓРїСЂР°РІР»РµРЅРёСЏ/ Рѕ СЃС‚СЂСѓРєС‚СѓСЂРЅРѕРј РїРѕРґСЂР°Р·РґРµР»РµРЅРёРё
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 }
 
 model StructureDocument {
   id          String   @id @default(uuid())
-  title       String   // Название документа
-  description String?  // Описание документа
-  fileUrl     String   // Путь к файлу
-  fileName    String   // Оригинальное имя файла
-  fileSize    Int      // Размер файла в байтах
-  fileType    String   // MIME тип файла
-  isActive    Boolean  @default(true) // Активен ли документ
-  order       Int      @default(0) // Порядок отображения
+  title       String   // РќР°Р·РІР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  description String?  // РћРїРёСЃР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  fileUrl     String   // РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
+  fileName    String   // РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+  fileSize    Int      // Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ Р±Р°Р№С‚Р°С…
+  fileType    String   // MIME С‚РёРї С„Р°Р№Р»Р°
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РґРѕРєСѓРјРµРЅС‚
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model Document {
   id          String   @id @default(uuid())
-  field       String   @unique // Поле документа (ustavDocLink, localActStud и т.д.)
-  fileUrl     String   // Путь к файлу
-  fileName    String   // Оригинальное имя файла
-  fileSize    Int      // Размер файла в байтах
-  fileType    String   // MIME тип файла
+  field       String   @unique // РџРѕР»Рµ РґРѕРєСѓРјРµРЅС‚Р° (ustavDocLink, localActStud Рё С‚.Рґ.)
+  fileUrl     String   // РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
+  fileName    String   // РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+  fileSize    Int      // Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ Р±Р°Р№С‚Р°С…
+  fileType    String   // MIME С‚РёРї С„Р°Р№Р»Р°
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model EducationalProgram {
   id            String   @id @default(uuid())
-  code          String   // Код, шифр программы
-  name          String   // Наименование программы
-  level         String   // Уровень образования
-  program       String   // Образовательная программа
-  form          String   // Формы обучения
-  description   String?  // Описание программы
-  curriculum    String?  // Учебный план
-  workPrograms  String?  // Рабочие программы
-  schedule      String?  // Календарный график
-  practices     String?  // Практики
-  documents     String?  // Методические документы
-  order         Int      @default(0) // Порядок отображения
-  isActive      Boolean  @default(true) // Активна ли программа
+  code          String   // РљРѕРґ, С€РёС„СЂ РїСЂРѕРіСЂР°РјРјС‹
+  name          String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
+  level         String   // РЈСЂРѕРІРµРЅСЊ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ
+  program       String   // РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°
+  form          String   // Р¤РѕСЂРјС‹ РѕР±СѓС‡РµРЅРёСЏ
+  description   String?  // РћРїРёСЃР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
+  curriculum    String?  // РЈС‡РµР±РЅС‹Р№ РїР»Р°РЅ
+  workPrograms  String?  // Р Р°Р±РѕС‡РёРµ РїСЂРѕРіСЂР°РјРјС‹
+  schedule      String?  // РљР°Р»РµРЅРґР°СЂРЅС‹Р№ РіСЂР°С„РёРє
+  practices     String?  // РџСЂР°РєС‚РёРєРё
+  documents     String?  // РњРµС‚РѕРґРёС‡РµСЃРєРёРµ РґРѕРєСѓРјРµРЅС‚С‹
+  order         Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive      Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё РїСЂРѕРіСЂР°РјРјР°
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
 
-// === РАЗДЕЛ "ОБРАЗОВАНИЕ" В "СВЕДЕНИЯХ ОБ ОРГАНИЗАЦИИ" ===
+// === Р РђР—Р”Р•Р› "РћР‘Р РђР—РћР’РђРќРР•" Р’ "РЎР’Р•Р”Р•РќРРЇРҐ РћР‘ РћР Р“РђРќРР—РђР¦РР" ===
 
-// Модель для основной информации о реализуемых уровнях образования (Таблица 3.5.2)
+// РњРѕРґРµР»СЊ РґР»СЏ РѕСЃРЅРѕРІРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЂРµР°Р»РёР·СѓРµРјС‹С… СѓСЂРѕРІРЅСЏС… РѕР±СЂР°Р·РѕРІР°РЅРёСЏ (РўР°Р±Р»РёС†Р° 3.5.2)
 model EducationProgram {
   id            String   @id @default(uuid())
-  code          String   // Код, шифр
-  name          String   // Наименование профессии, специальности, направления подготовки
-  program       String   // Образовательная программа, направленность, профиль
-  level         String   // Уровень образования
-  form          String   // Формы обучения
-  term          String   // Нормативный срок обучения
-  subjects      String   // Учебные предметы, курсы, дисциплины
-  practices     String   // Практики
-  order         Int      @default(0) // Порядок отображения
-  isActive      Boolean  @default(true) // Активна ли программа
+  code          String   // РљРѕРґ, С€РёС„СЂ
+  name          String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїСЂРѕС„РµСЃСЃРёРё, СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё, РЅР°РїСЂР°РІР»РµРЅРёСЏ РїРѕРґРіРѕС‚РѕРІРєРё
+  program       String   // РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°, РЅР°РїСЂР°РІР»РµРЅРЅРѕСЃС‚СЊ, РїСЂРѕС„РёР»СЊ
+  level         String   // РЈСЂРѕРІРµРЅСЊ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ
+  form          String   // Р¤РѕСЂРјС‹ РѕР±СѓС‡РµРЅРёСЏ
+  term          String   // РќРѕСЂРјР°С‚РёРІРЅС‹Р№ СЃСЂРѕРє РѕР±СѓС‡РµРЅРёСЏ
+  subjects      String   // РЈС‡РµР±РЅС‹Рµ РїСЂРµРґРјРµС‚С‹, РєСѓСЂСЃС‹, РґРёСЃС†РёРїР»РёРЅС‹
+  practices     String   // РџСЂР°РєС‚РёРєРё
+  order         Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive      Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё РїСЂРѕРіСЂР°РјРјР°
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
-// Модель для детальной информации об образовательных программах (Таблица 3.5.6)
+// РњРѕРґРµР»СЊ РґР»СЏ РґРµС‚Р°Р»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё РѕР± РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅС‹С… РїСЂРѕРіСЂР°РјРјР°С… (РўР°Р±Р»РёС†Р° 3.5.6)
 model EducationalProgramDetail {
   id                  String   @id @default(uuid())
-  code                String   // Код, шифр
-  name                String   // Наименование профессии, специальности, направления подготовки
-  level               String   // Уровень образования
-  program             String   // Образовательная программа, направленность, профиль
-  form                String   // Реализуемые формы обучения
-  descriptionFile     String?  // Файл описания образовательной программы
-  curriculumFile      String?  // Файл учебного плана
-  workProgramsFile    String?  // Файл рабочих программ дисциплин
-  scheduleFile        String?  // Файл календарного учебного графика
-  practicesFile       String?  // Файл рабочих программ практик
-  documentsFile       String?  // Файл методических документов
-  order               Int      @default(0) // Порядок отображения
-  isActive            Boolean  @default(true) // Активна ли программа
+  code                String   // РљРѕРґ, С€РёС„СЂ
+  name                String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїСЂРѕС„РµСЃСЃРёРё, СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё, РЅР°РїСЂР°РІР»РµРЅРёСЏ РїРѕРґРіРѕС‚РѕРІРєРё
+  level               String   // РЈСЂРѕРІРµРЅСЊ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ
+  program             String   // РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°, РЅР°РїСЂР°РІР»РµРЅРЅРѕСЃС‚СЊ, РїСЂРѕС„РёР»СЊ
+  form                String   // Р РµР°Р»РёР·СѓРµРјС‹Рµ С„РѕСЂРјС‹ РѕР±СѓС‡РµРЅРёСЏ
+  descriptionFile     String?  // Р¤Р°Р№Р» РѕРїРёСЃР°РЅРёСЏ РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹
+  curriculumFile      String?  // Р¤Р°Р№Р» СѓС‡РµР±РЅРѕРіРѕ РїР»Р°РЅР°
+  workProgramsFile    String?  // Р¤Р°Р№Р» СЂР°Р±РѕС‡РёС… РїСЂРѕРіСЂР°РјРј РґРёСЃС†РёРїР»РёРЅ
+  scheduleFile        String?  // Р¤Р°Р№Р» РєР°Р»РµРЅРґР°СЂРЅРѕРіРѕ СѓС‡РµР±РЅРѕРіРѕ РіСЂР°С„РёРєР°
+  practicesFile       String?  // Р¤Р°Р№Р» СЂР°Р±РѕС‡РёС… РїСЂРѕРіСЂР°РјРј РїСЂР°РєС‚РёРє
+  documentsFile       String?  // Р¤Р°Р№Р» РјРµС‚РѕРґРёС‡РµСЃРєРёС… РґРѕРєСѓРјРµРЅС‚РѕРІ
+  order               Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive            Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё РїСЂРѕРіСЂР°РјРјР°
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
 
-// Модель для адаптированных образовательных программ (Таблица 3.5.7)
+// РњРѕРґРµР»СЊ РґР»СЏ Р°РґР°РїС‚РёСЂРѕРІР°РЅРЅС‹С… РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅС‹С… РїСЂРѕРіСЂР°РјРј (РўР°Р±Р»РёС†Р° 3.5.7)
 model AdaptedProgram {
   id            String   @id @default(uuid())
-  code          String   // Код, шифр
-  name          String   // Наименование профессии, специальности, направления подготовки
-  level         String   // Уровень образования
-  program       String   // Образовательная программа, направленность, профиль
-  form          String   // Реализуемые формы обучения
-  description   String?  // Ссылка на описание образовательной программы
-  curriculum    String?  // Ссылка на учебный план
-  workPrograms  String[] // Массив ссылок на рабочие программы дисциплин
-  schedule      String?  // Ссылка на календарный учебный график
-  practices     String?  // Ссылка на рабочие программы практик
-  documents     String?  // Ссылка на методические документы
-  order         Int      @default(0) // Порядок отображения
-  isActive      Boolean  @default(true) // Активна ли программа
+  code          String   // РљРѕРґ, С€РёС„СЂ
+  name          String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїСЂРѕС„РµСЃСЃРёРё, СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё, РЅР°РїСЂР°РІР»РµРЅРёСЏ РїРѕРґРіРѕС‚РѕРІРєРё
+  level         String   // РЈСЂРѕРІРµРЅСЊ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ
+  program       String   // РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°, РЅР°РїСЂР°РІР»РµРЅРЅРѕСЃС‚СЊ, РїСЂРѕС„РёР»СЊ
+  form          String   // Р РµР°Р»РёР·СѓРµРјС‹Рµ С„РѕСЂРјС‹ РѕР±СѓС‡РµРЅРёСЏ
+  description   String?  // РЎСЃС‹Р»РєР° РЅР° РѕРїРёСЃР°РЅРёРµ РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹
+  curriculum    String?  // РЎСЃС‹Р»РєР° РЅР° СѓС‡РµР±РЅС‹Р№ РїР»Р°РЅ
+  workPrograms  String[] // РњР°СЃСЃРёРІ СЃСЃС‹Р»РѕРє РЅР° СЂР°Р±РѕС‡РёРµ РїСЂРѕРіСЂР°РјРјС‹ РґРёСЃС†РёРїР»РёРЅ
+  schedule      String?  // РЎСЃС‹Р»РєР° РЅР° РєР°Р»РµРЅРґР°СЂРЅС‹Р№ СѓС‡РµР±РЅС‹Р№ РіСЂР°С„РёРє
+  practices     String?  // РЎСЃС‹Р»РєР° РЅР° СЂР°Р±РѕС‡РёРµ РїСЂРѕРіСЂР°РјРјС‹ РїСЂР°РєС‚РёРє
+  documents     String?  // РЎСЃС‹Р»РєР° РЅР° РјРµС‚РѕРґРёС‡РµСЃРєРёРµ РґРѕРєСѓРјРµРЅС‚С‹
+  order         Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive      Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё РїСЂРѕРіСЂР°РјРјР°
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
-// Модель для научной деятельности (Таблица 3.5.8)
+// РњРѕРґРµР»СЊ РґР»СЏ РЅР°СѓС‡РЅРѕР№ РґРµСЏС‚РµР»СЊРЅРѕСЃС‚Рё (РўР°Р±Р»РёС†Р° 3.5.8)
 model ScientificActivity {
   id            String   @id @default(uuid())
-  code          String   // Код, шифр
-  name          String   // Наименование специальности, направления подготовки
-  directions    String   // Перечень научных направлений
-  program       String   // Образовательная программа, направленность, профиль
-  level         String   // Уровень образования
-  directionName String   // Название научного направления/научной школы
-  results       String   // Результаты научной деятельности
-  base          String   // Научно-исследовательская база
-  order         Int      @default(0) // Порядок отображения
-  isActive      Boolean  @default(true) // Активна ли запись
+  code          String   // РљРѕРґ, С€РёС„СЂ
+  name          String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё, РЅР°РїСЂР°РІР»РµРЅРёСЏ РїРѕРґРіРѕС‚РѕРІРєРё
+  directions    String   // РџРµСЂРµС‡РµРЅСЊ РЅР°СѓС‡РЅС‹С… РЅР°РїСЂР°РІР»РµРЅРёР№
+  program       String   // РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°, РЅР°РїСЂР°РІР»РµРЅРЅРѕСЃС‚СЊ, РїСЂРѕС„РёР»СЊ
+  level         String   // РЈСЂРѕРІРµРЅСЊ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ
+  directionName String   // РќР°Р·РІР°РЅРёРµ РЅР°СѓС‡РЅРѕРіРѕ РЅР°РїСЂР°РІР»РµРЅРёСЏ/РЅР°СѓС‡РЅРѕР№ С€РєРѕР»С‹
+  results       String   // Р РµР·СѓР»СЊС‚Р°С‚С‹ РЅР°СѓС‡РЅРѕР№ РґРµСЏС‚РµР»СЊРЅРѕСЃС‚Рё
+  base          String   // РќР°СѓС‡РЅРѕ-РёСЃСЃР»РµРґРѕРІР°С‚РµР»СЊСЃРєР°СЏ Р±Р°Р·Р°
+  order         Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive      Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё Р·Р°РїРёСЃСЊ
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
-// Модель для трудоустройства выпускников (Таблица 3.5.9)
+// РњРѕРґРµР»СЊ РґР»СЏ С‚СЂСѓРґРѕСѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РїСѓСЃРєРЅРёРєРѕРІ (РўР°Р±Р»РёС†Р° 3.5.9)
 model GraduateEmployment {
   id            String   @id @default(uuid())
-  code          String   // Код, шифр
-  name          String   // Наименование профессии, специальности, направления подготовки
-  program       String   // Образовательная программа, направленность, профиль
-  graduates     Int      // Количество выпускников
-  employed      Int      // Количество трудоустроенных выпускников
-  year          String   // Учебный год (например, "2023/2024")
-  order         Int      @default(0) // Порядок отображения
-  isActive      Boolean  @default(true) // Активна ли запись
+  code          String   // РљРѕРґ, С€РёС„СЂ
+  name          String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїСЂРѕС„РµСЃСЃРёРё, СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё, РЅР°РїСЂР°РІР»РµРЅРёСЏ РїРѕРґРіРѕС‚РѕРІРєРё
+  program       String   // РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°, РЅР°РїСЂР°РІР»РµРЅРЅРѕСЃС‚СЊ, РїСЂРѕС„РёР»СЊ
+  graduates     Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РІС‹РїСѓСЃРєРЅРёРєРѕРІ
+  employed      Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ С‚СЂСѓРґРѕСѓСЃС‚СЂРѕРµРЅРЅС‹С… РІС‹РїСѓСЃРєРЅРёРєРѕРІ
+  year          String   // РЈС‡РµР±РЅС‹Р№ РіРѕРґ (РЅР°РїСЂРёРјРµСЂ, "2023/2024")
+  order         Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive      Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё Р·Р°РїРёСЃСЊ
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
-// Модель для хранения ссылок на документы образования
+// РњРѕРґРµР»СЊ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃСЃС‹Р»РѕРє РЅР° РґРѕРєСѓРјРµРЅС‚С‹ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 model EducationDocument {
   id          String   @id @default(uuid())
-  title       String   // Заголовок документа
-  description String?  // Описание документа
-  fileUrl     String   // Путь к файлу
-  fileName    String   // Оригинальное имя файла
-  fileSize    Int      // Размер файла в байтах
-  fileType    String   // MIME тип файла
-  isActive    Boolean  @default(true) // Активен ли документ
+  title       String   // Р—Р°РіРѕР»РѕРІРѕРє РґРѕРєСѓРјРµРЅС‚Р°
+  description String?  // РћРїРёСЃР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  fileUrl     String   // РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
+  fileName    String   // РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+  fileSize    Int      // Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ Р±Р°Р№С‚Р°С…
+  fileType    String   // MIME С‚РёРї С„Р°Р№Р»Р°
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РґРѕРєСѓРјРµРЅС‚
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// === РАЗДЕЛ "ОБРАЗОВАТЕЛЬНЫЕ СТАНДАРТЫ И ТРЕБОВАНИЯ" ===
+// === Р РђР—Р”Р•Р› "РћР‘Р РђР—РћР’РђРўР•Р›Р¬РќР«Р• РЎРўРђРќР”РђР РўР« Р РўР Р•Р‘РћР’РђРќРРЇ" ===
 
-// Модель для образовательных стандартов и требований
+// РњРѕРґРµР»СЊ РґР»СЏ РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅС‹С… СЃС‚Р°РЅРґР°СЂС‚РѕРІ Рё С‚СЂРµР±РѕРІР°РЅРёР№
 model EducationalStandard {
   id            String   @id @default(uuid())
-  code          String   // Код, шифр программы
-  name          String   // Наименование программы
-  level         String   // Уровень образования
-  program       String   // Образовательная программа
-  form          String   // Форма обучения
-  // Федеральные государственные образовательные стандарты
-  fedDocUrl     String?  // Ссылка на ФГОС
-  fedDocName    String?  // Название файла ФГОС
-  // Образовательные стандарты
-  standartDocUrl String? // Ссылка на образовательный стандарт
-  standartDocName String? // Название файла образовательного стандарта
-  // Федеральные государственные требования
-  fedTrebUrl    String?  // Ссылка на ФГТ
-  fedTrebName   String?  // Название файла ФГТ
-  // Самостоятельно устанавливаемые требования
-  standartTrebUrl String? // Ссылка на самостоятельно устанавливаемые требования
-  standartTrebName String? // Название файла самостоятельно устанавливаемых требований
-  order         Int      @default(0) // Порядок отображения
-  isActive      Boolean  @default(true) // Активен ли стандарт
+  code          String   // РљРѕРґ, С€РёС„СЂ РїСЂРѕРіСЂР°РјРјС‹
+  name          String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
+  level         String   // РЈСЂРѕРІРµРЅСЊ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ
+  program       String   // РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°
+  form          String   // Р¤РѕСЂРјР° РѕР±СѓС‡РµРЅРёСЏ
+  // Р¤РµРґРµСЂР°Р»СЊРЅС‹Рµ РіРѕСЃСѓРґР°СЂСЃС‚РІРµРЅРЅС‹Рµ РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅС‹Рµ СЃС‚Р°РЅРґР°СЂС‚С‹
+  fedDocUrl     String?  // РЎСЃС‹Р»РєР° РЅР° Р¤Р“РћРЎ
+  fedDocName    String?  // РќР°Р·РІР°РЅРёРµ С„Р°Р№Р»Р° Р¤Р“РћРЎ
+  // РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅС‹Рµ СЃС‚Р°РЅРґР°СЂС‚С‹
+  standartDocUrl String? // РЎСЃС‹Р»РєР° РЅР° РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅС‹Р№ СЃС‚Р°РЅРґР°СЂС‚
+  standartDocName String? // РќР°Р·РІР°РЅРёРµ С„Р°Р№Р»Р° РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅРѕРіРѕ СЃС‚Р°РЅРґР°СЂС‚Р°
+  // Р¤РµРґРµСЂР°Р»СЊРЅС‹Рµ РіРѕСЃСѓРґР°СЂСЃС‚РІРµРЅРЅС‹Рµ С‚СЂРµР±РѕРІР°РЅРёСЏ
+  fedTrebUrl    String?  // РЎСЃС‹Р»РєР° РЅР° Р¤Р“Рў
+  fedTrebName   String?  // РќР°Р·РІР°РЅРёРµ С„Р°Р№Р»Р° Р¤Р“Рў
+  // РЎР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹Рµ С‚СЂРµР±РѕРІР°РЅРёСЏ
+  standartTrebUrl String? // РЎСЃС‹Р»РєР° РЅР° СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹Рµ С‚СЂРµР±РѕРІР°РЅРёСЏ
+  standartTrebName String? // РќР°Р·РІР°РЅРёРµ С„Р°Р№Р»Р° СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹С… С‚СЂРµР±РѕРІР°РЅРёР№
+  order         Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive      Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё СЃС‚Р°РЅРґР°СЂС‚
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
-// === РАЗДЕЛ "РУКОВОДСТВО" ===
+// === Р РђР—Р”Р•Р› "Р РЈРљРћР’РћР”РЎРўР’Рћ" ===
 
-// Модель для руководства организации
+// РњРѕРґРµР»СЊ РґР»СЏ СЂСѓРєРѕРІРѕРґСЃС‚РІР° РѕСЂРіР°РЅРёР·Р°С†РёРё
 model Manager {
   id        String   @id @default(uuid())
-  fio       String   // ФИО
-  post      String   // Должность
-  telephone String   // Контактные телефоны
-  email     String   // Адреса электронной почты
-  type      String   // Тип: 'director', 'deputy', 'filial'
-  filialName String? // Наименование филиала (для руководителей филиалов)
+  fio       String   // Р¤РРћ
+  post      String   // Р”РѕР»Р¶РЅРѕСЃС‚СЊ
+  telephone String   // РљРѕРЅС‚Р°РєС‚РЅС‹Рµ С‚РµР»РµС„РѕРЅС‹
+  email     String   // РђРґСЂРµСЃР° СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹
+  type      String   // РўРёРї: 'director', 'deputy', 'filial'
+  filialName String? // РќР°РёРјРµРЅРѕРІР°РЅРёРµ С„РёР»РёР°Р»Р° (РґР»СЏ СЂСѓРєРѕРІРѕРґРёС‚РµР»РµР№ С„РёР»РёР°Р»РѕРІ)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// === РАЗДЕЛ "ПЕДАГОГИЧЕСКИЙ СОСТАВ" ===
+// === Р РђР—Р”Р•Р› "РџР•Р”РђР“РћР“РР§Р•РЎРљРР™ РЎРћРЎРўРђР’" ===
 
-// Модель для педагогического состава
+// РњРѕРґРµР»СЊ РґР»СЏ РїРµРґР°РіРѕРіРёС‡РµСЃРєРѕРіРѕ СЃРѕСЃС‚Р°РІР°
 model Employee {
   id                      String   @id @default(uuid())
-  fio                     String   // Ф.И.О.
-  post                    String   // Должность
-  disciplines             String   // Перечень преподаваемых дисциплин
-  educationLevel          String   // Уровень профессионального образования, квалификация
-  degree                  String?  // Учёная степень
-  academicTitle           String?  // Учёное звание
-  qualification           String?  // Сведения о повышении квалификации (за последние 3 года)
-  professionalDevelopment String?  // Сведения о профессиональной переподготовке
-  experience              String   // Стаж работы (лет)
-  programs                String   // Наименование образовательных программ
-  order                   Int      @default(0) // Порядок отображения
-  isActive                Boolean  @default(true) // Активен ли сотрудник
+  fio                     String   // Р¤.Р.Рћ.
+  post                    String   // Р”РѕР»Р¶РЅРѕСЃС‚СЊ
+  disciplines             String   // РџРµСЂРµС‡РµРЅСЊ РїСЂРµРїРѕРґР°РІР°РµРјС‹С… РґРёСЃС†РёРїР»РёРЅ
+  educationLevel          String   // РЈСЂРѕРІРµРЅСЊ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ, РєРІР°Р»РёС„РёРєР°С†РёСЏ
+  degree                  String?  // РЈС‡С‘РЅР°СЏ СЃС‚РµРїРµРЅСЊ
+  academicTitle           String?  // РЈС‡С‘РЅРѕРµ Р·РІР°РЅРёРµ
+  qualification           String?  // РЎРІРµРґРµРЅРёСЏ Рѕ РїРѕРІС‹С€РµРЅРёРё РєРІР°Р»РёС„РёРєР°С†РёРё (Р·Р° РїРѕСЃР»РµРґРЅРёРµ 3 РіРѕРґР°)
+  professionalDevelopment String?  // РЎРІРµРґРµРЅРёСЏ Рѕ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕР№ РїРµСЂРµРїРѕРґРіРѕС‚РѕРІРєРµ
+  experience              String   // РЎС‚Р°Р¶ СЂР°Р±РѕС‚С‹ (Р»РµС‚)
+  programs                String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅС‹С… РїСЂРѕРіСЂР°РјРј
+  order                   Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive                Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё СЃРѕС‚СЂСѓРґРЅРёРє
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 }
-// === РАЗДЕЛ "ВАКАНТНЫЕ МЕСТА ДЛЯ ПРИЕМА (ПЕРЕВОДА) ОБУЧАЮЩИХСЯ" ===
+// === Р РђР—Р”Р•Р› "Р’РђРљРђРќРўРќР«Р• РњР•РЎРўРђ Р”Р›РЇ РџР РР•РњРђ (РџР•Р Р•Р’РћР”Рђ) РћР‘РЈР§РђР®Р©РРҐРЎРЇ" ===
 
-// Модель для вакантных мест
+// РњРѕРґРµР»СЊ РґР»СЏ РІР°РєР°РЅС‚РЅС‹С… РјРµСЃС‚
 model VacantPlace {
   id                    String   @id @default(uuid())
-  eduCode               String   // Код, шифр группы научных специальностей
-  eduName               String   // Наименование профессии, специальности, направления подготовки
-  eduLevel              String   // Уровень образования
-  eduProf               String?  // Образовательная программа, направленность, профиль
-  eduCourse             Int      // Курс
-  eduForm               String   // Форма обучения
-  numberBFVacant        Int      @default(0) // Количество вакантных мест за счет федерального бюджета
-  numberBRVacant        Int      @default(0) // Количество вакантных мест за счет бюджета субъекта РФ
-  numberBMVacant        Int      @default(0) // Количество вакантных мест за счет местных бюджетов
-  numberPVacant         Int      @default(0) // Количество вакантных мест за счет средств физических/юридических лиц
-  order                 Int      @default(0) // Порядок отображения
-  isActive              Boolean  @default(true) // Активна ли запись
+  eduCode               String   // РљРѕРґ, С€РёС„СЂ РіСЂСѓРїРїС‹ РЅР°СѓС‡РЅС‹С… СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚РµР№
+  eduName               String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїСЂРѕС„РµСЃСЃРёРё, СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё, РЅР°РїСЂР°РІР»РµРЅРёСЏ РїРѕРґРіРѕС‚РѕРІРєРё
+  eduLevel              String   // РЈСЂРѕРІРµРЅСЊ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ
+  eduProf               String?  // РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°, РЅР°РїСЂР°РІР»РµРЅРЅРѕСЃС‚СЊ, РїСЂРѕС„РёР»СЊ
+  eduCourse             Int      // РљСѓСЂСЃ
+  eduForm               String   // Р¤РѕСЂРјР° РѕР±СѓС‡РµРЅРёСЏ
+  numberBFVacant        Int      @default(0) // РљРѕР»РёС‡РµСЃС‚РІРѕ РІР°РєР°РЅС‚РЅС‹С… РјРµСЃС‚ Р·Р° СЃС‡РµС‚ С„РµРґРµСЂР°Р»СЊРЅРѕРіРѕ Р±СЋРґР¶РµС‚Р°
+  numberBRVacant        Int      @default(0) // РљРѕР»РёС‡РµСЃС‚РІРѕ РІР°РєР°РЅС‚РЅС‹С… РјРµСЃС‚ Р·Р° СЃС‡РµС‚ Р±СЋРґР¶РµС‚Р° СЃСѓР±СЉРµРєС‚Р° Р Р¤
+  numberBMVacant        Int      @default(0) // РљРѕР»РёС‡РµСЃС‚РІРѕ РІР°РєР°РЅС‚РЅС‹С… РјРµСЃС‚ Р·Р° СЃС‡РµС‚ РјРµСЃС‚РЅС‹С… Р±СЋРґР¶РµС‚РѕРІ
+  numberPVacant         Int      @default(0) // РљРѕР»РёС‡РµСЃС‚РІРѕ РІР°РєР°РЅС‚РЅС‹С… РјРµСЃС‚ Р·Р° СЃС‡РµС‚ СЃСЂРµРґСЃС‚РІ С„РёР·РёС‡РµСЃРєРёС…/СЋСЂРёРґРёС‡РµСЃРєРёС… Р»РёС†
+  order                 Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive              Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё Р·Р°РїРёСЃСЊ
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }
 
-// === РАЗДЕЛ "МАТЕРИАЛЬНО-ТЕХНИЧЕСКОЕ ОБЕСПЕЧЕНИЕ" ===
+// === Р РђР—Р”Р•Р› "РњРђРўР•Р РРђР›Р¬РќРћ-РўР•РҐРќРР§Р•РЎРљРћР• РћР‘Р•РЎРџР•Р§Р•РќРР•" ===
 
-// Модель для оборудованных учебных кабинетов
+// РњРѕРґРµР»СЊ РґР»СЏ РѕР±РѕСЂСѓРґРѕРІР°РЅРЅС‹С… СѓС‡РµР±РЅС‹С… РєР°Р±РёРЅРµС‚РѕРІ
 model Cabinet {
   id          String   @id @default(uuid())
-  address     String   // Адрес места нахождения
-  name        String   // Наименование оборудованного учебного кабинета
-  equipment   String   // Оснащенность оборудованного учебного кабинета
-  accessibility String // Приспособленность для использования инвалидами
-  order       Int      @default(0) // Порядок отображения
-  isActive    Boolean  @default(true) // Активен ли кабинет
+  address     String   // РђРґСЂРµСЃ РјРµСЃС‚Р° РЅР°С…РѕР¶РґРµРЅРёСЏ
+  name        String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РѕР±РѕСЂСѓРґРѕРІР°РЅРЅРѕРіРѕ СѓС‡РµР±РЅРѕРіРѕ РєР°Р±РёРЅРµС‚Р°
+  equipment   String   // РћСЃРЅР°С‰РµРЅРЅРѕСЃС‚СЊ РѕР±РѕСЂСѓРґРѕРІР°РЅРЅРѕРіРѕ СѓС‡РµР±РЅРѕРіРѕ РєР°Р±РёРЅРµС‚Р°
+  accessibility String // РџСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅРѕСЃС‚СЊ РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РёРЅРІР°Р»РёРґР°РјРё
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РєР°Р±РёРЅРµС‚
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Модель для объектов для проведения практических занятий
+// РњРѕРґРµР»СЊ РґР»СЏ РѕР±СЉРµРєС‚РѕРІ РґР»СЏ РїСЂРѕРІРµРґРµРЅРёСЏ РїСЂР°РєС‚РёС‡РµСЃРєРёС… Р·Р°РЅСЏС‚РёР№
 model PracticeObject {
   id          String   @id @default(uuid())
-  address     String   // Адрес места нахождения
-  name        String   // Наименование объекта для проведения практических занятий
-  equipment   String   // Оснащенность объекта для проведения практических занятий
-  accessibility String // Приспособленность для использования инвалидами
-  order       Int      @default(0) // Порядок отображения
-  isActive    Boolean  @default(true) // Активен ли объект
+  address     String   // РђРґСЂРµСЃ РјРµСЃС‚Р° РЅР°С…РѕР¶РґРµРЅРёСЏ
+  name        String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р° РґР»СЏ РїСЂРѕРІРµРґРµРЅРёСЏ РїСЂР°РєС‚РёС‡РµСЃРєРёС… Р·Р°РЅСЏС‚РёР№
+  equipment   String   // РћСЃРЅР°С‰РµРЅРЅРѕСЃС‚СЊ РѕР±СЉРµРєС‚Р° РґР»СЏ РїСЂРѕРІРµРґРµРЅРёСЏ РїСЂР°РєС‚РёС‡РµСЃРєРёС… Р·Р°РЅСЏС‚РёР№
+  accessibility String // РџСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅРѕСЃС‚СЊ РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РёРЅРІР°Р»РёРґР°РјРё
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РѕР±СЉРµРєС‚
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Модель для библиотек
+// РњРѕРґРµР»СЊ РґР»СЏ Р±РёР±Р»РёРѕС‚РµРє
 model Library {
   id          String   @id @default(uuid())
-  name        String   // Наименование объекта
-  address     String   // Адрес места нахождения объекта
-  area        Int      // Площадь, м²
-  seats       Int      // Количество мест
-  accessibility String // Приспособленность для использования инвалидами
-  order       Int      @default(0) // Порядок отображения
-  isActive    Boolean  @default(true) // Активна ли библиотека
+  name        String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р°
+  address     String   // РђРґСЂРµСЃ РјРµСЃС‚Р° РЅР°С…РѕР¶РґРµРЅРёСЏ РѕР±СЉРµРєС‚Р°
+  area        Int      // РџР»РѕС‰Р°РґСЊ, РјВІ
+  seats       Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РјРµСЃС‚
+  accessibility String // РџСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅРѕСЃС‚СЊ РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РёРЅРІР°Р»РёРґР°РјРё
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё Р±РёР±Р»РёРѕС‚РµРєР°
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Модель для объектов спорта
+// РњРѕРґРµР»СЊ РґР»СЏ РѕР±СЉРµРєС‚РѕРІ СЃРїРѕСЂС‚Р°
 model SportObject {
   id          String   @id @default(uuid())
-  name        String   // Наименование объекта
-  address     String   // Адрес места нахождения объекта
-  area        Int      // Площадь, м²
-  seats       Int      // Количество мест
-  accessibility String // Приспособленность для использования инвалидами
-  order       Int      @default(0) // Порядок отображения
-  isActive    Boolean  @default(true) // Активен ли объект спорта
+  name        String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р°
+  address     String   // РђРґСЂРµСЃ РјРµСЃС‚Р° РЅР°С…РѕР¶РґРµРЅРёСЏ РѕР±СЉРµРєС‚Р°
+  area        Int      // РџР»РѕС‰Р°РґСЊ, РјВІ
+  seats       Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РјРµСЃС‚
+  accessibility String // РџСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅРѕСЃС‚СЊ РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РёРЅРІР°Р»РёРґР°РјРё
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РѕР±СЉРµРєС‚ СЃРїРѕСЂС‚Р°
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Модель для текстовых блоков материально-технического обеспечения
+// РњРѕРґРµР»СЊ РґР»СЏ С‚РµРєСЃС‚РѕРІС‹С… Р±Р»РѕРєРѕРІ РјР°С‚РµСЂРёР°Р»СЊРЅРѕ-С‚РµС…РЅРёС‡РµСЃРєРѕРіРѕ РѕР±РµСЃРїРµС‡РµРЅРёСЏ
 model ObjectsTextBlock {
   id        String   @id @default(uuid())
-  blockType String   // Тип блока: 'accessibility', 'facilities', 'adaptedFacilities', 'comNet', 'comNetOvz', 'eios', 'erList', 'erListOvz', 'techOvz', 'hostelInterOvz'
-  content   String   @db.Text // Содержимое блока
-  isActive  Boolean  @default(true) // Активен ли блок
+  blockType String   // РўРёРї Р±Р»РѕРєР°: 'accessibility', 'facilities', 'adaptedFacilities', 'comNet', 'comNetOvz', 'eios', 'erList', 'erListOvz', 'techOvz', 'hostelInterOvz'
+  content   String   @db.Text // РЎРѕРґРµСЂР¶РёРјРѕРµ Р±Р»РѕРєР°
+  isActive  Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё Р±Р»РѕРє
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// Модель для информации об общежитиях
+// РњРѕРґРµР»СЊ РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё РѕР± РѕР±С‰РµР¶РёС‚РёСЏС…
 model HostelInfo {
   id          String   @id @default(uuid())
-  hostels     Int      // Количество общежитий
-  places      Int      // Количество мест
-  adapted     Int      // Количество жилых помещений, приспособленных для инвалидов
-  internats   Int      // Количество интернатов
-  interPlaces Int      // Количество мест в интернатах
-  interAdapted Int     // Количество жилых помещений в интернате, приспособленных для инвалидов
+  hostels     Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±С‰РµР¶РёС‚РёР№
+  places      Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РјРµСЃС‚
+  adapted     Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ Р¶РёР»С‹С… РїРѕРјРµС‰РµРЅРёР№, РїСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅС‹С… РґР»СЏ РёРЅРІР°Р»РёРґРѕРІ
+  internats   Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РёРЅС‚РµСЂРЅР°С‚РѕРІ
+  interPlaces Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РјРµСЃС‚ РІ РёРЅС‚РµСЂРЅР°С‚Р°С…
+  interAdapted Int     // РљРѕР»РёС‡РµСЃС‚РІРѕ Р¶РёР»С‹С… РїРѕРјРµС‰РµРЅРёР№ РІ РёРЅС‚РµСЂРЅР°С‚Рµ, РїСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅС‹С… РґР»СЏ РёРЅРІР°Р»РёРґРѕРІ
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Модель для документов материально-технического обеспечения
+// РњРѕРґРµР»СЊ РґР»СЏ РґРѕРєСѓРјРµРЅС‚РѕРІ РјР°С‚РµСЂРёР°Р»СЊРЅРѕ-С‚РµС…РЅРёС‡РµСЃРєРѕРіРѕ РѕР±РµСЃРїРµС‡РµРЅРёСЏ
 model ObjectsDocument {
   id          String   @id @default(uuid())
-  title       String   // Название документа
-  description String?  // Описание документа
-  fileUrl     String   // Путь к файлу
-  fileName    String   // Оригинальное имя файла
-  fileSize    Int      // Размер файла в байтах
-  fileType    String   // MIME тип файла
-  category    String?  // Категория документа
-  isActive    Boolean  @default(true) // Активен ли документ
-  order       Int      @default(0) // Порядок отображения
+  title       String   // РќР°Р·РІР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  description String?  // РћРїРёСЃР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  fileUrl     String   // РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
+  fileName    String   // РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+  fileSize    Int      // Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ Р±Р°Р№С‚Р°С…
+  fileType    String   // MIME С‚РёРї С„Р°Р№Р»Р°
+  category    String?  // РљР°С‚РµРіРѕСЂРёСЏ РґРѕРєСѓРјРµРЅС‚Р°
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РґРѕРєСѓРјРµРЅС‚
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// === РАЗДЕЛ "СТИПЕНДИИ И МЕРЫ ПОДДЕРЖКИ ОБУЧАЮЩИХСЯ" ===
+// === Р РђР—Р”Р•Р› "РЎРўРРџР•РќР”РР Р РњР•Р Р« РџРћР”Р”Р•Р Р–РљР РћР‘РЈР§РђР®Р©РРҐРЎРЇ" ===
 
-// Модель для документов о стипендиях
+// РњРѕРґРµР»СЊ РґР»СЏ РґРѕРєСѓРјРµРЅС‚РѕРІ Рѕ СЃС‚РёРїРµРЅРґРёСЏС…
 model GrantsDocument {
   id          String   @id @default(uuid())
-  title       String   // Название документа
-  description String?  // Описание документа
-  fileUrl     String   // Путь к файлу
-  fileName    String   // Оригинальное имя файла
-  fileSize    Int      // Размер файла в байтах
-  fileType    String   // MIME тип файла
-  isActive    Boolean  @default(true) // Активен ли документ
-  order       Int      @default(0) // Порядок отображения
+  title       String   // РќР°Р·РІР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  description String?  // РћРїРёСЃР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  fileUrl     String   // РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
+  fileName    String   // РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+  fileSize    Int      // Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ Р±Р°Р№С‚Р°С…
+  fileType    String   // MIME С‚РёРї С„Р°Р№Р»Р°
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РґРѕРєСѓРјРµРЅС‚
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Модель для информации о стипендиях
+// РњРѕРґРµР»СЊ РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЃС‚РёРїРµРЅРґРёСЏС…
 model GrantsInfo {
   id        String   @id @default(uuid())
-  content   String   @db.Text // Содержимое информации о стипендиях
-  isActive  Boolean  @default(true) // Активна ли запись
+  content   String   @db.Text // РЎРѕРґРµСЂР¶РёРјРѕРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЃС‚РёРїРµРЅРґРёСЏС…
+  isActive  Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё Р·Р°РїРёСЃСЊ
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// Модель для мер социальной поддержки
+// РњРѕРґРµР»СЊ РґР»СЏ РјРµСЂ СЃРѕС†РёР°Р»СЊРЅРѕР№ РїРѕРґРґРµСЂР¶РєРё
 model SupportMeasure {
   id        String   @id @default(uuid())
-  content   String   @db.Text // Содержимое мер поддержки
-  isActive  Boolean  @default(true) // Активна ли запись
+  content   String   @db.Text // РЎРѕРґРµСЂР¶РёРјРѕРµ РјРµСЂ РїРѕРґРґРµСЂР¶РєРё
+  isActive  Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё Р·Р°РїРёСЃСЊ
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// Модель для информации об общежитиях в разделе стипендий
+// РњРѕРґРµР»СЊ РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё РѕР± РѕР±С‰РµР¶РёС‚РёСЏС… РІ СЂР°Р·РґРµР»Рµ СЃС‚РёРїРµРЅРґРёР№
 model GrantsHostelInfo {
   id          String   @id @default(uuid())
-  hostels     Int      // Количество общежитий
-  places      Int      // Количество мест
-  adapted     Int      // Количество жилых помещений, приспособленных для инвалидов
-  internats   Int      // Количество интернатов
-  interPlaces Int      // Количество мест в интернатах
-  interAdapted Int     // Количество жилых помещений в интернате, приспособленных для инвалидов
+  hostels     Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±С‰РµР¶РёС‚РёР№
+  places      Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РјРµСЃС‚
+  adapted     Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ Р¶РёР»С‹С… РїРѕРјРµС‰РµРЅРёР№, РїСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅС‹С… РґР»СЏ РёРЅРІР°Р»РёРґРѕРІ
+  internats   Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РёРЅС‚РµСЂРЅР°С‚РѕРІ
+  interPlaces Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РјРµСЃС‚ РІ РёРЅС‚РµСЂРЅР°С‚Р°С…
+  interAdapted Int     // РљРѕР»РёС‡РµСЃС‚РІРѕ Р¶РёР»С‹С… РїРѕРјРµС‰РµРЅРёР№ РІ РёРЅС‚РµСЂРЅР°С‚Рµ, РїСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅС‹С… РґР»СЏ РёРЅРІР°Р»РёРґРѕРІ
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Модель для документов о плате за проживание в общежитии
+// РњРѕРґРµР»СЊ РґР»СЏ РґРѕРєСѓРјРµРЅС‚РѕРІ Рѕ РїР»Р°С‚Рµ Р·Р° РїСЂРѕР¶РёРІР°РЅРёРµ РІ РѕР±С‰РµР¶РёС‚РёРё
 model GrantsHostelPaymentDocument {
   id          String   @id @default(uuid())
-  title       String   // Название документа
-  description String?  // Описание документа
-  fileUrl     String   // Путь к файлу
-  fileName    String   // Оригинальное имя файла
-  fileSize    Int      // Размер файла в байтах
-  fileType    String   // MIME тип файла
-  isActive    Boolean  @default(true) // Активен ли документ
+  title       String   // РќР°Р·РІР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  description String?  // РћРїРёСЃР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  fileUrl     String   // РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
+  fileName    String   // РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+  fileSize    Int      // Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ Р±Р°Р№С‚Р°С…
+  fileType    String   // MIME С‚РёРї С„Р°Р№Р»Р°
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РґРѕРєСѓРјРµРЅС‚
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// === РАЗДЕЛ "ПЛАТНЫЕ ОБРАЗОВАТЕЛЬНЫЕ УСЛУГИ" ===
+// === Р РђР—Р”Р•Р› "РџР›РђРўРќР«Р• РћР‘Р РђР—РћР’РђРўР•Р›Р¬РќР«Р• РЈРЎР›РЈР“Р" ===
 
-// Модель для документов о платных образовательных услугах
+// РњРѕРґРµР»СЊ РґР»СЏ РґРѕРєСѓРјРµРЅС‚РѕРІ Рѕ РїР»Р°С‚РЅС‹С… РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅС‹С… СѓСЃР»СѓРіР°С…
 model PaidEduDocument {
   id             String   @id @default(uuid())
-  title          String?  // Название документа
-  description    String?  // Описание документа
-  fileUrl        String?  // Путь к файлу
-  fileName       String?  // Оригинальное имя файла
-  fileSize       Int?     // Размер файла в байтах
-  fileType       String?  // MIME тип файла
-  docType        String   // Тип документа: 'paidEdu', 'paidDog', 'paidSt', 'paidParents'
-  programName    String?  // Название образовательной программы (для paidSt и paidParents)
-  educationLevel String?  // Уровень образования (для paidSt и paidParents)
-  isActive       Boolean  @default(true) // Активен ли документ
-  order          Int      @default(0) // Порядок отображения
+  title          String?  // РќР°Р·РІР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  description    String?  // РћРїРёСЃР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  fileUrl        String?  // РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
+  fileName       String?  // РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+  fileSize       Int?     // Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ Р±Р°Р№С‚Р°С…
+  fileType       String?  // MIME С‚РёРї С„Р°Р№Р»Р°
+  docType        String   // РўРёРї РґРѕРєСѓРјРµРЅС‚Р°: 'paidEdu', 'paidDog', 'paidSt', 'paidParents'
+  programName    String?  // РќР°Р·РІР°РЅРёРµ РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹ (РґР»СЏ paidSt Рё paidParents)
+  educationLevel String?  // РЈСЂРѕРІРµРЅСЊ РѕР±СЂР°Р·РѕРІР°РЅРёСЏ (РґР»СЏ paidSt Рё paidParents)
+  isActive       Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РґРѕРєСѓРјРµРЅС‚
+  order          Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
 
-// === РАЗДЕЛ "ФИНАНСОВО-ХОЗЯЙСТВЕННАЯ ДЕЯТЕЛЬНОСТЬ" ===
+// === Р РђР—Р”Р•Р› "Р¤РРќРђРќРЎРћР’Рћ-РҐРћР—РЇР™РЎРўР’Р•РќРќРђРЇ Р”Р•РЇРўР•Р›Р¬РќРћРЎРўР¬" ===
 
-// Модель для объема образовательной деятельности по источникам финансирования
+// РњРѕРґРµР»СЊ РґР»СЏ РѕР±СЉРµРјР° РѕР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅРѕР№ РґРµСЏС‚РµР»СЊРЅРѕСЃС‚Рё РїРѕ РёСЃС‚РѕС‡РЅРёРєР°Рј С„РёРЅР°РЅСЃРёСЂРѕРІР°РЅРёСЏ
 model BudgetVolume {
   id             String   @id @default(uuid())
-  year           Int      // Год отчетности
-  federalBudget  Float?   // Федеральный бюджет (тыс. руб.)
-  regionalBudget Float?   // Бюджет субъекта РФ (тыс. руб.)
-  localBudget    Float?   // Местный бюджет (тыс. руб.)
-  paidServices   Float?   // Платные услуги (тыс. руб.)
-  isActive       Boolean  @default(true) // Активна ли запись
+  year           Int      // Р“РѕРґ РѕС‚С‡РµС‚РЅРѕСЃС‚Рё
+  federalBudget  Float?   // Р¤РµРґРµСЂР°Р»СЊРЅС‹Р№ Р±СЋРґР¶РµС‚ (С‚С‹СЃ. СЂСѓР±.)
+  regionalBudget Float?   // Р‘СЋРґР¶РµС‚ СЃСѓР±СЉРµРєС‚Р° Р Р¤ (С‚С‹СЃ. СЂСѓР±.)
+  localBudget    Float?   // РњРµСЃС‚РЅС‹Р№ Р±СЋРґР¶РµС‚ (С‚С‹СЃ. СЂСѓР±.)
+  paidServices   Float?   // РџР»Р°С‚РЅС‹Рµ СѓСЃР»СѓРіРё (С‚С‹СЃ. СЂСѓР±.)
+  isActive       Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё Р·Р°РїРёСЃСЊ
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
 
-// Модель для поступления и расходования финансовых средств
+// РњРѕРґРµР»СЊ РґР»СЏ РїРѕСЃС‚СѓРїР»РµРЅРёСЏ Рё СЂР°СЃС…РѕРґРѕРІР°РЅРёСЏ С„РёРЅР°РЅСЃРѕРІС‹С… СЃСЂРµРґСЃС‚РІ
 model BudgetFlow {
   id             String   @id @default(uuid())
-  year           Int      // Год отчетности
-  income         String   // Поступившие финансовые и материальные средства
-  expenses       String   // Расходованные финансовые и материальные средства
-  isActive       Boolean  @default(true) // Активна ли запись
+  year           Int      // Р“РѕРґ РѕС‚С‡РµС‚РЅРѕСЃС‚Рё
+  income         String   // РџРѕСЃС‚СѓРїРёРІС€РёРµ С„РёРЅР°РЅСЃРѕРІС‹Рµ Рё РјР°С‚РµСЂРёР°Р»СЊРЅС‹Рµ СЃСЂРµРґСЃС‚РІР°
+  expenses       String   // Р Р°СЃС…РѕРґРѕРІР°РЅРЅС‹Рµ С„РёРЅР°РЅСЃРѕРІС‹Рµ Рё РјР°С‚РµСЂРёР°Р»СЊРЅС‹Рµ СЃСЂРµРґСЃС‚РІР°
+  isActive       Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё Р·Р°РїРёСЃСЊ
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
 
-// Модель для плана финансово-хозяйственной деятельности
+// РњРѕРґРµР»СЊ РґР»СЏ РїР»Р°РЅР° С„РёРЅР°РЅСЃРѕРІРѕ-С…РѕР·СЏР№СЃС‚РІРµРЅРЅРѕР№ РґРµСЏС‚РµР»СЊРЅРѕСЃС‚Рё
 model BudgetPlan {
   id          String   @id @default(uuid())
-  title       String   // Название документа
-  description String?  // Описание документа
-  fileUrl     String   // Путь к файлу
-  fileName    String   // Оригинальное имя файла
-  fileSize    Int      // Размер файла в байтах
-  fileType    String   // MIME тип файла
-  isActive    Boolean  @default(true) // Активен ли документ
+  title       String   // РќР°Р·РІР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  description String?  // РћРїРёСЃР°РЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
+  fileUrl     String   // РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
+  fileName    String   // РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+  fileSize    Int      // Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° РІ Р±Р°Р№С‚Р°С…
+  fileType    String   // MIME С‚РёРї С„Р°Р№Р»Р°
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РґРѕРєСѓРјРµРЅС‚
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
-// === РАЗДЕЛ "ОРГАНИЗАЦИЯ ПИТАНИЯ В ОБРАЗОВАТЕЛЬНОЙ ОРГАНИЗАЦИИ" ===
+// === Р РђР—Р”Р•Р› "РћР Р“РђРќРР—РђР¦РРЇ РџРРўРђРќРРЇ Р’ РћР‘Р РђР—РћР’РђРўР•Р›Р¬РќРћР™ РћР Р“РђРќРР—РђР¦РР" ===
 
-// Модель для объектов питания и охраны здоровья
+// РњРѕРґРµР»СЊ РґР»СЏ РѕР±СЉРµРєС‚РѕРІ РїРёС‚Р°РЅРёСЏ Рё РѕС…СЂР°РЅС‹ Р·РґРѕСЂРѕРІСЊСЏ
 model Catering {
   id          String   @id @default(uuid())
-  type        String   // 'meals' или 'health' - тип объекта (питание или охрана здоровья)
-  name        String   // Наименование объекта
-  address     String   // Адрес места нахождения объекта
-  area        Int      // Площадь объекта, м²
-  seats       Int      // Количество мест
-  accessibility String // Приспособленность для использования инвалидами
-  order       Int      @default(0) // Порядок отображения
-  isActive    Boolean  @default(true) // Активен ли объект
+  type        String   // 'meals' РёР»Рё 'health' - С‚РёРї РѕР±СЉРµРєС‚Р° (РїРёС‚Р°РЅРёРµ РёР»Рё РѕС…СЂР°РЅР° Р·РґРѕСЂРѕРІСЊСЏ)
+  name        String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р°
+  address     String   // РђРґСЂРµСЃ РјРµСЃС‚Р° РЅР°С…РѕР¶РґРµРЅРёСЏ РѕР±СЉРµРєС‚Р°
+  area        Int      // РџР»РѕС‰Р°РґСЊ РѕР±СЉРµРєС‚Р°, РјВІ
+  seats       Int      // РљРѕР»РёС‡РµСЃС‚РІРѕ РјРµСЃС‚
+  accessibility String // РџСЂРёСЃРїРѕСЃРѕР±Р»РµРЅРЅРѕСЃС‚СЊ РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РёРЅРІР°Р»РёРґР°РјРё
+  order       Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive    Boolean  @default(true) // РђРєС‚РёРІРµРЅ Р»Рё РѕР±СЉРµРєС‚
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// === РАЗДЕЛ "МЕЖДУНАРОДНОЕ СОТРУДНИЧЕСТВО" ===
+// === Р РђР—Р”Р•Р› "РњР•Р–Р”РЈРќРђР РћР”РќРћР• РЎРћРўР РЈР”РќРР§Р•РЎРўР’Рћ" ===
 
-// Модель для международного сотрудничества
+// РњРѕРґРµР»СЊ РґР»СЏ РјРµР¶РґСѓРЅР°СЂРѕРґРЅРѕРіРѕ СЃРѕС‚СЂСѓРґРЅРёС‡РµСЃС‚РІР°
 model InternationalCooperation {
   id        String   @id @default(uuid())
-  stateName String   // Название государства
-  orgName   String   // Наименование организации
-  dogReg    String   // Регистрационный номер договора
-  order     Int      @default(0) // Порядок отображения
-  isActive  Boolean  @default(true) // Активна ли запись
+  stateName String   // РќР°Р·РІР°РЅРёРµ РіРѕСЃСѓРґР°СЂСЃС‚РІР°
+  orgName   String   // РќР°РёРјРµРЅРѕРІР°РЅРёРµ РѕСЂРіР°РЅРёР·Р°С†РёРё
+  dogReg    String   // Р РµРіРёСЃС‚СЂР°С†РёРѕРЅРЅС‹Р№ РЅРѕРјРµСЂ РґРѕРіРѕРІРѕСЂР°
+  order     Int      @default(0) // РџРѕСЂСЏРґРѕРє РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+  isActive  Boolean  @default(true) // РђРєС‚РёРІРЅР° Р»Рё Р·Р°РїРёСЃСЊ
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// === конец РАЗДЕЛ "ОБРАЗОВАНИЕ" В "СВЕДЕНИЯХ ОБ ОРГАНИЗАЦИИ" ===
-// === конец РАЗДЕЛ "ОБРАЗОВАНИЕ" В "СВЕДЕНИЯХ ОБ ОРГАНИЗАЦИИ" ===
-
+// === РєРѕРЅРµС† Р РђР—Р”Р•Р› "РћР‘Р РђР—РћР’РђРќРР•" Р’ "РЎР’Р•Р”Р•РќРРЇРҐ РћР‘ РћР Р“РђРќРР—РђР¦РР" ===

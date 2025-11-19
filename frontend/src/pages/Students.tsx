@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactElement } from 'react';
 import {
   FaCalendar,
   FaFileAlt,
@@ -11,6 +11,15 @@ import {
   FaGraduationCap,
   FaDownload
 } from 'react-icons/fa';
+
+type QuickLink = {
+  title: string;
+  icon: ReactElement;
+  description: string;
+  color: string;
+  path?: string;
+  state?: Record<string, unknown>;
+};
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
@@ -18,24 +27,27 @@ export default function Students() {
   const navigate = useNavigate();
 
   // Быстрые ссылки для студентов Политехнического техникума
-  const quickLinks = [
+  const quickLinks: QuickLink[] = [
     {
       title: "Расписание занятий",
       icon: <FaCalendar className="w-6 h-6" />,
       description: "Актуальное расписание по группам и преподавателям",
-      color: "bg-blue-600 hover:bg-blue-700"
+      color: 'bg-blue-600 hover:bg-blue-700',
+      path: '/students/raspisanie'
     },
     {
       title: "Библиотека",
       icon: <FaFileAlt className="w-6 h-6" />,
       description: "Электронный каталог и учебные материалы",
-      color: "bg-purple-600 hover:bg-purple-700"
+      color: 'bg-purple-600 hover:bg-purple-700',
+      path: '/students/library'
     },
     {
       title: "Стипендии",
       icon: <FaAward className="w-6 h-6" />,
       description: "Информация о стипендиальном обеспечении",
-      color: "bg-yellow-600 hover:bg-yellow-700"
+      color: 'bg-yellow-600 hover:bg-yellow-700',
+      path: '/sveden/grants?from=students'
     }
   ];
 
@@ -131,9 +143,7 @@ export default function Students() {
             <div
               key={index}
               onClick={() => {
-                if (link.title === "Расписание занятий") {
-                  navigate('/students/raspisanie');
-                }
+                if (link.path) navigate(link.path, link.state ? { state: link.state } : undefined)
               }}
               className={`${link.color} text-white p-6 rounded-lg transition-colors block cursor-pointer hover:shadow-lg animate-slide-up`}
               style={{ animationDelay: `${200 + index * 100}ms` }}
@@ -330,3 +340,5 @@ export default function Students() {
     </div>
   );
 }
+
+

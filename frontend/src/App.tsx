@@ -11,6 +11,7 @@ import AdminAdmission from "./pages/admin/AdminAdmission";
 import AdminRaspisanie from "./pages/admin/AdminRaspisanie";
 import AdminAnons from "./pages/admin/AdminAnons";
 import AdminStudents from "./pages/admin/AdminStudents";
+import AdminStudentsLibrary from "./pages/admin/AdminStudentsLibrary";
 import AdminHome from "./pages/admin/AdminHome";
 import AdminCommon from "./pages/admin/about/AdminCommon";
 import AdminStructure from "./pages/admin/about/AdminStructure";
@@ -31,6 +32,7 @@ import NewsDetail from "./pages/NewsDetail";
 import Home from "./pages/Home";
 import Admission from "./pages/Admission";
 import Students from "./pages/Students";
+import StudentLibrary from "./pages/StudentLibrary";
 import Anons from "./pages/Anons";
 import Raspisanie from "./pages/Raspisanie";
 import GroupRaspisanie from "./pages/GroupRaspisanie";
@@ -90,6 +92,11 @@ function App() {
           <Route path="/admin/students" element={
             <ProtectedRoute>
               <AdminStudents />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/students/library" element={
+            <ProtectedRoute>
+              <AdminStudentsLibrary />
             </ProtectedRoute>
           } />
           <Route path="/admin/home" element={
@@ -230,6 +237,15 @@ function App() {
               <Header />
               <main className="flex-1">
                 <GroupRaspisanie />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/students/library" element={
+            <>
+              <Header />
+              <main className="flex-1">
+                <StudentLibrary />
               </main>
               <Footer />
             </>

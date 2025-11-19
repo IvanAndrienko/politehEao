@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FaFileDownload, FaHome, FaMoneyBillWave } from 'react-icons/fa';
 import { apiUrl, assetUrl } from '../../lib/api.ts';
 
@@ -42,6 +43,10 @@ interface HostelPaymentDocument {
 }
 
 export default function Grants() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const params = new URLSearchParams(location.search)
+  const fromStudents = params.get('from') === 'students'
   const [documents, setDocuments] = useState<GrantsDocument[]>([]);
   const [grantsInfo, setGrantsInfo] = useState<GrantsInfo[]>([]);
   const [supportMeasures, setSupportMeasures] = useState<SupportMeasure[]>([]);
@@ -114,6 +119,20 @@ export default function Grants() {
 
   return (
     <div>
+      {fromStudents && (
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('/students')}
+            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Назад к студенческому порталу
+          </button>
+        </div>
+      )}
+
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Стипендии и меры поддержки обучающихся</h2>
 
       {/* Локальные нормативные акты */}
