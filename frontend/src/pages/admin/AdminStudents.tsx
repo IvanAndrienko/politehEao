@@ -1,697 +1,568 @@
-import { useState, useEffect } from 'react';
-import { FaGraduationCap, FaFileAlt, FaUsers, FaDownload } from 'react-icons/fa';
+import { useEffect, useState } from 'react'
+import type { IconType } from 'react-icons'
+import {
+  FaGraduationCap,
+  FaFileAlt,
+  FaUsers,
+  FaDownload,
+  FaHome,
+  FaUtensils,
+  FaHeart,
+  FaLaptop,
+  FaHandsHelping,
+  FaBook,
+  FaInfoCircle,
+  FaUniversity,
+  FaBriefcase
+} from 'react-icons/fa'
 
 interface StudentService {
-  id: string;
-  title: string;
-  description: string;
-  url?: string;
-  icon: string;
-  order: number;
-  isActive: boolean;
+  id: string
+  title: string
+  description: string
+  url?: string
+  icon: string
+  order: number
+  isActive: boolean
 }
 
 interface StudentDocument {
-  id: string;
-  title: string;
-  description?: string;
-  fileUrl: string;
-  fileName: string;
-  fileSize: number;
-  fileType: string;
-  category?: string;
-  isActive: boolean;
-  order: number;
+  id: string
+  title: string
+  description?: string
+  fileUrl: string
+  fileName: string
+  fileSize: number
+  fileType: string
+  category?: string
+  isActive: boolean
+  order: number
 }
 
 interface StudentLifeItem {
-  id: string;
-  title: string;
-  description: string;
-  images: string[];
+  id: string
+  title: string
+  description: string
+  images: string[]
 }
 
+const SERVICE_ICON_OPTIONS: Array<{ value: string; label: string; icon: IconType }> = [
+  { value: 'FaHome', label: '–î–æ–º / –æ–±—â–µ–∂–∏—Ç–∏–µ', icon: FaHome },
+  { value: 'FaUtensils', label: '–ü–∏—Ç–∞–Ω–∏–µ / —Å—Ç–æ–ª–æ–≤–∞—è', icon: FaUtensils },
+  { value: 'FaHeart', label: '–ó–¥–æ—Ä–æ–≤—å–µ –∏ –ø–æ–¥–¥–µ—Ä–∂–∫–∞', icon: FaHeart },
+  { value: 'FaGraduationCap', label: '–£—á—ë–±–∞ –∏ —Ä–∞—Å–ø–∏—Å–∞–Ω–∏–µ', icon: FaGraduationCap },
+  { value: 'FaLaptop', label: '–û–Ω–ª–∞–π–Ω‚Äë—Å–µ—Ä–≤–∏—Å—ã', icon: FaLaptop },
+  { value: 'FaHandsHelping', label: '–í–æ–ª–æ–Ω—Ç—ë—Ä—ã –∏ –ø–æ–º–æ—â—å', icon: FaHandsHelping },
+  { value: 'FaBook', label: '–ë–∏–±–ª–∏–æ—Ç–µ–∫–∞ –∏ –º–∞—Ç–µ—Ä–∏–∞–ª—ã', icon: FaBook },
+  { value: 'FaInfoCircle', label: '–°–ø—Ä–∞–≤–æ—á–Ω–∞—è –∏–Ω—Ñ–æ—Ä–º–∞—Ü–∏—è', icon: FaInfoCircle },
+  { value: 'FaUniversity', label: '–ü—Ä–∏—ë–º–Ω–∞—è –∫–æ–º–∏—Å—Å–∏—è', icon: FaUniversity },
+  { value: 'FaBriefcase', label: '–ö–∞—Ä—å–µ—Ä–Ω—ã–π —Ü–µ–Ω—Ç—Ä', icon: FaBriefcase }
+]
+
+const SERVICE_ICON_MAP: Record<string, IconType> = SERVICE_ICON_OPTIONS.reduce((acc, option) => {
+  acc[option.value] = option.icon
+  return acc
+}, {} as Record<string, IconType>)
+
 export default function AdminStudents() {
-  const [services, setServices] = useState<StudentService[]>([]);
-  const [documents, setDocuments] = useState<StudentDocument[]>([]);
-  const [loadingDocuments, setLoadingDocuments] = useState(true);
-  const [showUploadForm, setShowUploadForm] = useState(false);
-  const [uploadForm, setUploadForm] = useState({
-    title: '',
-    description: '',
-    file: null as File | null
-  });
-
-  const [studentLife, setStudentLife] = useState<StudentLifeItem[]>([]);
-  const [loadingStudentLife, setLoadingStudentLife] = useState(true);
-
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
+  const [services, setServices] = useState<StudentService[]>([])
+  const [savingServiceId, setSavingServiceId] = useState<string | null>(null)
+  const [documents, setDocuments] = useState<StudentDocument[]>([])
+  const [showUploadForm, setShowUploadForm] = useState(false)
+  const [uploadForm, setUploadForm] = useState({ title: '', description: '', file: null as File | null })
+  const [studentLife, setStudentLife] = useState<StudentLifeItem[]>([])
+  const [loadingServices, setLoadingServices] = useState(true)
+  const [loadingDocuments, setLoadingDocuments] = useState(true)
+  const [loadingStudentLife, setLoadingStudentLife] = useState(true)
+  const [savingLife, setSavingLife] = useState(false)
 
   useEffect(() => {
-    loadServices();
-    loadDocuments();
-    loadStudentLife();
-  }, []);
+    loadServices()
+    loadDocuments()
+    loadStudentLife()
+  }, [])
 
   const loadServices = async () => {
     try {
-      const response = await fetch('/api/students/services/all');
-      const data = await response.json();
-      setServices(data);
+      const response = await fetch('/api/students/services/all')
+      const data = await response.json()
+      setServices(data)
     } catch (error) {
-      console.error('Error loading services:', error);
+      console.error('Error loading services:', error)
     } finally {
-      setLoading(false);
+      setLoadingServices(false)
     }
-  };
+  }
 
   const loadDocuments = async () => {
     try {
-      const response = await fetch('/api/student-documents/all');
-      const data = await response.json();
-      setDocuments(data);
+      const response = await fetch('/api/student-documents/all')
+      const data = await response.json()
+      setDocuments(data)
     } catch (error) {
-      console.error('Error loading documents:', error);
+      console.error('Error loading documents:', error)
     } finally {
-      setLoadingDocuments(false);
+      setLoadingDocuments(false)
     }
-  };
+  }
 
   const loadStudentLife = async () => {
     try {
-      const response = await fetch('/api/student-life/all');
-      const data = await response.json();
-      setStudentLife(data);
+      const response = await fetch('/api/student-life/all')
+      const data = await response.json()
+      setStudentLife(data)
     } catch (error) {
-      console.error('Error loading student life:', error);
+      console.error('Error loading student life:', error)
     } finally {
-      setLoadingStudentLife(false);
+      setLoadingStudentLife(false)
     }
-  };
+  }
 
-
-  const updateService = (id: string, field: string, value: unknown) => {
-    setServices(services.map(service =>
-      service.id === id ? { ...service, [field]: value } : service
-    ));
-  };
+  const updateService = (id: string, field: keyof StudentService, value: unknown) => {
+    setServices((prev) => prev.map((service) => (service.id === id ? { ...service, [field]: value } : service)))
+  }
 
   const addService = () => {
-    const newService = {
-      id: `temp-${Date.now()}`,
-      title: '¶›¶-¶-TÀ¶¶ T¡¶¶T¿¶-¶¨T¡',
-      description: '¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶ T¡¶¶T¿¶-¶¨T¡¶-',
-      url: '',
-      icon: 'FaHome',
-      order: services.length,
-      isActive: true
-    };
-    setServices([...services, newService]);
-  };
+    setServices((prev) => [
+      ...prev,
+      {
+        id: `temp-${Date.now()}`,
+        title: '–ù–æ–≤—ã–π —Å–µ—Ä–≤–∏—Å',
+        description: '–ö—Ä–∞—Ç–∫–æ–µ –æ–ø–∏—Å–∞–Ω–∏–µ —Å–µ—Ä–≤–∏—Å–∞',
+        url: '',
+        icon: 'FaHome',
+        order: prev.length,
+        isActive: true
+      }
+    ])
+  }
+
+  const saveService = async (service: StudentService) => {
+    if (!service.title.trim()) {
+      alert('–ó–∞–ø–æ–ª–Ω–∏—Ç–µ –Ω–∞–∑–≤–∞–Ω–∏–µ —Å–µ—Ä–≤–∏—Å–∞')
+      return
+    }
+
+    const isNew = service.id.startsWith('temp-')
+    const url = isNew ? '/api/students/services' : `/api/students/services/${service.id}`
+    const method = isNew ? 'POST' : 'PUT'
+
+    try {
+      setSavingServiceId(service.id)
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: service.title,
+          description: service.description,
+          url: service.url,
+          icon: service.icon,
+          order: service.order,
+          isActive: service.isActive
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save service')
+      }
+
+      const payload = await response.json()
+      setServices((prev) => prev.map((item) => (item.id === service.id ? payload : item)))
+      alert('–°–µ—Ä–≤–∏—Å —Å–æ—Ö—Ä–∞–Ω—ë–Ω')
+    } catch (error) {
+      console.error('Error saving service:', error)
+      alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ —Å–æ—Ö—Ä–∞–Ω–µ–Ω–∏–∏ —Å–µ—Ä–≤–∏—Å–∞')
+    } finally {
+      setSavingServiceId(null)
+    }
+  }
 
   const removeService = async (id: string) => {
-    if (confirm('¶“TÀ T√¶-¶¶T¿¶¶¶-TÀ, T«T¬¶- T≈¶-T¬¶¨T¬¶¶ T√¶+¶-¶¨¶¨T¬TÃ TÕT¬¶-T¬ T¡¶¶T¿¶-¶¨T¡?')) {
-      try {
-        await fetch(`/api/students/services/${id}`, {
-          method: 'DELETE',
-        });
-        setServices(services.filter(service => service.id !== id));
-      } catch (error) {
-        console.error('Error deleting service:', error);
-        alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ T√¶+¶-¶¨¶¶¶-¶¨¶¨ T¡¶¶T¿¶-¶¨T¡¶-');
-      }
+    if (!confirm('–í—ã —É–≤–µ—Ä–µ–Ω—ã, —á—Ç–æ —Ö–æ—Ç–∏—Ç–µ —É–¥–∞–ª–∏—Ç—å —Å–µ—Ä–≤–∏—Å?')) return
+
+    if (id.startsWith('temp-')) {
+      setServices((prev) => prev.filter((service) => service.id !== id))
+      return
     }
-  };
 
-  const updateDocument = (id: string, field: string, value: unknown) => {
-    setDocuments(documents.map(doc =>
-      doc.id === id ? { ...doc, [field]: value } : doc
-    ));
-  };
+    try {
+      await fetch(`/api/students/services/${id}`, { method: 'DELETE' })
+      setServices((prev) => prev.filter((service) => service.id !== id))
+    } catch (error) {
+      console.error('Error deleting service:', error)
+      alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ —É–¥–∞–ª–µ–Ω–∏–∏ —Å–µ—Ä–≤–∏—Å–∞')
+    }
+  }
 
+  const handleServiceIcon = (id: string, value: string) => {
+    updateService(id, 'icon', value)
+  }
+
+  const addDocument = () => {
+    setShowUploadForm(true)
+    setUploadForm({ title: '', description: '', file: null })
+  }
 
   const uploadDocument = async () => {
     if (!uploadForm.file || !uploadForm.title.trim()) {
-      alert('¶ﬂ¶-¶¶¶-¶¨T√¶¶T¡T¬¶-, ¶-TÀ¶-¶¶T¿¶¨T¬¶¶ Tƒ¶-¶¶¶¨ ¶¨ ¶-¶-¶¶¶+¶¨T¬¶¶ ¶-¶-¶¨¶-¶-¶-¶¨¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-');
-      return;
+      alert('–£–∫–∞–∂–∏—Ç–µ –Ω–∞–∑–≤–∞–Ω–∏–µ –∏ –≤—ã–±–µ—Ä–∏—Ç–µ —Ñ–∞–π–ª')
+      return
     }
 
-    const formData = new FormData();
-    formData.append('file', uploadForm.file);
-    formData.append('title', uploadForm.title);
-    formData.append('description', uploadForm.description || '');
+    const formData = new FormData()
+    formData.append('file', uploadForm.file)
+    formData.append('title', uploadForm.title)
+    formData.append('description', uploadForm.description || '')
 
     try {
       const response = await fetch('/api/student-documents', {
         method: 'POST',
-        body: formData,
-      });
+        body: formData
+      })
 
-      if (response.ok) {
-        alert('¶‘¶-¶¶T√¶-¶¶¶-T¬ ¶¨¶-¶¶T¿T√¶¶¶¶¶- T√T¡¶¨¶¶T»¶-¶-!');
-        loadDocuments();
-        setShowUploadForm(false);
-        setUploadForm({ title: '', description: '', file: null });
-      } else {
-        alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ ¶¨¶-¶¶T¿T√¶¨¶¶¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-');
-      }
+      if (!response.ok) throw new Error('Failed to upload')
+
+      alert('–î–æ–∫—É–º–µ–Ω—Ç –∑–∞–≥—Ä—É–∂–µ–Ω')
+      setShowUploadForm(false)
+      loadDocuments()
     } catch (error) {
-      console.error('Error uploading document:', error);
-      alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ ¶¨¶-¶¶T¿T√¶¨¶¶¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-');
+      console.error('Error uploading document:', error)
+      alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ –∑–∞–≥—Ä—É–∑–∫–µ –¥–æ–∫—É–º–µ–Ω—Ç–∞')
     }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploadForm(prev => ({ ...prev, file }));
-    }
-  };
+  }
 
   const removeDocument = async (id: string) => {
-    if (confirm('¶“TÀ T√¶-¶¶T¿¶¶¶-TÀ, T«T¬¶- T≈¶-T¬¶¨T¬¶¶ T√¶+¶-¶¨¶¨T¬TÃ TÕT¬¶-T¬ ¶+¶-¶¶T√¶-¶¶¶-T¬?')) {
-      try {
-        await fetch(`/api/student-documents/${id}`, {
-          method: 'DELETE',
-        });
-        setDocuments(documents.filter(doc => doc.id !== id));
-      } catch (error) {
-        console.error('Error deleting document:', error);
-        alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ T√¶+¶-¶¨¶¶¶-¶¨¶¨ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-');
-      }
-    }
-  };
-
-  const updateStudentLife = (id: string, field: string, value: unknown) => {
-    setStudentLife(studentLife.map(item =>
-      item.id === id ? { ...item, [field]: value } : item
-    ));
-  };
-
-  const saveStudentLifeChanges = async () => {
-    setSaving(true);
-    try {
-      for (const item of studentLife) {
-        if (item.id && !item.id.startsWith('temp-')) {
-          // ¶ﬁ¶-¶-¶-¶-¶¨Tœ¶¶¶- T¡T√T…¶¶T¡T¬¶-T√TŒT…¶¨¶¶
-          await fetch(`/api/student-life/${item.id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(item),
-          });
-        } else {
-          // ¶·¶-¶¨¶+¶-¶¶¶- ¶-¶-¶-TÀ¶¶
-          const { id: _unused, ...itemData } = item;
-          const response = await fetch('/api/student-life', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(itemData),
-          });
-          const newItem = await response.json();
-          item.id = newItem.id;
-        }
-      }
-      alert('¶ÿ¶¨¶-¶¶¶-¶¶¶-¶¨Tœ T¡¶-T≈T¿¶-¶-¶¶¶-TÀ T√T¡¶¨¶¶T»¶-¶-!');
-      loadStudentLife();
-    } catch (error) {
-      console.error('Error saving student life:', error);
-      alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ T¡¶-T≈T¿¶-¶-¶¶¶-¶¨¶¨ ¶¨¶¨¶-¶¶¶-¶¶¶-¶¨¶¶');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const uploadStudentLifeImages = async (files: FileList) => {
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
-    }
+    if (!confirm('–£–¥–∞–ª–∏—Ç—å –¥–æ–∫—É–º–µ–Ω—Ç?')) return
 
     try {
-      const response = await fetch('/api/upload/student-life/images', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data.filenames; // ¶“¶-¶¨¶-T¿¶-T…¶-¶¶¶- ¶-¶-T¡T¡¶¨¶- ¶¨¶-¶¶¶- Tƒ¶-¶¶¶¨¶-¶-
-      } else {
-        throw new Error('¶ﬁT»¶¨¶-¶¶¶- ¶¨¶-¶¶T¿T√¶¨¶¶¶¨ ¶¨¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨¶¶');
-      }
+      await fetch(`/api/student-documents/${id}`, { method: 'DELETE' })
+      setDocuments((prev) => prev.filter((doc) => doc.id !== id))
     } catch (error) {
-      console.error('Error uploading images:', error);
-       
-      throw error;
+      console.error('Error deleting document:', error)
+      alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ —É–¥–∞–ª–µ–Ω–∏–∏ –¥–æ–∫—É–º–µ–Ω—Ç–∞')
     }
-  };
+  }
+
+  const updateStudentLifeField = (id: string, field: keyof StudentLifeItem, value: unknown) => {
+    setStudentLife((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
+  }
 
   const addStudentLife = () => {
-    const newItem = {
-      id: `temp-${Date.now()}`,
-      title: '¶›¶-¶-¶-¶¶ ¶-¶¶T¿¶-¶¨T¿¶¨TœT¬¶¨¶¶',
-      description: '¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶ ¶-¶¶T¿¶-¶¨T¿¶¨TœT¬¶¨Tœ',
-      images: []
-    };
-    setStudentLife([...studentLife, newItem]);
-  };
-
-  const removeStudentLife = async (id: string) => {
-    if (confirm('¶“TÀ T√¶-¶¶T¿¶¶¶-TÀ, T«T¬¶- T≈¶-T¬¶¨T¬¶¶ T√¶+¶-¶¨¶¨T¬TÃ TÕT¬¶-T¬ TÕ¶¨¶¶¶-¶¶¶-T¬?')) {
-      try {
-        await fetch(`/api/student-life/${id}`, {
-          method: 'DELETE',
-        });
-        setStudentLife(studentLife.filter((item: StudentLifeItem) => item.id !== id));
-      } catch (error) {
-        console.error('Error deleting student life item:', error);
-        alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ T√¶+¶-¶¨¶¶¶-¶¨¶¨ TÕ¶¨¶¶¶-¶¶¶-T¬¶-');
+    setStudentLife((prev) => [
+      ...prev,
+      {
+        id: `temp-${Date.now()}`,
+        title: '–ù–æ–≤–æ–µ –º–µ—Ä–æ–ø—Ä–∏—è—Ç–∏–µ',
+        description: '–û–ø–∏—Å–∞–Ω–∏–µ –º–µ—Ä–æ–ø—Ä–∏—è—Ç–∏—è',
+        images: []
       }
-    }
-  };
+    ])
+  }
 
-  const removeImageFromItem = (itemId: string, imageIndex: number) => {
-    setStudentLife(studentLife.map((item: StudentLifeItem) =>
-      item.id === itemId
-        ? { ...item, images: item.images.filter((_: string, index: number) => index !== imageIndex) }
-        : item
-    ));
-  };
+  const saveStudentLifeChanges = async () => {
+    setSavingLife(true)
+    try {
+      for (const item of studentLife) {
+        if (item.id.startsWith('temp-')) {
+          await fetch('/api/student-life', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: item.title, description: item.description, images: item.images })
+          })
+        } else {
+          await fetch(`/api/student-life/${item.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+          })
+        }
+      }
+      alert('–ò–∑–º–µ–Ω–µ–Ω–∏—è —Å–æ—Ö—Ä–∞–Ω–µ–Ω—ã')
+      loadStudentLife()
+    } catch (error) {
+      console.error('Error saving student life:', error)
+      alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ —Å–æ—Ö—Ä–∞–Ω–µ–Ω–∏–∏ –¥–∞–Ω–Ω—ã—Ö')
+    } finally {
+      setSavingLife(false)
+    }
+  }
+
+  const uploadStudentLifeImages = async (files: FileList) => {
+    const formData = new FormData()
+    Array.from(files).forEach((file) => formData.append('files', file))
+
+    const response = await fetch('/api/upload/student-life/images', {
+      method: 'POST',
+      body: formData
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to upload images')
+    }
+
+    const payload = await response.json()
+    return payload.files?.map((file: { url: string }) => file.url) ?? []
+  }
+
+  const removeStudentLifeImage = (itemId: string, index: number) => {
+    setStudentLife((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, images: item.images.filter((_, idx) => idx !== index) } : item
+      )
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="space-y-6">
-          {/* ¶⁄¶-¶-¶¨¶¶¶- ¶-¶-¶¨¶-¶+ */}
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => window.history.back()}
-              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              ¶›¶-¶¨¶-¶+
-            </button>
-            <button
-              onClick={() => {
-                loadServices();
-                loadDocuments();
-                loadStudentLife();
-              }}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              ¶ﬁ¶-¶-¶-¶-¶¨T¬TÃ
+    <div className="min-h-screen bg-gray-100 py-8">
+      <div className="max-w-7xl mx-auto space-y-8 px-4">
+        {/* Services */}
+        <section className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-semibold flex items-center">
+              <FaUsers className="w-5 h-5 text-blue-600 mr-2" />
+              –°—Ç—É–¥–µ–Ω—á–µ—Å–∫–∏–µ —Å–µ—Ä–≤–∏—Å—ã
+            </h2>
+            <button onClick={addService} className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm">
+              –î–æ–±–∞–≤–∏—Ç—å —Å–µ—Ä–≤–∏—Å
             </button>
           </div>
-
-          {/* ¶◊¶-¶¶¶-¶¨¶-¶-¶-¶¶ */}
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶¨¶¶ ¶¨¶-T¿T¬¶-¶¨ - ¶–¶+¶-¶¨¶-¶¨T¡T¬T¿¶¨T¿¶-¶-¶-¶-¶¨¶¶</h1>
-            <p className="text-lg text-gray-600">¶„¶¨T¿¶-¶-¶¨¶¶¶-¶¨¶¶ T¡¶¶T¿¶-¶¨T¡¶-¶-¶-¶¨, ¶+¶-¶¶T√¶-¶¶¶-T¬¶-¶-¶¨ ¶¨ T¡T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶-¶¶ ¶¶¶¨¶¨¶-TÃTŒ</p>
+          <div className="p-6">
+            {loadingServices ? (
+              <p className="text-gray-600">–ó–∞–≥—Ä—É–∑–∫–∞...</p>
+            ) : (
+              <div className="space-y-6">
+                {services.map((service) => (
+                  <div key={service.id} className="border rounded-lg p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">–ù–∞–∑–≤–∞–Ω–∏–µ</label>
+                        <input
+                          type="text"
+                          value={service.title}
+                          onChange={(e) => updateService(service.id, 'title', e.target.value)}
+                          className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">–ò–∫–æ–Ω–∫–∞</label>
+                        <div className="flex items-center space-x-3">
+                          <select
+                            value={service.icon}
+                            onChange={(e) => handleServiceIcon(service.id, e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                          >
+                            {SERVICE_ICON_OPTIONS.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="w-12 h-12 border rounded-lg flex items-center justify-center bg-gray-50">
+                            {(() => {
+                              const IconPreview = SERVICE_ICON_MAP[service.icon]
+                              return IconPreview ? <IconPreview className="w-6 h-6 text-blue-600" /> : '‚Äî'
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">–û–ø–∏—Å–∞–Ω–∏–µ</label>
+                      <textarea
+                        value={service.description}
+                        onChange={(e) => updateService(service.id, 'description', e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                        rows={2}
+                      />
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
+                      <input
+                        type="text"
+                        value={service.url || ''}
+                        onChange={(e) => updateService(service.id, 'url', e.target.value)}
+                        placeholder="https://example.com"
+                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="mt-4 flex items-center justify-between">
+                      <label className="flex items-center text-sm font-medium text-gray-700">
+                        <input
+                          type="checkbox"
+                          className="mr-2"
+                          checked={service.isActive}
+                          onChange={(e) => updateService(service.id, 'isActive', e.target.checked)}
+                        />
+                        –ê–∫—Ç–∏–≤–Ω–æ
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => saveService(service)}
+                          disabled={savingServiceId === service.id}
+                          className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-3 py-1 rounded-md text-sm"
+                        >
+                          {savingServiceId === service.id ? '–°–æ—Ö—Ä–∞–Ω–µ–Ω–∏–µ...' : '–°–æ—Ö—Ä–∞–Ω–∏—Ç—å'}
+                        </button>
+                        <button
+                          onClick={() => removeService(service.id)}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm"
+                        >
+                          –£–¥–∞–ª–∏—Ç—å
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div className="px-4 py-8 sm:px-0">
-              {/* ¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶¨¶¶ T¡¶¶T¿¶-¶¨T¡TÀ */}
-              <div className="bg-white shadow rounded-lg mb-8">
-                <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                  <h2 className="text-lg font-medium text-gray-900 flex items-center">
-                    <FaUsers className="w-5 h-5 mr-2 text-blue-600" />
-                    ¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶¨¶¶ T¡¶¶T¿¶-¶¨T¡TÀ
-                  </h2>
-                  <button
-                    onClick={addService}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm"
-                  >
-                    ¶‘¶-¶-¶-¶-¶¨T¬TÃ T¡¶¶T¿¶-¶¨T¡
+        </section>
+
+        {/* Documents */}
+        <section className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-semibold flex items-center">
+              <FaFileAlt className="w-5 h-5 text-green-600 mr-2" />
+              –î–æ–∫—É–º–µ–Ω—Ç—ã
+            </h2>
+            <button onClick={addDocument} className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm">
+              –î–æ–±–∞–≤–∏—Ç—å –¥–æ–∫—É–º–µ–Ω—Ç
+            </button>
+          </div>
+          <div className="p-6 space-y-4">
+            {showUploadForm && (
+              <div className="border rounded-lg p-4 space-y-3">
+                <input
+                  type="text"
+                  placeholder="–ù–∞–∑–≤–∞–Ω–∏–µ"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                  value={uploadForm.title}
+                  onChange={(e) => setUploadForm((prev) => ({ ...prev, title: e.target.value }))}
+                />
+                <textarea
+                  placeholder="–û–ø–∏—Å–∞–Ω–∏–µ"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                  rows={2}
+                  value={uploadForm.description}
+                  onChange={(e) => setUploadForm((prev) => ({ ...prev, description: e.target.value }))}
+                />
+                <input
+                  type="file"
+                  onChange={(e) => setUploadForm((prev) => ({ ...prev, file: e.target.files?.[0] || null }))}
+                />
+                <div className="flex space-x-2">
+                  <button onClick={uploadDocument} className="bg-green-600 text-white px-3 py-1 rounded-md text-sm">
+                    –ó–∞–≥—Ä—É–∑–∏—Ç—å
+                  </button>
+                  <button onClick={() => setShowUploadForm(false)} className="px-3 py-1 rounded-md text-sm border">
+                    –û—Ç–º–µ–Ω–∞
                   </button>
                 </div>
-                <div className="p-6">
-                  {loading ? (
-                    <p className="text-gray-600">¶◊¶-¶¶T¿T√¶¨¶¶¶- T¡¶¶T¿¶-¶¨T¡¶-¶-...</p>
-                  ) : (
-                    <div className="space-y-6">
-                      {services.map((service) => (
-                        <div key={service.id} className="border rounded-lg p-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                ¶›¶-¶¨¶-¶-¶-¶¨¶¶ T¡¶¶T¿¶-¶¨T¡¶-
-                              </label>
-                              <input
-                                type="text"
-                                value={service.title}
-                                onChange={(e) => updateService(service.id, 'title', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                ¶ÿ¶¶¶-¶-¶¶¶-
-                              </label>
-                              <select
-                                value={service.icon}
-                                onChange={(e) => updateService(service.id, 'icon', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              >
-                                <option value="FaHome">FaHome</option>
-                                <option value="FaUtensils">FaUtensils</option>
-                                <option value="FaHeart">FaHeart</option>
-                                <option value="FaGraduationCap">FaGraduationCap</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              ¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶
-                            </label>
-                            <input
-                              type="text"
-                              value={service.description}
-                              onChange={(e) => updateService(service.id, 'description', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-                          <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              URL T¡T¡TÀ¶¨¶¶¶¨
-                            </label>
-                            <input
-                              type="text"
-                              value={service.url || ''}
-                              onChange={(e) => updateService(service.id, 'url', e.target.value)}
-                              placeholder="https://example.com"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-                          <div className="mt-4 flex items-center justify-between">
-                            <div className="flex items-center">
-                              <input
-                                type="checkbox"
-                                checked={service.isActive}
-                                onChange={(e) => updateService(service.id, 'isActive', e.target.checked)}
-                                className="mr-2"
-                              />
-                              <label className="text-sm font-medium text-gray-700">¶–¶¶T¬¶¨¶-¶¶¶-</label>
-                            </div>
-                            <button
-                              onClick={() => removeService(service.id)}
-                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm"
-                            >
-                              ¶„¶+¶-¶¨¶¨T¬TÃ
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
+            )}
 
-              {/* ¶‘¶-¶¶T√¶-¶¶¶-T¬TÀ ¶¨ T¡¶¨T¿¶-¶-¶¶¶¨ */}
-              <div className="bg-white shadow rounded-lg mb-8">
-                <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                  <h2 className="text-lg font-medium text-gray-900 flex items-center">
-                    <FaFileAlt className="w-5 h-5 mr-2 text-green-600" />
-                    ¶‘¶-¶¶T√¶-¶¶¶-T¬TÀ ¶¨ T¡¶¨T¿¶-¶-¶¶¶¨
-                  </h2>
-                  <button
-                    onClick={() => setShowUploadForm(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm"
-                  >
-                    ¶›¶-¶-TÀ¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬
-                  </button>
-                </div>
-                <div className="p-6">
-                  {loadingDocuments ? (
-                    <p className="text-gray-600">¶◊¶-¶¶T¿T√¶¨¶¶¶- ¶+¶-¶¶T√¶-¶¶¶-T¬¶-¶-...</p>
-                  ) : (
-                    <div className="space-y-4">
-                      {/* ¶‰¶-T¿¶-¶- ¶¨¶-¶¶T¿T√¶¨¶¶¶¨ ¶-¶-¶-¶-¶¶¶- ¶+¶-¶¶T√¶-¶¶¶-T¬¶- */}
-                      {showUploadForm && (
-                        <div className="border rounded-lg p-6 bg-blue-50">
-                          <h3 className="text-lg font-medium text-gray-900 mb-4">¶◊¶-¶¶T¿T√¶¨¶¶¶- ¶-¶-¶-¶-¶¶¶- ¶+¶-¶¶T√¶-¶¶¶-T¬¶-</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                ¶›¶-¶¨¶-¶-¶-¶¨¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶- *
-                              </label>
-                              <input
-                                type="text"
-                                value={uploadForm.title}
-                                onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
-                                placeholder="¶“¶-¶¶¶+¶¨T¬¶¶ ¶-¶-¶¨¶-¶-¶-¶¨¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                ¶‰¶-¶¶¶¨ *
-                              </label>
-                              <input
-                                type="file"
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png,.gif"
-                                onChange={handleFileSelect}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                              {uploadForm.file && (
-                                <p className="text-sm text-gray-600 mt-1">
-                                  ¶“TÀ¶-T¿¶-¶- Tƒ¶-¶¶¶¨: {uploadForm.file.name}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              ¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶
-                            </label>
-                            <textarea
-                              value={uploadForm.description}
-                              onChange={(e) => setUploadForm(prev => ({ ...prev, description: e.target.value }))}
-                              placeholder="¶“¶-¶¶¶+¶¨T¬¶¶ ¶-¶¨¶¨T¡¶-¶-¶¨¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-"
-                              rows={3}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-                          <div className="mt-4 flex justify-end space-x-2">
-                            <button
-                              onClick={() => {
-                                setShowUploadForm(false);
-                                setUploadForm({ title: '', description: '', file: null });
-                              }}
-                              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm"
-                            >
-                              ¶ﬁT¬¶-¶¶¶-¶-
-                            </button>
-                            <button
-                              onClick={uploadDocument}
-                              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm"
-                            >
-                              ¶◊¶-¶¶T¿T√¶¨¶¨T¬TÃ
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* ¶·¶¨¶¨T¡¶-¶¶ ¶+¶-¶¶T√¶-¶¶¶-T¬¶-¶- */}
-                      {documents.map((doc) => (
-                        <div key={doc.id} className="border rounded-lg p-4">
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                ¶›¶-¶¨¶-¶-¶-¶¨¶¶
-                              </label>
-                              <input
-                                type="text"
-                                value={doc.title}
-                                onChange={(e) => updateDocument(doc.id, 'title', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                ¶‡¶-¶¨¶-¶¶T¿ Tƒ¶-¶¶¶¨¶-
-                              </label>
-                              <p className="text-sm text-gray-600 mt-2">
-                                {(doc.fileSize / 1024).toFixed(1)} KB
-                              </p>
-                            </div>
-                            <div className="flex items-end space-x-2">
-                              <button
-                                onClick={() => window.open(`/uploads/${doc.fileUrl}`, '_blank')}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm flex items-center"
-                              >
-                                <FaDownload className="w-4 h-4 mr-1" />
-                                ¶·¶¶¶-T«¶-T¬TÃ
-                              </button>
-                            </div>
-                            <div className="flex items-end">
-                              <button
-                                onClick={() => removeDocument(doc.id)}
-                                className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm"
-                              >
-                                ¶„¶+¶-¶¨¶¨T¬TÃ
-                              </button>
-                            </div>
-                          </div>
-                          <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              ¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶
-                            </label>
-                            <input
-                              type="text"
-                              value={doc.description || ''}
-                              onChange={(e) => updateDocument(doc.id, 'description', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-                          <div className="mt-4 flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={doc.isActive}
-                              onChange={(e) => updateDocument(doc.id, 'isActive', e.target.checked)}
-                              className="mr-2"
-                            />
-                            <label className="text-sm font-medium text-gray-700">¶–¶¶T¬¶¨¶-¶¶¶-</label>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* ¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶-Tœ ¶¶¶¨¶¨¶-TÃ */}
-              <div className="bg-white shadow rounded-lg">
-                <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                  <h2 className="text-lg font-medium text-gray-900 flex items-center">
-                    <FaGraduationCap className="w-5 h-5 mr-2 text-purple-600" />
-                    ¶·T¬T√¶+¶¶¶-T«¶¶T¡¶¶¶-Tœ ¶¶¶¨¶¨¶-TÃ
-                  </h2>
-                  <div className="flex space-x-2">
+            {loadingDocuments ? (
+              <p className="text-gray-600">–ó–∞–≥—Ä—É–∑–∫–∞...</p>
+            ) : (
+              documents.map((doc) => (
+                <div key={doc.id} className="border rounded-lg p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-gray-900">{doc.title}</p>
+                    <p className="text-sm text-gray-600">{doc.description}</p>
                     <button
-                      onClick={saveStudentLifeChanges}
-                      disabled={saving}
-                      className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-3 py-1 rounded-md text-sm"
+                      onClick={() => window.open(`/uploads/${doc.fileUrl}`, '_blank')}
+                      className="text-blue-600 hover:text-blue-700 text-sm flex items-center mt-2"
                     >
-                      {saving ? '¶·¶-T≈T¿¶-¶-¶¶¶-¶¨¶¶...' : '¶·¶-T≈T¿¶-¶-¶¨T¬TÃ'}
-                    </button>
-                    <button
-                      onClick={addStudentLife}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm"
-                    >
-                      ¶‘¶-¶-¶-¶-¶¨T¬TÃ
+                      <FaDownload className="w-4 h-4 mr-1" />
+                      –°–∫–∞—á–∞—Ç—å
                     </button>
                   </div>
+                  <button
+                    onClick={() => removeDocument(doc.id)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm"
+                  >
+                    –£–¥–∞–ª–∏—Ç—å
+                  </button>
                 </div>
-                <div className="p-6">
-                  {loadingStudentLife ? (
-                    <p className="text-gray-600">¶◊¶-¶¶T¿T√¶¨¶¶¶-...</p>
-                  ) : (
-                    <div className="space-y-6">
-                      {studentLife.map((item) => (
-                        <div key={item.id} className="border rounded-lg p-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                ¶›¶-¶¨¶-¶-¶-¶¨¶¶ ¶-¶¶T¿¶-¶¨T¿¶¨TœT¬¶¨Tœ
-                              </label>
-                              <input
-                                type="text"
-                                value={item.title}
-                                onChange={(e) => updateStudentLife(item.id, 'title', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                ¶ÿ¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨Tœ ({item.images.length})
-                              </label>
-                              <input
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={async (e) => {
-                                  if (e.target.files && e.target.files.length > 0) {
-                                    try {
-                                      const filenames = await uploadStudentLifeImages(e.target.files);
-                                      updateStudentLife(item.id, 'images', [...item.images, ...filenames]);
-                                      e.target.value = ''; // ¶·¶-T¿¶-T¡¶¨T¬TÃ input
-                                    } catch (error) {
-                                      console.error('Error uploading images:', error);
-                                      alert('¶ﬁT»¶¨¶-¶¶¶- ¶¨T¿¶¨ ¶¨¶-¶¶T¿T√¶¨¶¶¶¶ ¶¨¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨¶¶');
-                                    }
-                                  }
-                                }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-                          </div>
-                          <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              ¶ﬁ¶¨¶¨T¡¶-¶-¶¨¶¶
-                            </label>
-                            <textarea
-                              value={item.description}
-                              onChange={(e) => updateStudentLife(item.id, 'description', e.target.value)}
-                              rows={3}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-                          {item.images.length > 0 && (
-                            <div className="mt-4">
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                ¶◊¶-¶¶T¿T√¶¶¶¶¶-¶-TÀ¶¶ ¶¨¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨Tœ
-                              </label>
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                {item.images.map((imageName: string, index: number) => (
-                                  <div key={index} className="relative">
-                                    <img
-                                      src={`/uploads/images/${imageName}`}
-                                      alt={`¶ÿ¶¨¶-¶-T¿¶-¶¶¶¶¶-¶¨¶¶ ${index + 1}`}
-                                      className="w-full h-20 object-cover rounded-md"
-                                      onError={(e) => {
-                                        e.currentTarget.src = '/placeholder-image.png';
-                                      }}
-                                    />
-                                    <button
-                                      onClick={() => removeImageFromItem(item.id, index)}
-                                      className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                                    >
-                                      +◊
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          <div className="mt-4 flex justify-end">
-                            <button
-                              onClick={() => removeStudentLife(item.id)}
-                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm"
-                            >
-                              ¶„¶+¶-¶¨¶¨T¬TÃ ¶-¶¶T¿¶-¶¨T¿¶¨TœT¬¶¨¶¶
-                            </button>
-                          </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        {/* Student life */}
+        <section className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-semibold flex items-center">
+              <FaGraduationCap className="w-5 h-5 text-purple-600 mr-2" />
+              –°—Ç—É–¥–µ–Ω—á–µ—Å–∫–∞—è –∂–∏–∑–Ω—å
+            </h2>
+            <div className="space-x-2">
+              <button
+                onClick={saveStudentLifeChanges}
+                disabled={savingLife}
+                className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-3 py-1 rounded-md text-sm"
+              >
+                {savingLife ? '–°–æ—Ö—Ä–∞–Ω–µ–Ω–∏–µ...' : '–°–æ—Ö—Ä–∞–Ω–∏—Ç—å'}
+              </button>
+              <button onClick={addStudentLife} className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm">
+                –î–æ–±–∞–≤–∏—Ç—å
+              </button>
+            </div>
+          </div>
+          <div className="p-6 space-y-6">
+            {loadingStudentLife ? (
+              <p className="text-gray-600">–ó–∞–≥—Ä—É–∑–∫–∞...</p>
+            ) : (
+              studentLife.map((item) => (
+                <div key={item.id} className="border rounded-lg p-4 space-y-4">
+                  <input
+                    type="text"
+                    value={item.title}
+                    onChange={(e) => updateStudentLifeField(item.id, 'title', e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                  />
+                  <textarea
+                    value={item.description}
+                    onChange={(e) => updateStudentLifeField(item.id, 'description', e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                    rows={2}
+                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">–§–æ—Ç–æ–≥—Ä–∞—Ñ–∏–∏</label>
+                    <div className="flex flex-wrap gap-3 mb-3">
+                      {item.images.map((url, index) => (
+                        <div key={url} className="relative w-24 h-24 border rounded-lg overflow-hidden">
+                          <img src={url} className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => removeStudentLifeImage(item.id, index)}
+                            className="absolute top-1 right-1 text-xs bg-red-600 text-white px-1 rounded"
+                          >
+                            √ó
+                          </button>
                         </div>
                       ))}
                     </div>
-                  )}
+                    <input
+                      type="file"
+                      multiple
+                      onChange={async (e) => {
+                        if (!e.target.files?.length) return
+                        try {
+                          const urls = await uploadStudentLifeImages(e.target.files)
+                          updateStudentLifeField(item.id, 'images', [...item.images, ...urls])
+                        } catch (error) {
+                          console.error('Error uploading images:', error)
+                          alert('–û—à–∏–±–∫–∞ –ø—Ä–∏ –∑–∞–≥—Ä—É–∑–∫–µ –∏–∑–æ–±—Ä–∞–∂–µ–Ω–∏–π')
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
+              ))
+            )}
           </div>
-        </div>
+        </section>
       </div>
     </div>
-  );
+  )
 }
