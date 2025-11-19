@@ -67,6 +67,50 @@ router.post('/news/documents', validateFileCount(50), uploadDocuments.array('fil
   }
 });
 
+// Загрузка изображений для конструкторных страниц
+router.post('/pages/images', validateFileCount(50), uploadImages.array('files', 20), (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'Файлы не были отправлены' });
+    }
+
+    res.json({
+      files: req.files.map((file) => ({
+        url: `/uploads/images/${file.filename}`,
+        filename: file.filename,
+        name: file.originalname,
+        size: file.size,
+        type: file.mimetype
+      }))
+    });
+  } catch (error) {
+    console.error('Ошибка загрузки изображений страницы:', error);
+    res.status(500).json({ message: 'Не удалось загрузить изображения' });
+  }
+});
+
+// Загрузка документов для конструкторных страниц
+router.post('/pages/documents', validateFileCount(50), uploadDocuments.array('files', 20), (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'Файлы не были отправлены' });
+    }
+
+    res.json({
+      files: req.files.map((file) => ({
+        url: `/uploads/documents/${file.filename}`,
+        filename: file.filename,
+        name: file.originalname,
+        size: file.size,
+        type: file.mimetype
+      }))
+    });
+  } catch (error) {
+    console.error('Ошибка загрузки документов страницы:', error);
+    res.status(500).json({ message: 'Не удалось загрузить документы' });
+  }
+});
+
 // Загрузка изображений для общежития
 router.post('/dormitory/images', uploadImages.array('files', 10), (req, res) => {
   try {

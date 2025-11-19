@@ -1,4 +1,4 @@
-export default function AdminDashboard() {
+﻿export default function AdminDashboard() {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     window.location.href = '/admin/login';
@@ -317,6 +317,38 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="p-5">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-slate-600 rounded-md flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">KS</span>
+                      </div>
+                    </div>
+                    <div className="ml-5 w-0 flex-1">
+                      <dl>
+                        <dt className="text-sm font-medium text-gray-500 truncate">
+                          Управление контентом
+                        </dt>
+                        <dd className="text-lg font-medium text-gray-900">
+                          Конструктор страниц
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-5 py-3">
+                  <div className="text-sm">
+                    <a
+                      href="/admin/pages"
+                      className="font-medium text-blue-600 hover:text-blue-500"
+                    >
+                      Перейти
+                    </a>
+                  </div>
+                </div>
+              </div>
+
 
                 {/* Информация о техникуме */}
                 <div className="bg-white overflow-hidden shadow rounded-lg col-span-1 md:col-span-2 lg:col-span-3">
